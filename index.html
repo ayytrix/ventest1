@@ -2,43 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Verifying..</title>
+    <title>Verify You Are Human</title>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Set Arial for the whole page */
+            text-align: center;
+            margin-top: 100px;
+        }
+        .container {
+            display: inline-block;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        button {
+            font-family: Arial, sans-serif; /* Ensure button uses Arial too */
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h2>Please verify you're a human before proceeding.</h2>
+    <div class="container">
+        <h2>Verify you are human</h2>
 
-    <form id="captchaForm">
-        <!-- Cloudflare Turnstile widget -->
-        <div class="cf-turnstile" 
-             data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ" 
-             data-callback="captchaSuccess">
-        </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ" data-callback="captchaSuccess"></div>
         <br>
-        <input type="submit" value="Continue" disabled>
-    </form>
+        <button id="continueBtn" disabled>Continue</button>
+    </div>
 
     <script>
-        // Called when user passes the CAPTCHA
+        let verified = false;
+
+        // Called when CAPTCHA is successfully solved
         function captchaSuccess(token) {
-            // Enable submit button
-            document.querySelector('#captchaForm input[type="submit"]').disabled = false;
+            verified = true;
+            document.getElementById('continueBtn').disabled = false;
         }
 
-        // Optional: prevent form submission unless CAPTCHA is solved
-        document.getElementById('captchaForm').addEventListener('submit', function(e) {
-            if (!document.querySelector('#captchaForm input[type="submit"]').disabled) {
-                alert("CAPTCHA verified! Proceeding...");
-                // Redirect to your main site
-                window.location.href = "Home.html";
+        // Only redirect if CAPTCHA is solved
+        document.getElementById('continueBtn').addEventListener('click', function() {
+            if (verified) {
+                window.location.href = 'home.html'; // your actual site
             } else {
-                e.preventDefault();
                 alert("Please complete the CAPTCHA first!");
             }
         });
     </script>
 </body>
 </html>
-
-
-
