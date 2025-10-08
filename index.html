@@ -1,133 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Venux - Home</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #d4d4d4;
-      font-family: Arial, sans-serif;
-      font-size: 13px;
-      color: #222;
-    }
-
-   
-    #main-header {
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      padding: 10px 20px;
-      border-bottom: 2px solid #071b36;
-      display: flex;
-      align-items: center;
-    }
-
-    #main-header img {
-      height: 52px;
-      object-fit: contain;
-    }
-
-   
-    #sub-header {
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      padding: 8px 15px;
-      border-bottom: 1px solid #000000;
-    }
-
-    #sub-header a {
-      color: white;
-      text-decoration: none;
-      margin-right: 20px;
-      font-weight: bold;
-    }
-
-    #sub-header a:hover {
-      text-decoration: underline;
-    }
-
-    
-    #notice {
-      background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 2px solid #a85f00;
-    }
-
-    
-    #page-content {
-      padding: 20px;
-    }
-
-    h2 {
-      font-size: 15px;
-      margin-bottom: 15px;
-      color: #1a1a1a;
-      border-bottom: 1px solid #aaa;
-      padding-bottom: 5px;
-    }
-
-    .news-box {
-      background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
-      border: 2px solid #999;
-      padding: 12px;
-      margin-bottom: 15px;
-      width: 600px;
-      box-shadow: 2px 2px 0px #aaa;
-    }
-
-    .news-title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .news-date {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 10px;
-    }
-
-    .news-body {
-      font-size: 13px;
-    }
-
-    /* Footer with Version */
-    #footer {
-      text-align: center;
-      font-size: 12px;
-      color: #444;
-      padding: 10px;
-      border-top: 2px solid #999;
-      background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
-      margin-top: 40px;
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <title>Verify You Are Human</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
+    <h2>Verify you are human</h2>
 
-  
-  <div id="main-header">
-    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  </div>
+    <form id="captchaForm">
+        <!-- Cloudflare Turnstile widget -->
+        <div class="cf-turnstile" 
+             data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ" 
+             data-callback="captchaSuccess">
+        </div>
+        <br>
+        <input type="submit" value="Continue" disabled>
+    </form>
 
-  <div id="sub-header">
-    <a href="index.html">Home</a>
-    <a href="unfinished.html">Games</a>
-    <a href="unfinished.html">Catalog</a>
-    <a href="unfinished.html">Users</a>
-    <a href="unfinished.html">Forum</a>
-    <a href="unfinished.html">Clans</a>
-    <a href="unfinished.html">Help</a>
-    <a href="unfinished.html">Downloads</a>
-  </div>
+    <script>
+        // Called when user passes the CAPTCHA
+        function captchaSuccess(token) {
+            // Enable submit button
+            document.querySelector('#captchaForm input[type="submit"]').disabled = false;
+        }
 
-  <!-- Notification -->
-  <div id="notice">
-    Welcome to Venux Testing!
-  </div>
-
+        // Optional: prevent form submission unless CAPTCHA is solved
+        document.getElementById('captchaForm').addEventListener('submit', function(e) {
+            if (!document.querySelector('#captchaForm input[type="submit"]').disabled) {
+                alert("CAPTCHA verified! Proceeding...");
+                // Redirect to your main site
+                window.location.href = "home.html";
+            } else {
+                e.preventDefault();
+                alert("Please complete the CAPTCHA first!");
+            }
+        });
+    </script>
+</body>
+</html>
   <!-- Content -->
   <div id="page-content">
     <h2>Latest News</h2>
@@ -158,6 +69,7 @@
 
 </body>
 </html>
+
 
 
 
