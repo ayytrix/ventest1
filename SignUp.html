@@ -152,6 +152,7 @@
       margin: 15px 0;
     }
   </style>
+
   <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
@@ -173,41 +174,21 @@
     <a href="Create.html">Create</a>
   </div>
 
-  <!-- Notification -->
-<div id="notice">Loading...</div>
-
-<script>
-  // The link to fetch text from
-  const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc"; // replace with your actual URL
-
-  // Get the notice div
-  const notice = document.getElementById("notice");
-
-  // Fetch the text from the link
-  fetch(textLink)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.text();
-    })
-    .then(data => {
-      // Set the text of the notice div
-      notice.textContent = data;
-    })
-    .catch(error => {
-      // Handle errors
-      notice.textContent = "Failed to load message.";
-      console.error("Error fetching message:", error);
-    });
-</script>
-
-
+  <!-- Dynamic notice -->
+  <div id="notice">Loading...</div>
+  <script>
+    const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc";
+    const notice = document.getElementById("notice");
+    fetch(textLink)
+      .then(r => r.ok ? r.text() : "Failed to load")
+      .then(data => notice.textContent = data)
+      .catch(() => notice.textContent = "Failed to load message.");
+  </script>
 
   <div id="page-content">
     <div class="signup-box">
       <h2>Sign Up</h2>
-      <form id="signupForm" method="get">
+      <form id="signupForm">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
 
@@ -224,7 +205,6 @@
         <div id="passwordSuccess" class="success-message">Passwords match!</div>
 
         <div class="turnstile-wrapper">
-          <!-- Site Keys and stuff-->
           <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ"></div>
         </div>
 
@@ -241,7 +221,29 @@
     © 2025, Venux All rights reserved
   </div>
 
-  <script>
+  <!-- Firebase + Auth integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+      authDomain: "venux1.firebaseapp.com",
+      projectId: "venux1",
+      storageBucket: "venux1.firebasestorage.app",
+      messagingSenderId: "231055963335",
+      appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+      measurementId: "G-N36RRV95SW"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- Sign-up logic ---
     const form = document.getElementById('signupForm');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
@@ -255,14 +257,12 @@
         error.textContent = 'Password must be at least 6 characters long.';
         return false;
       }
-
       if (password.value !== confirmPassword.value) {
         success.style.display = 'none';
         error.style.display = 'block';
         error.textContent = 'Passwords do not match.';
         return false;
       }
-
       error.style.display = 'none';
       success.style.display = 'block';
       return true;
@@ -271,21 +271,39 @@
     password.addEventListener('input', checkPasswords);
     confirmPassword.addEventListener('input', checkPasswords);
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault(); // prevent the default redirect
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      // check password rules
       if (!checkPasswords()) return;
 
-      // check Cloudflare CAPTCHA
-      const tokenField = document.querySelector('input[name="cf-turnstile-response"]');
-      if (!tokenField || !tokenField.value) {
-        alert('Please complete the CAPTCHA before continuing.');
+      // Check Cloudflare CAPTCHA
+      const captchaToken = document.querySelector('input[name="cf-turnstile-response"]');
+      if (!captchaToken || !captchaToken.value) {
+        alert("Please complete the CAPTCHA before continuing.");
         return;
       }
 
-      // all good → redirect or handle next step
-      window.location.href = "Home.html";
+      const email = document.getElementById('email').value;
+      const pass = password.value;
+      const username = document.getElementById('username').value;
+
+      try {
+        // Create account in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        // Save username to Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          username: username,
+          email: email,
+          createdAt: new Date().toISOString()
+        });
+
+        alert(`Account created successfully, ${username}!`);
+        window.location.href = "Home.html";
+      } catch (err) {
+        alert("Error creating account: " + err.message);
+      }
     });
   </script>
 
