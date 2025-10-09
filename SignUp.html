@@ -347,25 +347,38 @@
 
       try {
         // Generate a unique email for Firebase Auth (since it requires email)
-        const uniqueEmail = `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@venux.local`;
+        // Use a consistent domain and clean the username
+        const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const timestamp = Date.now();
+        const uniqueEmail = `${cleanUsername}_${timestamp}@venux.local`;
+
+        console.log("Creating account with email:", uniqueEmail);
 
         // Create account in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, pass);
         const user = userCredential.user;
 
+        console.log("Firebase Auth user created:", user.uid);
+
         // Save username to Firestore
         await setDoc(doc(db, "users", user.uid), {
           username: username,
+          authEmail: uniqueEmail, // Store the generated email for login
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString()
         });
 
-        console.log("Account created successfully, redirecting...");
-        // Redirect to home page - will automatically happen due to onAuthStateChanged
+        console.log("Firestore document created");
+
+        // Force redirect to home page
+        window.location.href = "Home.html";
+        
       } catch (err) {
         console.error("Signup error:", err);
         if (err.code === 'auth/email-already-in-use') {
           alert("Username is already taken. Please choose a different username.");
+        } else if (err.code === 'auth/weak-password') {
+          alert("Password is too weak. Please use a stronger password.");
         } else {
           alert("Error creating account: " + err.message);
         }
