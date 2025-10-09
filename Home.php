@@ -18,11 +18,36 @@
       border-bottom: 2px solid #071b36;
       display: flex;
       align-items: center;
+      justify-content: space-between;
     }
 
     #main-header img {
       height: 52px;
       object-fit: contain;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-buttons button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .login-btn {
+      background: linear-gradient(to bottom, #4CAF50 0%, #45a049 100%);
+      color: white;
+    }
+
+    .logout-btn {
+      background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
+      color: white;
     }
 
     #sub-header {
@@ -104,6 +129,17 @@
       font-size: 13px;
     }
 
+    .welcome-message {
+      background: linear-gradient(to bottom, #4CAF50 0%, #45a049 100%);
+      color: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
     #footer {
       text-align: center;
       font-size: 12px;
@@ -119,10 +155,13 @@
 
   <div id="main-header">
     <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+    <div class="auth-buttons" id="authButtons">
+      <!-- Buttons will be dynamically added by JavaScript -->
+    </div>
   </div>
 
   <div id="sub-header">
-    <a href="Home.html">Home</a>
+    <a href="Home.php">Home</a>
     <a href="unfinished.html">Games</a>
     <a href="unfinished.html">Catalog</a>
     <a href="unfinished.html">Users</a>
@@ -136,23 +175,10 @@
   <!-- Notice bar -->
   <div id="notice">Loading...</div>
 
-  <!-- Dynamic notice text loader -->
-  <script>
-    const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc";
-    const notice = document.getElementById("notice");
-
-    fetch(textLink)
-      .then(response => response.ok ? response.text() : "Failed to load message.")
-      .then(data => {
-        notice.textContent = data;
-      })
-      .catch(() => {
-        notice.textContent = "Failed to load message.";
-      });
-  </script>
-
   <!-- Content -->
   <div id="page-content">
+    <div id="welcomeContainer"></div>
+    
     <h2>Latest News</h2>
 
     <div class="news-box">
@@ -199,14 +225,32 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const noticeBar = document.getElementById("notice");
+    const authButtons = document.getElementById("authButtons");
+    const welcomeContainer = document.getElementById("welcomeContainer");
+
+    // Redirect to login if not authenticated
+    function checkAuth() {
+      const user = auth.currentUser;
+      if (!user) {
+        window.location.href = "login.php";
+        return false;
+      }
+      return true;
+    }
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // User is signed in
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const username = userDoc.exists() ? userDoc.data().username : "User";
+        
+        // Update notice bar
         noticeBar.textContent = `Welcome, ${username}!`;
 
-        // Create a logout button
+        // Create welcome message
+        welcomeContainer.innerHTML = `<div class="welcome-message">Welcome back, ${username}!</div>`;
+
+        // Create logout button in notice
         const logoutBtn = document.createElement("button");
         logoutBtn.textContent = "Log Out";
         logoutBtn.onclick = async () => {
@@ -214,10 +258,27 @@
           window.location.reload();
         };
         noticeBar.appendChild(logoutBtn);
+
+        // Update auth buttons in header
+        authButtons.innerHTML = `
+          <span style="color: white; margin-right: 10px;">Hello, ${username}</span>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        `;
+
       } else {
-        noticeBar.textContent = "You are not logged in.";
+        // User is not signed in - redirect to login
+        window.location.href = "login.php";
       }
     });
+
+    // Global logout function
+    window.logout = async function() {
+      await signOut(auth);
+      window.location.href = "login.php";
+    };
+
+    // Check auth on page load
+    checkAuth();
   </script>
 
 </body>
