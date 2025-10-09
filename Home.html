@@ -250,13 +250,36 @@
 
 
 
-  <!-- Notification -->
+   <!-- Notification -->
+<div id="notice">Loading...</div>
 
-  <div id="notice">
+<script>
+  // The link to fetch text from
+  const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc"; // replace with your actual URL
 
-    Welcome to Venux!
+  // Get the notice div
+  const notice = document.getElementById("notice");
 
-  </div>
+  // Fetch the text from the link
+  fetch(textLink)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.text();
+    })
+    .then(data => {
+      // Set the text of the notice div
+      notice.textContent = data;
+    })
+    .catch(error => {
+      // Handle errors
+      notice.textContent = "Failed to load message.";
+      console.error("Error fetching message:", error);
+    });
+</script>
+
+
 
 
 
