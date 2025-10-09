@@ -170,7 +170,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -184,6 +185,14 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Redirect if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "Home.html";
+      }
+    });
 
     const loginBtn = document.getElementById("loginBtn");
     const usernameInput = document.getElementById("username");
@@ -199,18 +208,44 @@
         return;
       }
 
-      const fakeEmail = `${username}@venux.local`;
+      // Generate the same unique email format used in signup
+      const uniqueEmail = `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@venux.local`;
 
       try {
-        await signInWithEmailAndPassword(auth, fakeEmail, password);
-        localStorage.setItem("venux_username", username);
+        const userCredential = await signInWithEmailAndPassword(auth, uniqueEmail, password);
+        const user = userCredential.user;
+        
+        // Update last login time
+        try {
+          await updateDoc(doc(db, "users", user.uid), {
+            lastLogin: new Date().toISOString()
+          });
+        } catch (updateError) {
+          console.log("Could not update last login time:", updateError);
+        }
+        
         window.location.href = "Home.html";
       } catch (error) {
         console.error("Login error:", error);
-        if (error.code === "auth/user-not-found") errorMessage.textContent = "Username not found.";
-        else if (error.code === "auth/wrong-password") errorMessage.textContent = "Incorrect password.";
-        else errorMessage.textContent = "Login failed. Try again.";
+        if (error.code === "auth/user-not-found") {
+          errorMessage.textContent = "Username not found.";
+        } else if (error.code === "auth/wrong-password") {
+          errorMessage.textContent = "Incorrect password.";
+        } else if (error.code === "auth/invalid-email") {
+          errorMessage.textContent = "Invalid username format.";
+        } else {
+          errorMessage.textContent = "Login failed. Please try again.";
+        }
       }
+    });
+
+    // Allow login with Enter key
+    usernameInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") loginBtn.click();
+    });
+    
+    passwordInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") loginBtn.click();
     });
   </script>
 </body>
