@@ -30,15 +30,10 @@
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .auth-buttons span {
       color: white;
-      font-weight: bold;
-      font-size: 13px;
     }
 
-    .auth-buttons button {
+    .logout-btn {
       padding: 8px 15px;
       border: none;
       border-radius: 4px;
@@ -121,12 +116,6 @@
       background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
       margin-top: 40px;
     }
-
-    .loading {
-      text-align: center;
-      padding: 50px;
-      font-size: 16px;
-    }
   </style>
 </head>
 <body>
@@ -158,17 +147,9 @@
     © 2025, Venux All rights reserved
   </div>
 
-  <!-- Firebase Auth Only -->
   <script type="module">
-    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-
-    // Clean up any existing Firebase apps
-    if (getApps().length > 0) {
-      for (const app of getApps()) {
-        await deleteApp(app);
-      }
-    }
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -182,41 +163,27 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
     const noticeBar = document.getElementById("notice");
     const authButtons = document.getElementById("authButtons");
     const pageContent = document.getElementById("page-content");
 
-    console.log("Home page loaded, checking auth state...");
-
-    let authChecked = false;
-
     onAuthStateChanged(auth, async (user) => {
-      console.log("Auth state changed - User:", user);
-
-      if (authChecked) return;
-      authChecked = true;
-
       if (user) {
-        // Retrieve saved Venux username from localStorage
-        const username = localStorage.getItem('venux_username') || "Player";
+        const username = localStorage.getItem("venux_username") || "User";
 
-        // Display username (not email)
-        noticeBar.innerHTML = `Welcome, ${username}!`;
+        noticeBar.textContent = `Welcome, ${username}!`;
 
-        // Header user info + logout button
         authButtons.innerHTML = `
           <span>Hello, ${username}</span>
-          <button id="logoutBtn">Logout</button>
+          <button class="logout-btn" id="logoutBtn">Logout</button>
         `;
 
         document.getElementById("logoutBtn").onclick = async () => {
           await signOut(auth);
-          localStorage.removeItem('venux_username');
+          localStorage.removeItem("venux_username");
           window.location.href = "Login.html";
         };
 
-        // Main content (no green welcome box)
         pageContent.innerHTML = `
           <h2>Latest News</h2>
           <div class="news-box">
@@ -237,8 +204,7 @@
           </div>
         `;
       } else {
-        console.log("No user found, redirecting to login...");
-        setTimeout(() => (window.location.href = "Login.html"), 200);
+        window.location.href = "Login.html";
       }
     });
   </script>
