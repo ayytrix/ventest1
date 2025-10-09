@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Venux - Login </title>
+  <title>Venux - Login</title>
   <style>
     body {
       margin: 0;
@@ -80,7 +80,7 @@
       margin-bottom: 5px;
     }
 
-    .login-box input[type="text"],
+    .login-box input[type="email"],
     .login-box input[type="password"] {
       width: 100%;
       padding: 8px;
@@ -90,7 +90,7 @@
       font-size: 13px;
     }
 
-    .login-box input[type="submit"] {
+    .login-box button {
       width: 100%;
       padding: 10px;
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
@@ -99,10 +99,23 @@
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
+      margin-bottom: 10px;
     }
 
-    .login-box input[type="submit"]:hover {
+    .login-box button:hover {
       background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
+    }
+
+    .login-box button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 12px;
+      margin-bottom: 10px;
+      text-align: center;
     }
 
     .login-links {
@@ -150,48 +163,22 @@
     <a href="Create.html">Create</a>
   </div>
 
- <!-- Notification -->
-<div id="notice">Loading...</div>
-
-<script>
-  // The link to fetch text from
-  const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc"; // replace with your actual URL
-
-  // Get the notice div
-  const notice = document.getElementById("notice");
-
-  // Fetch the text from the link
-  fetch(textLink)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.text();
-    })
-    .then(data => {
-      // Set the text of the notice div
-      notice.textContent = data;
-    })
-    .catch(error => {
-      // Handle errors
-      notice.textContent = "Failed to load message.";
-      console.error("Error fetching message:", error);
-    });
-</script>
-
-
+  <!-- Notification -->
+  <div id="notice">Loading...</div>
 
   <div id="page-content">
     <div class="login-box">
       <h2>Login</h2>
-      <form action="Home.html" method="get">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-        <input type="submit" value="Login">
+        <div id="errorMessage" class="error-message"></div>
+
+        <button type="submit" id="loginBtn">Login</button>
       </form>
 
       <div class="login-links">
@@ -204,6 +191,82 @@
   <div id="footer">
     © 2025, Venux All rights reserved
   </div>
+
+  <!-- Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+      authDomain: "venux1.firebaseapp.com",
+      projectId: "venux1",
+      storageBucket: "venux1.firebasestorage.app",
+      messagingSenderId: "231055963335",
+      appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+      measurementId: "G-N36RRV95SW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Redirect to home if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "Home.html";
+      }
+    });
+
+    // Login form handler
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const loginBtn = document.getElementById('loginBtn');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+      errorMessage.textContent = '';
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // Redirect happens automatically due to onAuthStateChanged
+      } catch (error) {
+        errorMessage.textContent = getErrorMessage(error.code);
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    });
+
+    function getErrorMessage(errorCode) {
+      switch (errorCode) {
+        case 'auth/invalid-email':
+          return 'Invalid email address.';
+        case 'auth/user-disabled':
+          return 'This account has been disabled.';
+        case 'auth/user-not-found':
+          return 'No account found with this email.';
+        case 'auth/wrong-password':
+          return 'Incorrect password.';
+        case 'auth/too-many-requests':
+          return 'Too many failed attempts. Please try again later.';
+        default:
+          return 'Login failed. Please try again.';
+      }
+    }
+
+    // Dynamic notice
+    const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc";
+    const notice = document.getElementById("notice");
+    fetch(textLink)
+      .then(r => r.ok ? r.text() : "Failed to load")
+      .then(data => notice.textContent = data)
+      .catch(() => notice.textContent = "Failed to load message.");
+  </script>
 
 </body>
 </html>
