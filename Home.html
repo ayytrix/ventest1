@@ -150,6 +150,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -163,46 +164,57 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
     const noticeBar = document.getElementById("notice");
     const authButtons = document.getElementById("authButtons");
     const pageContent = document.getElementById("page-content");
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const username = localStorage.getItem("venux_username") || "User";
+        try {
+          // Get user data from Firestore
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          let username = "User";
+          
+          if (userDoc.exists()) {
+            username = userDoc.data().username || username;
+          }
 
-        noticeBar.textContent = `Welcome, ${username}!`;
+          noticeBar.textContent = `Welcome, ${username}!`;
 
-        authButtons.innerHTML = `
-          <span>Hello, ${username}</span>
-          <button class="logout-btn" id="logoutBtn">Logout</button>
-        `;
+          authButtons.innerHTML = `
+            <span>Hello, ${username}</span>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+          `;
 
-        document.getElementById("logoutBtn").onclick = async () => {
-          await signOut(auth);
-          localStorage.removeItem("venux_username");
+          document.getElementById("logoutBtn").onclick = async () => {
+            await signOut(auth);
+            window.location.href = "Login.html";
+          };
+
+          pageContent.innerHTML = `
+            <h2>Latest News</h2>
+            <div class="news-box">
+              <div class="news-title">Welcome to Venux!</div>
+              <div class="news-date">Posted: 8th October, 2025</div>
+              <div class="news-body">
+                This is for news happening in Venux!
+              </div>
+            </div>
+            <div class="news-box">
+              <div class="news-title">Update Log</div>
+              <div class="news-date">Posted: 8th October, 2025</div>
+              <div class="news-body">
+                - Added more pages<br>
+                - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
+                - Our website is live!
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error("Error loading user data:", error);
           window.location.href = "Login.html";
-        };
-
-        pageContent.innerHTML = `
-          <h2>Latest News</h2>
-          <div class="news-box">
-            <div class="news-title">Welcome to Venux!</div>
-            <div class="news-date">Posted: 8th October, 2025</div>
-            <div class="news-body">
-              This is for news happening in Venux!
-            </div>
-          </div>
-          <div class="news-box">
-            <div class="news-title">Update Log</div>
-            <div class="news-date">Posted: 8th October, 2025</div>
-            <div class="news-body">
-              - Added more pages<br>
-              - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
-              - Our website is live!
-            </div>
-          </div>
-        `;
+        }
       } else {
         window.location.href = "Login.html";
       }
