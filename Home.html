@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Venux - Login</title>
+  <title>Venux - Home</title>
   <style>
     body {
       margin: 0;
@@ -18,11 +18,36 @@
       border-bottom: 2px solid #071b36;
       display: flex;
       align-items: center;
+      justify-content: space-between;
     }
 
     #main-header img {
       height: 52px;
       object-fit: contain;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-buttons button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .login-btn {
+      background: linear-gradient(to bottom, #4CAF50 0%, #45a049 100%);
+      color: white;
+    }
+
+    .logout-btn {
+      background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
+      color: white;
     }
 
     #sub-header {
@@ -51,86 +76,68 @@
       border-bottom: 2px solid #a85f00;
     }
 
-    #page-content {
-      padding: 40px;
-      display: flex;
-      justify-content: center;
+    #notice button {
+      margin-left: 15px;
+      padding: 3px 8px;
+      font-size: 12px;
+      border: none;
+      border-radius: 3px;
+      background: white;
+      color: #cc7a00;
+      cursor: pointer;
+      font-weight: bold;
     }
 
-    .login-box {
+    #notice button:hover {
+      background: #ffe0b2;
+    }
+
+    #page-content {
+      padding: 20px;
+    }
+
+    h2 {
+      font-size: 15px;
+      margin-bottom: 15px;
+      color: #1a1a1a;
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 5px;
+    }
+
+    .news-box {
       background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
       border: 2px solid #999;
-      box-shadow: 2px 2px 0px #aaa;
-      padding: 25px 35px;
-      width: 380px;
-      border-radius: 6px;
-    }
-
-    .login-box h2 {
-      text-align: center;
-      font-size: 16px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #aaa;
-      padding-bottom: 8px;
-    }
-
-    .login-box label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .login-box input[type="email"],
-    .login-box input[type="password"] {
-      width: 100%;
-      padding: 8px;
+      padding: 12px;
       margin-bottom: 15px;
-      border: 1px solid #999;
-      border-radius: 3px;
+      width: 600px;
+      box-shadow: 2px 2px 0px #aaa;
+    }
+
+    .news-title {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .news-date {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .news-body {
       font-size: 13px;
     }
 
-    .login-box button {
-      width: 100%;
-      padding: 10px;
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+    .welcome-message {
+      background: linear-gradient(to bottom, #4CAF50 0%, #45a049 100%);
       color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-
-    .login-box button:hover {
-      background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
-    }
-
-    .login-box button:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-    }
-
-    .error-message {
-      color: red;
-      font-size: 12px;
-      margin-bottom: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
       text-align: center;
-    }
-
-    .login-links {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .login-links a {
-      color: #0b2c5a;
-      text-decoration: none;
       font-weight: bold;
-    }
-
-    .login-links a:hover {
-      text-decoration: underline;
+      font-size: 16px;
     }
 
     #footer {
@@ -143,12 +150,20 @@
       margin-top: 40px;
     }
 
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
 
   <div id="main-header">
     <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+    <div class="auth-buttons" id="authButtons">
+      <!-- Buttons will be dynamically added by JavaScript -->
+    </div>
   </div>
 
   <div id="sub-header">
@@ -163,39 +178,24 @@
     <a href="Create.html">Create</a>
   </div>
 
-  <!-- Notification -->
+  <!-- Notice bar -->
   <div id="notice">Loading...</div>
 
+  <!-- Content -->
   <div id="page-content">
-    <div class="login-box">
-      <h2>Login</h2>
-      <form id="loginForm">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
-
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-
-        <div id="errorMessage" class="error-message"></div>
-
-        <button type="submit" id="loginBtn">Login</button>
-      </form>
-
-      <div class="login-links">
-        <a href="SignUp.html">Create an Account</a> | 
-        <a href="forgot.html">Forgot Password?</a>
-      </div>
-    </div>
+    <div class="loading">Checking authentication...</div>
   </div>
 
+  <!-- Footer -->
   <div id="footer">
     © 2025, Venux All rights reserved
   </div>
 
-  <!-- Firebase Auth -->
+  <!-- Firebase user welcome script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -207,71 +207,82 @@
       measurementId: "G-N36RRV95SW"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    // Set persistence to LOCAL to maintain login state
+    auth.setPersistence('local');
     
-    // Set persistence to LOCAL to maintain login state across pages
-    setPersistence(auth, browserLocalPersistence);
+    const db = getFirestore(app);
+    const noticeBar = document.getElementById("notice");
+    const authButtons = document.getElementById("authButtons");
+    const pageContent = document.getElementById("page-content");
 
-    // Redirect to home if already logged in
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User already logged in, redirecting to home");
-        window.location.href = "Home.html";
-      }
-    });
-
-    // Login form handler
-    const loginForm = document.getElementById('loginForm');
-    const errorMessage = document.getElementById('errorMessage');
-    const loginBtn = document.getElementById('loginBtn');
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    onAuthStateChanged(auth, async (user) => {
+      console.log("Auth state changed:", user);
       
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      if (user) {
+        // User is signed in - show home page content
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const username = userDoc.exists() ? userDoc.data().username : "User";
+          
+          // Update notice bar
+          noticeBar.textContent = `Welcome, ${username}!`;
 
-      loginBtn.disabled = true;
-      loginBtn.textContent = 'Logging in...';
-      errorMessage.textContent = '';
+          // Create logout button in notice
+          const logoutBtn = document.createElement("button");
+          logoutBtn.textContent = "Log Out";
+          logoutBtn.onclick = async () => {
+            await signOut(auth);
+            window.location.reload();
+          };
+          noticeBar.appendChild(logoutBtn);
 
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log("Login successful:", userCredential.user);
-        // Redirect happens automatically due to onAuthStateChanged
-      } catch (error) {
-        console.error("Login error:", error);
-        errorMessage.textContent = getErrorMessage(error.code);
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login';
+          // Update auth buttons in header
+          authButtons.innerHTML = `
+            <span style="color: white; margin-right: 10px;">Hello, ${username}</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          `;
+
+          // Show home page content
+          pageContent.innerHTML = `
+            <div class="welcome-message">Welcome back, ${username}!</div>
+            <h2>Latest News</h2>
+            <div class="news-box">
+              <div class="news-title">Welcome to Venux!</div>
+              <div class="news-date">Posted: 8th October, 2025</div>
+              <div class="news-body">
+                This is for news happening in Venux!
+              </div>
+            </div>
+            <div class="news-box">
+              <div class="news-title">Update Log</div>
+              <div class="news-date">Posted: 8th October, 2025</div>
+              <div class="news-body">
+                - Added more pages<br>
+                - Greatblox is also great! https://greatblox.com/<br>
+                - Our website is live!
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          console.error("Error getting user data:", error);
+          window.location.href = "Login.html";
+        }
+
+      } else {
+        // User is not signed in - redirect to login.html
+        console.log("No user, redirecting to login");
+        window.location.href = "Login.html";
       }
     });
 
-    function getErrorMessage(errorCode) {
-      switch (errorCode) {
-        case 'auth/invalid-email':
-          return 'Invalid email address.';
-        case 'auth/user-disabled':
-          return 'This account has been disabled.';
-        case 'auth/user-not-found':
-          return 'No account found with this email.';
-        case 'auth/wrong-password':
-          return 'Incorrect password.';
-        case 'auth/too-many-requests':
-          return 'Too many failed attempts. Please try again later.';
-        default:
-          return 'Login failed. Please try again.';
-      }
-    }
-
-    // Dynamic notice
-    const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc";
-    const notice = document.getElementById("notice");
-    fetch(textLink)
-      .then(r => r.ok ? r.text() : "Failed to load")
-      .then(data => notice.textContent = data)
-      .catch(() => notice.textContent = "Failed to load message.");
+    // Global logout function
+    window.logout = async function() {
+      await signOut(auth);
+      window.location.href = "Login.html";
+    };
   </script>
 
 </body>
