@@ -210,25 +210,28 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    // Set persistence to LOCAL to maintain login state
-    auth.setPersistence('local');
-    
     const db = getFirestore(app);
     const noticeBar = document.getElementById("notice");
     const authButtons = document.getElementById("authButtons");
     const pageContent = document.getElementById("page-content");
 
+    console.log("Home page loaded, checking auth state...");
+
     onAuthStateChanged(auth, async (user) => {
-      console.log("Auth state changed:", user);
+      console.log("Auth state changed - User:", user);
       
       if (user) {
         // User is signed in - show home page content
+        console.log("User is signed in:", user.email);
+        
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           const username = userDoc.exists() ? userDoc.data().username : "User";
           
+          console.log("User data loaded:", username);
+
           // Update notice bar
-          noticeBar.textContent = `Welcome, ${username}!`;
+          noticeBar.innerHTML = `Welcome, ${username}!`;
 
           // Create logout button in notice
           const logoutBtn = document.createElement("button");
@@ -266,20 +269,42 @@
               </div>
             </div>
           `;
+
         } catch (error) {
           console.error("Error getting user data:", error);
-          window.location.href = "Login.html";
+          // If there's an error getting user data, still show the page but with generic welcome
+          pageContent.innerHTML = `
+            <div class="welcome-message">Welcome back!</div>
+            <h2>Latest News</h2>
+            <div class="news-box">
+              <div class="news-title">Welcome to Venux!</div>
+              <div class="news-date">Posted: 8th October, 2025</div>
+              <div class="news-body">
+                This is for news happening in Venux!
+              </div>
+            </div>
+            <div class="news-box">
+              <div class="news-title">Update Log</div>
+              <div class="news-date">Posted: 8th October, 2025</div>
+              <div class="news-body">
+                - Added more pages<br>
+                - Greatblox is also great! https://greatblox.com/<br>
+                - Our website is live!
+              </div>
+            </div>
+          `;
         }
 
       } else {
         // User is not signed in - redirect to login.html
-        console.log("No user, redirecting to login");
+        console.log("No user found, redirecting to login...");
         window.location.href = "Login.html";
       }
     });
 
     // Global logout function
     window.logout = async function() {
+      console.log("Logging out...");
       await signOut(auth);
       window.location.href = "Login.html";
     };
