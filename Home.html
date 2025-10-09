@@ -144,19 +144,31 @@
   </div>
 
   <div id="footer">
-    © 2025, Venux All rights reserved
+    © 2025, Venux — All rights reserved
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setLogLevel 
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    // ✅ Suppress Firestore WebChannel "Listen" transport warnings
+    setLogLevel('error'); // Only log real errors
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
       authDomain: "venux1.firebaseapp.com",
       projectId: "venux1",
-      storageBucket: "venux1.firebasestorage.app",
+      storageBucket: "venux1.appspot.com",
       messagingSenderId: "231055963335",
       appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
       measurementId: "G-N36RRV95SW"
@@ -172,12 +184,13 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          // Get user data from Firestore
-          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+
           let username = "User";
-          
           if (userDoc.exists()) {
-            username = userDoc.data().username || username;
+            const data = userDoc.data();
+            if (data.username) username = data.username;
           }
 
           noticeBar.textContent = `Welcome, ${username}!`;
@@ -187,10 +200,10 @@
             <button class="logout-btn" id="logoutBtn">Logout</button>
           `;
 
-          document.getElementById("logoutBtn").onclick = async () => {
+          document.getElementById("logoutBtn").addEventListener("click", async () => {
             await signOut(auth);
             window.location.href = "Login.html";
-          };
+          });
 
           pageContent.innerHTML = `
             <h2>Latest News</h2>
@@ -213,7 +226,7 @@
           `;
         } catch (error) {
           console.error("Error loading user data:", error);
-          window.location.href = "Login.html";
+          noticeBar.textContent = "Error loading user info.";
         }
       } else {
         window.location.href = "Login.html";
