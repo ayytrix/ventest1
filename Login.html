@@ -80,7 +80,7 @@
       margin-bottom: 5px;
     }
 
-    .login-box input[type="email"],
+    .login-box input[type="text"],
     .login-box input[type="password"] {
       width: 100%;
       padding: 8px;
@@ -169,8 +169,8 @@
     <div class="login-box">
       <h2>Login</h2>
       <form id="loginForm">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Enter your password" required>
@@ -195,6 +195,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -208,6 +209,7 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
     
     let authChecked = false;
 
@@ -236,7 +238,7 @@
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const email = document.getElementById('email').value;
+      const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
 
       loginBtn.disabled = true;
@@ -244,7 +246,25 @@
       errorMessage.textContent = '';
 
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // First, find the user by username in Firestore to get their email
+        console.log("Looking up username:", username);
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("username", "==", username));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          throw new Error('auth/user-not-found');
+        }
+        
+        // Get the first matching user (usernames should be unique)
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+        const userEmail = userData.email;
+        
+        console.log("Found user email:", userEmail);
+        
+        // Now login with the email and password
+        const userCredential = await signInWithEmailAndPassword(auth, userEmail, password);
         console.log("Login successful:", userCredential.user);
         
         // Wait a moment for auth state to propagate, then redirect
@@ -254,26 +274,25 @@
         
       } catch (error) {
         console.error("Login error:", error);
-        errorMessage.textContent = getErrorMessage(error.code);
+        errorMessage.textContent = getErrorMessage(error.message);
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
       }
     });
 
-    function getErrorMessage(errorCode) {
-      switch (errorCode) {
-        case 'auth/invalid-email':
-          return 'Invalid email address.';
-        case 'auth/user-disabled':
-          return 'This account has been disabled.';
-        case 'auth/user-not-found':
-          return 'No account found with this email.';
-        case 'auth/wrong-password':
-          return 'Incorrect password.';
-        case 'auth/too-many-requests':
-          return 'Too many failed attempts. Please try again later.';
-        default:
-          return 'Login failed. Please try again.';
+    function getErrorMessage(error) {
+      if (error.includes('auth/user-not-found')) {
+        return 'Username not found.';
+      } else if (error.includes('auth/wrong-password')) {
+        return 'Incorrect password.';
+      } else if (error.includes('auth/invalid-email')) {
+        return 'Invalid email format.';
+      } else if (error.includes('auth/user-disabled')) {
+        return 'This account has been disabled.';
+      } else if (error.includes('auth/too-many-requests')) {
+        return 'Too many failed attempts. Please try again later.';
+      } else {
+        return 'Login failed. Please try again.';
       }
     }
 
