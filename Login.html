@@ -12,90 +12,168 @@
       color: #222;
     }
 
-    .login-container {
-      width: 400px;
-      margin: 100px auto;
-      background: white;
+    #main-header {
+      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+      padding: 10px 20px;
+      border-bottom: 2px solid #071b36;
+      display: flex;
+      align-items: center;
+    }
+
+    #main-header img {
+      height: 52px;
+      object-fit: contain;
+    }
+
+    #sub-header {
+      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+      padding: 8px 15px;
+      border-bottom: 1px solid #000000;
+    }
+
+    #sub-header a {
+      color: white;
+      text-decoration: none;
+      margin-right: 20px;
+      font-weight: bold;
+    }
+
+    #sub-header a:hover {
+      text-decoration: underline;
+    }
+
+    #notice {
+      background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 2px solid #a85f00;
+    }
+
+    #page-content {
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .login-box {
+      background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
       border: 2px solid #999;
       box-shadow: 2px 2px 0px #aaa;
-      padding: 20px;
+      padding: 25px 35px;
+      width: 380px;
       border-radius: 6px;
     }
 
-    h1 {
+    .login-box h2 {
       text-align: center;
-      color: #0b2c5a;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 8px;
     }
 
-    input {
+    .login-box input {
       width: 100%;
       padding: 8px;
-      margin: 8px 0;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      border: 1px solid #999;
+      border-radius: 3px;
+      font-size: 13px;
     }
 
-    button {
+    .login-box button {
       width: 100%;
       padding: 10px;
+      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+      color: white;
       border: none;
       border-radius: 4px;
-      background: linear-gradient(to bottom, #4CAF50 0%, #45a049 100%);
-      color: white;
       font-weight: bold;
-      font-size: 14px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
-    button:hover {
-      background: linear-gradient(to bottom, #45a049 0%, #3e8e41 100%);
+    .login-box button:hover {
+      background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
     }
 
-    .error {
+    .error-message {
       color: red;
+      font-size: 12px;
+      margin-bottom: 10px;
       text-align: center;
-      margin-top: 10px;
     }
 
-    .link {
+    .login-links {
       text-align: center;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
-    .link a {
+    .login-links a {
       color: #0b2c5a;
-      font-weight: bold;
       text-decoration: none;
+      font-weight: bold;
     }
 
-    .link a:hover {
+    .login-links a:hover {
       text-decoration: underline;
+    }
+
+    #footer {
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      padding: 10px;
+      border-top: 2px solid #999;
+      background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login to Venux</h1>
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button id="loginBtn">Login</button>
-    <div class="error" id="errorMsg"></div>
-    <div class="link">
-      Don't have an account? <a href="Signup.html">Sign up</a>
+
+  <div id="main-header">
+    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+  </div>
+
+  <div id="sub-header">
+    <a href="Home.html">Home</a>
+    <a href="unfinished.html">Games</a>
+    <a href="unfinished.html">Catalog</a>
+    <a href="unfinished.html">Users</a>
+    <a href="unfinished.html">Forum</a>
+    <a href="unfinished.html">Clans</a>
+    <a href="unfinished.html">Help</a>
+    <a href="unfinished.html">Downloads</a>
+    <a href="Create.html">Create</a>
+  </div>
+
+  <div id="notice">Please log in to continue.</div>
+
+  <div id="page-content">
+    <div class="login-box">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Enter your username" required>
+      <input type="password" id="password" placeholder="Enter your password" required>
+      <div id="errorMessage" class="error-message"></div>
+      <button id="loginBtn">Login</button>
+
+      <div class="login-links">
+        <a href="SignUp.html">Create an Account</a> | 
+        <a href="forgot.html">Forgot Password?</a>
+      </div>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  <div id="footer">
+    © 2025, Venux All rights reserved
+  </div>
 
-    // 🔧 Clean up existing Firebase instances (prevents Firestore logs)
-    if (getApps().length > 0) {
-      for (const app of getApps()) {
-        await deleteApp(app);
-      }
-    }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -110,41 +188,31 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const loginBtn = document.getElementById("loginBtn");
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
-    const errorMsg = document.getElementById("errorMsg");
+    const errorMessage = document.getElementById("errorMessage");
+    const loginBtn = document.getElementById("loginBtn");
 
-    // 🧠 Login by username (stored locally as email@venux.fake)
     loginBtn.addEventListener("click", async () => {
       const username = usernameInput.value.trim();
       const password = passwordInput.value;
 
       if (!username || !password) {
-        errorMsg.textContent = "Please enter both username and password.";
+        errorMessage.textContent = "Please enter both username and password.";
         return;
       }
 
-      // Venux fake email format (usernames become unique emails)
-      const fakeEmail = `${username}@venux.fake`;
+      const fakeEmail = `${username}@venux.local`;
 
       try {
-        // Attempt login with fake email
         await signInWithEmailAndPassword(auth, fakeEmail, password);
-
-        // Save username locally for display on Home page
         localStorage.setItem("venux_username", username);
-
         window.location.href = "Home.html";
       } catch (error) {
         console.error("Login error:", error);
-        if (error.code === "auth/user-not-found") {
-          errorMsg.textContent = "User not found. Please check your username or sign up first.";
-        } else if (error.code === "auth/wrong-password") {
-          errorMsg.textContent = "Incorrect password. Try again.";
-        } else {
-          errorMsg.textContent = "Login failed: " + error.message;
-        }
+        if (error.code === "auth/user-not-found") errorMessage.textContent = "Username not found.";
+        else if (error.code === "auth/wrong-password") errorMessage.textContent = "Incorrect password.";
+        else errorMessage.textContent = "Login failed. Please try again.";
       }
     });
   </script>
