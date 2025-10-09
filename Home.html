@@ -149,6 +149,12 @@
       background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
       margin-top: 40px;
     }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -161,7 +167,7 @@
   </div>
 
   <div id="sub-header">
-    <a href="Home.php">Home</a>
+    <a href="Home.html">Home</a>
     <a href="unfinished.html">Games</a>
     <a href="unfinished.html">Catalog</a>
     <a href="unfinished.html">Users</a>
@@ -177,27 +183,7 @@
 
   <!-- Content -->
   <div id="page-content">
-    <div id="welcomeContainer"></div>
-    
-    <h2>Latest News</h2>
-
-    <div class="news-box">
-      <div class="news-title">Welcome to Venux!</div>
-      <div class="news-date">Posted: 8th October, 2025</div>
-      <div class="news-body">
-        This is for news happening in Venux!
-      </div>
-    </div>
-
-    <div class="news-box">
-      <div class="news-title">Update Log</div>
-      <div class="news-date">Posted: 8th October, 2025</div>
-      <div class="news-body">
-        - Added more pages<br>
-        - Greatblox is also great! https://greatblox.com/<br>
-        - Our website is live!
-      </div>
-    </div>
+    <div class="loading">Checking authentication...</div>
   </div>
 
   <!-- Footer -->
@@ -226,29 +212,16 @@
     const db = getFirestore(app);
     const noticeBar = document.getElementById("notice");
     const authButtons = document.getElementById("authButtons");
-    const welcomeContainer = document.getElementById("welcomeContainer");
-
-    // Redirect to login if not authenticated
-    function checkAuth() {
-      const user = auth.currentUser;
-      if (!user) {
-        window.location.href = "login.php";
-        return false;
-      }
-      return true;
-    }
+    const pageContent = document.getElementById("page-content");
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // User is signed in
+        // User is signed in - show home page content
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const username = userDoc.exists() ? userDoc.data().username : "User";
         
         // Update notice bar
         noticeBar.textContent = `Welcome, ${username}!`;
-
-        // Create welcome message
-        welcomeContainer.innerHTML = `<div class="welcome-message">Welcome back, ${username}!</div>`;
 
         // Create logout button in notice
         const logoutBtn = document.createElement("button");
@@ -265,20 +238,39 @@
           <button class="logout-btn" onclick="logout()">Logout</button>
         `;
 
+        // Show home page content
+        pageContent.innerHTML = `
+          <div class="welcome-message">Welcome back, ${username}!</div>
+          <h2>Latest News</h2>
+          <div class="news-box">
+            <div class="news-title">Welcome to Venux!</div>
+            <div class="news-date">Posted: 8th October, 2025</div>
+            <div class="news-body">
+              This is for news happening in Venux!
+            </div>
+          </div>
+          <div class="news-box">
+            <div class="news-title">Update Log</div>
+            <div class="news-date">Posted: 8th October, 2025</div>
+            <div class="news-body">
+              - Added more pages<br>
+              - Greatblox is also great! https://greatblox.com/<br>
+              - Our website is live!
+            </div>
+          </div>
+        `;
+
       } else {
         // User is not signed in - redirect to login
-        window.location.href = "login.php";
+        window.location.href = "Login.html";
       }
     });
 
     // Global logout function
     window.logout = async function() {
       await signOut(auth);
-      window.location.href = "login.php";
+      window.location.href = "Login.html";
     };
-
-    // Check auth on page load
-    checkAuth();
   </script>
 
 </body>
