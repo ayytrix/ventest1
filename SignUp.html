@@ -222,7 +222,7 @@
   <!-- Firebase + Auth integration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
     import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     // Your Firebase configuration
@@ -239,11 +239,14 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
+    
+    // Set persistence to LOCAL to maintain login state across pages
+    setPersistence(auth, browserLocalPersistence);
 
     // Redirect to home if already logged in
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log("User already logged in, redirecting to home");
         window.location.href = "Home.html";
       }
     });
@@ -308,9 +311,10 @@
           createdAt: new Date().toISOString()
         });
 
-        alert(`Account created successfully, ${username}!`);
+        console.log("Account created successfully, redirecting...");
         // Redirect to home page - will automatically happen due to onAuthStateChanged
       } catch (err) {
+        console.error("Signup error:", err);
         alert("Error creating account: " + err.message);
         signupBtn.disabled = false;
         signupBtn.textContent = 'Create Account';
