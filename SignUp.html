@@ -91,7 +91,7 @@
       font-size: 13px;
     }
 
-    .signup-box input[type="submit"] {
+    .signup-box button {
       width: 100%;
       padding: 10px;
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
@@ -100,10 +100,16 @@
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 10px;
     }
 
-    .signup-box input[type="submit"]:hover {
+    .signup-box button:hover {
       background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
+    }
+
+    .signup-box button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
     }
 
     .error-message {
@@ -176,19 +182,11 @@
 
   <!-- Dynamic notice -->
   <div id="notice">Loading...</div>
-  <script>
-    const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc";
-    const notice = document.getElementById("notice");
-    fetch(textLink)
-      .then(r => r.ok ? r.text() : "Failed to load")
-      .then(data => notice.textContent = data)
-      .catch(() => notice.textContent = "Failed to load message.");
-  </script>
 
   <div id="page-content">
     <div class="signup-box">
       <h2>Sign Up</h2>
-      <form id="signupForm" class="signupForm">
+      <form id="signupForm">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
 
@@ -208,7 +206,7 @@
           <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ"></div>
         </div>
 
-        <input type="submit" value="Create Account">
+        <button type="submit" id="signupBtn">Create Account</button>
       </form>
 
       <div class="signup-links">
@@ -224,7 +222,7 @@
   <!-- Firebase + Auth integration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
     import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     // Your Firebase configuration
@@ -243,12 +241,20 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Redirect to home if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "Home.html";
+      }
+    });
+
     // --- Sign-up logic ---
     const form = document.getElementById('signupForm');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
     const error = document.getElementById('passwordError');
     const success = document.getElementById('passwordSuccess');
+    const signupBtn = document.getElementById('signupBtn');
 
     function checkPasswords() {
       if (password.value.length < 6) {
@@ -287,6 +293,9 @@
       const pass = password.value;
       const username = document.getElementById('username').value;
 
+      signupBtn.disabled = true;
+      signupBtn.textContent = 'Creating Account...';
+
       try {
         // Create account in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
@@ -300,11 +309,21 @@
         });
 
         alert(`Account created successfully, ${username}!`);
-        window.location.href = "https://venux.fun/Home.html"
+        // Redirect to home page - will automatically happen due to onAuthStateChanged
       } catch (err) {
         alert("Error creating account: " + err.message);
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
       }
     });
+
+    // Dynamic notice
+    const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc";
+    const notice = document.getElementById("notice");
+    fetch(textLink)
+      .then(r => r.ok ? r.text() : "Failed to load")
+      .then(data => notice.textContent = data)
+      .catch(() => notice.textContent = "Failed to load message.");
   </script>
 
 </body>
