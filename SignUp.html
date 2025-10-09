@@ -189,9 +189,11 @@
       <form id="signupForm">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
+        <div id="usernameError" class="error-message"></div>
 
         <label for="email">Email Address</label>
         <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        <div id="emailError" class="error-message"></div>
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Create a password" required>
@@ -222,8 +224,8 @@
   <!-- Firebase + Auth integration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, setDoc, doc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     // Your Firebase configuration
     const firebaseConfig = {
@@ -239,9 +241,7 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    
-    // Set persistence to LOCAL to maintain login state across pages
-    setPersistence(auth, browserLocalPersistence);
+    const db = getFirestore(app);
 
     // Redirect to home if already logged in
     onAuthStateChanged(auth, (user) => {
@@ -253,37 +253,114 @@
 
     // --- Sign-up logic ---
     const form = document.getElementById('signupForm');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
-    const error = document.getElementById('passwordError');
-    const success = document.getElementById('passwordSuccess');
+    const usernameError = document.getElementById('usernameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const passwordSuccess = document.getElementById('passwordSuccess');
     const signupBtn = document.getElementById('signupBtn');
+
+    // Check if username is available
+    async function checkUsernameAvailability(username) {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.empty;
+    }
+
+    // Check if email is available
+    async function checkEmailAvailability(email) {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.empty;
+    }
 
     function checkPasswords() {
       if (password.value.length < 6) {
-        success.style.display = 'none';
-        error.style.display = 'block';
-        error.textContent = 'Password must be at least 6 characters long.';
+        passwordSuccess.style.display = 'none';
+        passwordError.style.display = 'block';
+        passwordError.textContent = 'Password must be at least 6 characters long.';
         return false;
       }
       if (password.value !== confirmPassword.value) {
-        success.style.display = 'none';
-        error.style.display = 'block';
-        error.textContent = 'Passwords do not match.';
+        passwordSuccess.style.display = 'none';
+        passwordError.style.display = 'block';
+        passwordError.textContent = 'Passwords do not match.';
         return false;
       }
-      error.style.display = 'none';
-      success.style.display = 'block';
+      passwordError.style.display = 'none';
+      passwordSuccess.style.display = 'block';
       return true;
     }
 
     password.addEventListener('input', checkPasswords);
     confirmPassword.addEventListener('input', checkPasswords);
 
+    // Check username availability on input
+    usernameInput.addEventListener('blur', async () => {
+      const username = usernameInput.value.trim();
+      if (username.length < 3) {
+        usernameError.style.display = 'block';
+        usernameError.textContent = 'Username must be at least 3 characters.';
+        return;
+      }
+      
+      const isAvailable = await checkUsernameAvailability(username);
+      if (!isAvailable) {
+        usernameError.style.display = 'block';
+        usernameError.textContent = 'Username is already taken.';
+      } else {
+        usernameError.style.display = 'none';
+      }
+    });
+
+    // Check email availability on input
+    emailInput.addEventListener('blur', async () => {
+      const email = emailInput.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!emailRegex.test(email)) {
+        emailError.style.display = 'block';
+        emailError.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      
+      const isAvailable = await checkEmailAvailability(email);
+      if (!isAvailable) {
+        emailError.style.display = 'block';
+        emailError.textContent = 'Email is already registered.';
+      } else {
+        emailError.style.display = 'none';
+      }
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       if (!checkPasswords()) return;
+
+      const username = usernameInput.value.trim();
+      const email = emailInput.value.trim();
+
+      // Final validation
+      const isUsernameAvailable = await checkUsernameAvailability(username);
+      const isEmailAvailable = await checkEmailAvailability(email);
+
+      if (!isUsernameAvailable) {
+        usernameError.style.display = 'block';
+        usernameError.textContent = 'Username is already taken.';
+        return;
+      }
+
+      if (!isEmailAvailable) {
+        emailError.style.display = 'block';
+        emailError.textContent = 'Email is already registered.';
+        return;
+      }
 
       // Check Cloudflare CAPTCHA
       const captchaToken = document.querySelector('input[name="cf-turnstile-response"]');
@@ -292,9 +369,7 @@
         return;
       }
 
-      const email = document.getElementById('email').value;
       const pass = password.value;
-      const username = document.getElementById('username').value;
 
       signupBtn.disabled = true;
       signupBtn.textContent = 'Creating Account...';
