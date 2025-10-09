@@ -161,9 +161,7 @@
 
   <div id="main-header">
     <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-    <div class="auth-buttons" id="authButtons">
-      <!-- Buttons will be dynamically added by JavaScript -->
-    </div>
+    <div class="auth-buttons" id="authButtons"></div>
   </div>
 
   <div id="sub-header">
@@ -178,23 +176,27 @@
     <a href="Create.html">Create</a>
   </div>
 
-  <!-- Notice bar -->
   <div id="notice">Loading...</div>
 
-  <!-- Content -->
   <div id="page-content">
     <div class="loading">Checking authentication...</div>
   </div>
 
-  <!-- Footer -->
   <div id="footer">
     © 2025, Venux All rights reserved
   </div>
 
-  <!-- Firebase Auth Only - No Firestore -->
+  <!-- Firebase Auth Only -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    // Clean up any previous Firebase apps to prevent Firestore errors
+    if (getApps().length > 0) {
+      for (const app of getApps()) {
+        await deleteApp(app);
+      }
+    }
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -206,9 +208,9 @@
       measurementId: "G-N36RRV95SW"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+
     const noticeBar = document.getElementById("notice");
     const authButtons = document.getElementById("authButtons");
     const pageContent = document.getElementById("page-content");
@@ -219,44 +221,29 @@
 
     onAuthStateChanged(auth, async (user) => {
       console.log("Auth state changed - User:", user);
-      
-      // Prevent multiple redirects
+
       if (authChecked) return;
       authChecked = true;
 
       if (user) {
-        // User is signed in - show home page content
-        console.log("User is signed in:", user.email);
-        
-        // Get username from localStorage or use email as fallback
-        let username = localStorage.getItem('venux_username');
-        if (!username) {
-          // Use email username (part before @) as fallback
-          username = user.email.split('@')[0];
-        }
-        
-        console.log("Welcome:", username);
-
-        // Update notice bar
+        const username = localStorage.getItem('venux_username') || user.email.split('@')[0];
         noticeBar.innerHTML = `Welcome, ${username}!`;
 
-        // Create logout button in notice
         const logoutBtn = document.createElement("button");
         logoutBtn.textContent = "Log Out";
         logoutBtn.onclick = async () => {
           await signOut(auth);
           localStorage.removeItem('venux_username');
-          window.location.reload();
+          window.location.href = "Login.html";
         };
         noticeBar.appendChild(logoutBtn);
 
-        // Update auth buttons in header
         authButtons.innerHTML = `
           <span style="color: white; margin-right: 10px;">Hello, ${username}</span>
-          <button class="logout-btn" onclick="logout()">Logout</button>
+          <button class="logout-btn" id="logoutBtn">Logout</button>
         `;
+        document.getElementById("logoutBtn").onclick = logoutBtn.onclick;
 
-        // Show home page content
         pageContent.innerHTML = `
           <div class="welcome-message">Welcome back, ${username}!</div>
           <h2>Latest News</h2>
@@ -272,28 +259,16 @@
             <div class="news-date">Posted: 8th October, 2025</div>
             <div class="news-body">
               - Added more pages<br>
-              - Greatblox is also great! https://greatblox.com/<br>
+              - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
               - Our website is live!
             </div>
           </div>
         `;
-
       } else {
-        // User is not signed in - redirect to login.html
         console.log("No user found, redirecting to login...");
-        setTimeout(() => {
-          window.location.href = "Login.html";
-        }, 100);
+        setTimeout(() => (window.location.href = "Login.html"), 200);
       }
     });
-
-    // Global logout function
-    window.logout = async function() {
-      console.log("Logging out...");
-      await signOut(auth);
-      localStorage.removeItem('venux_username');
-      window.location.href = "Login.html";
-    };
   </script>
 
 </body>
