@@ -142,7 +142,6 @@
       background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
       margin-top: 40px;
     }
-
   </style>
 </head>
 <body>
@@ -209,11 +208,23 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    
+    let authChecked = false;
 
     // Redirect to home if already logged in
     onAuthStateChanged(auth, (user) => {
+      console.log("Login page - Auth state changed:", user);
+      
+      // Prevent multiple redirects
+      if (authChecked) return;
+      authChecked = true;
+
       if (user) {
-        window.location.href = "Home.html";
+        console.log("User already logged in, redirecting to home");
+        // Use setTimeout to prevent immediate redirect loop
+        setTimeout(() => {
+          window.location.href = "Home.html";
+        }, 500);
       }
     });
 
@@ -233,9 +244,16 @@
       errorMessage.textContent = '';
 
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        // Redirect happens automatically due to onAuthStateChanged
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("Login successful:", userCredential.user);
+        
+        // Wait a moment for auth state to propagate, then redirect
+        setTimeout(() => {
+          window.location.href = "Home.html";
+        }, 1000);
+        
       } catch (error) {
+        console.error("Login error:", error);
         errorMessage.textContent = getErrorMessage(error.code);
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
