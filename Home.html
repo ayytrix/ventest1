@@ -217,9 +217,15 @@
 
     console.log("Home page loaded, checking auth state...");
 
+    let authChecked = false;
+
     onAuthStateChanged(auth, async (user) => {
       console.log("Auth state changed - User:", user);
       
+      // Prevent multiple redirects
+      if (authChecked) return;
+      authChecked = true;
+
       if (user) {
         // User is signed in - show home page content
         console.log("User is signed in:", user.email);
@@ -298,7 +304,9 @@
       } else {
         // User is not signed in - redirect to login.html
         console.log("No user found, redirecting to login...");
-        window.location.href = "Login.html";
+        setTimeout(() => {
+          window.location.href = "Login.html";
+        }, 100);
       }
     });
 
