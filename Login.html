@@ -171,7 +171,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -199,6 +199,22 @@
     const passwordInput = document.getElementById("password");
     const errorMessage = document.getElementById("errorMessage");
 
+    // Function to find user by username and get their auth email
+    async function findUserByUsername(username) {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", username));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        return {
+          id: userDoc.id,
+          data: userDoc.data()
+        };
+      }
+      return null;
+    }
+
     loginBtn.addEventListener("click", async () => {
       const username = usernameInput.value.trim();
       const password = passwordInput.value;
@@ -208,13 +224,38 @@
         return;
       }
 
-      // Generate the same unique email format used in signup
-      const uniqueEmail = `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@venux.local`;
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Logging in...";
 
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, uniqueEmail, password);
+        // Find the user by username to get their auth email
+        const userData = await findUserByUsername(username);
+        
+        if (!userData) {
+          errorMessage.textContent = "Username not found.";
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Login";
+          return;
+        }
+
+        // Get the auth email from Firestore
+        const authEmail = userData.data.authEmail;
+        
+        if (!authEmail) {
+          errorMessage.textContent = "Account configuration error. Please contact support.";
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Login";
+          return;
+        }
+
+        console.log("Attempting login with email:", authEmail);
+
+        // Sign in with the stored auth email
+        const userCredential = await signInWithEmailAndPassword(auth, authEmail, password);
         const user = userCredential.user;
         
+        console.log("Login successful for user:", user.uid);
+
         // Update last login time
         try {
           await updateDoc(doc(db, "users", user.uid), {
@@ -224,7 +265,9 @@
           console.log("Could not update last login time:", updateError);
         }
         
+        // Force redirect to home page
         window.location.href = "Home.html";
+        
       } catch (error) {
         console.error("Login error:", error);
         if (error.code === "auth/user-not-found") {
@@ -233,9 +276,13 @@
           errorMessage.textContent = "Incorrect password.";
         } else if (error.code === "auth/invalid-email") {
           errorMessage.textContent = "Invalid username format.";
+        } else if (error.code === "auth/too-many-requests") {
+          errorMessage.textContent = "Too many failed attempts. Please try again later.";
         } else {
           errorMessage.textContent = "Login failed. Please try again.";
         }
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
       }
     });
 
