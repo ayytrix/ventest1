@@ -147,7 +147,13 @@
       margin-top: 40px;
     }
 
+    .turnstile-wrapper {
+      text-align: center;
+      margin: 15px 0;
+    }
   </style>
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -173,7 +179,7 @@
   <div id="page-content">
     <div class="signup-box">
       <h2>Sign Up</h2>
-      <form id="signupForm" action="Home.html" method="get">
+      <form id="signupForm" method="get">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
 
@@ -188,6 +194,11 @@
 
         <div id="passwordError" class="error-message">Passwords do not match or are too short (min 6 characters).</div>
         <div id="passwordSuccess" class="success-message">Passwords match!</div>
+
+        <div class="turnstile-wrapper">
+          <!-- Replace YOUR_SITE_KEY_HERE with your actual Cloudflare Turnstile site key -->
+          <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+        </div>
 
         <input type="submit" value="Create Account">
       </form>
@@ -233,9 +244,20 @@
     confirmPassword.addEventListener('input', checkPasswords);
 
     form.addEventListener('submit', function(e) {
-      if (!checkPasswords()) {
-        e.preventDefault();
+      e.preventDefault(); // prevent the default redirect
+
+      // check password rules
+      if (!checkPasswords()) return;
+
+      // check Cloudflare CAPTCHA
+      const tokenField = document.querySelector('input[name="cf-turnstile-response"]');
+      if (!tokenField || !tokenField.value) {
+        alert('Please complete the CAPTCHA before continuing.');
+        return;
       }
+
+      // all good → redirect or handle next step
+      window.location.href = "Home.html";
     });
   </script>
 
