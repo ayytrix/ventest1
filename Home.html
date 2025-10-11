@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Venux - Home</title>
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
   <style>
     body {
@@ -163,7 +162,7 @@
 
     (async () => {
       try {
-        setLogLevel("error"); // suppress Firestore debug logs
+        setLogLevel("error");
 
         const firebaseConfig = {
           apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -183,7 +182,6 @@
         const authButtons = document.getElementById("authButtons");
         const pageContent = document.getElementById("page-content");
 
-        // Wait for authentication
         const user = await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => reject(new Error("Auth timed out")), 10000);
           onAuthStateChanged(auth, (user) => {
@@ -197,23 +195,31 @@
           return;
         }
 
-        // One-time read of Firestore user doc
         const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
         let username = "User";
-        if (userDocSnap.exists() && userDocSnap.data().username) {
-          username = userDocSnap.data().username;
+        try {
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists() && userDocSnap.data().username) {
+            username = userDocSnap.data().username;
+          }
+        } catch (error) {
+          console.error("Failed to fetch user document:", error);
+          noticeBar.textContent = "Could not load user info.";
         }
 
-        // Update UI
         noticeBar.textContent = `Welcome ${username}`;
         authButtons.innerHTML = `<span>Welcome ${username}</span><button class="logout-btn" id="logoutBtn">Logout</button>`;
+
         document.getElementById("logoutBtn").addEventListener("click", async () => {
-          await signOut(auth);
-          window.location.href = "Login.html";
+          try {
+            await signOut(auth);
+            window.location.href = "Login.html";
+          } catch (err) {
+            console.error("Logout failed:", err);
+            noticeBar.textContent = "Logout failed. Try again.";
+          }
         });
 
-        // Render page content
         pageContent.innerHTML = `
           <h2>Latest News</h2>
           <div class="news-box">
@@ -236,10 +242,11 @@
 
       } catch (error) {
         console.error(error);
-        document.getElementById("notice").textContent = "Error loading user info.";
-        document.getElementById("page-content").innerHTML = `<div class="error-message">${error.message}</div>`;
+        noticeBar.textContent = "Error loading user info.";
+        pageContent.innerHTML = `<div class="error-message">${error.message}</div>`;
       }
     })();
   </script>
+
 </body>
 </html>
