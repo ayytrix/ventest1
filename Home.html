@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Venux - Home</title>
+  <!-- Add favicon -->
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
   <style>
     body {
       margin: 0;
@@ -161,7 +163,7 @@
       setLogLevel 
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-    // ✅ Suppress unnecessary Firestore network warnings
+    // Suppress unnecessary Firestore network warnings
     setLogLevel("error");
 
     const firebaseConfig = {
@@ -181,7 +183,7 @@
     const authButtons = document.getElementById("authButtons");
     const pageContent = document.getElementById("page-content");
 
-    // ✅ Wait until user state is known before touching Firestore
+    // Handle authentication state
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "Login.html";
@@ -198,20 +200,24 @@
           username = userDocSnap.data().username;
         }
 
-        // ✅ Update notice bar and UI
-        noticeBar.textContent = `Welcome, ${username}!`;
-
+        // Update notice bar and auth buttons with "Welcome Username"
+        noticeBar.textContent = `Welcome ${username}`;
         authButtons.innerHTML = `
-          <span>Hello, ${username}</span>
+          <span>Welcome ${username}</span>
           <button class="logout-btn" id="logoutBtn">Logout</button>
         `;
 
         document.getElementById("logoutBtn").addEventListener("click", async () => {
-          await signOut(auth);
-          window.location.href = "Login.html";
+          try {
+            await signOut(auth);
+            window.location.href = "Login.html";
+          } catch (error) {
+            console.error("Logout error:", error);
+            noticeBar.textContent = "Error logging out. Please try again.";
+          }
         });
 
-        // ✅ Render page content
+        // Render page content
         pageContent.innerHTML = `
           <h2>Latest News</h2>
           <div class="news-box">
@@ -233,7 +239,7 @@
         `;
       } catch (error) {
         console.error("Error loading user data:", error);
-        noticeBar.textContent = "Error loading user info.";
+        noticeBar.textContent = "Error loading user info. Please try again.";
       }
     });
   </script>
