@@ -158,22 +158,12 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { 
-      getAuth, 
-      onAuthStateChanged, 
-      signOut 
-    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setLogLevel
-    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     (async () => {
       try {
-        // Suppress unnecessary Firestore logs
-        setLogLevel("error");
+        setLogLevel("error"); // suppress Firestore debug logs
 
         const firebaseConfig = {
           apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -185,109 +175,69 @@
           measurementId: "G-N36RRV95SW"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        console.log("Firebase initialized successfully");
 
         const noticeBar = document.getElementById("notice");
         const authButtons = document.getElementById("authButtons");
         const pageContent = document.getElementById("page-content");
 
-        // Add timeout for auth state change
-        const authPromise = new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error("Authentication timed out")), 10000);
+        // Wait for authentication
+        const user = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error("Auth timed out")), 10000);
           onAuthStateChanged(auth, (user) => {
             clearTimeout(timeout);
             resolve(user);
           }, reject);
         });
 
-        // Handle authentication state
-        try {
-          const user = await authPromise;
-          console.log("onAuthStateChanged resolved, user:", user ? user.uid : "null");
-
-          if (!user) {
-            console.log("No user found, redirecting to Login.html");
-            window.location.href = "Login.html";
-            return;
-          }
-
-          // Fetch user document with safer timeout + retry
-          const userDocRef = doc(db, "users", user.uid);
-          console.log("Attempting Firestore query for user:", user.uid);
-
-          let userDocSnap;
-          try {
-            const docPromise = getDoc(userDocRef);
-            const timeoutPromise = new Promise((_, reject) =>
-              setTimeout(() => reject(new Error("Firestore query timed out")), 15000)
-            );
-            userDocSnap = await Promise.race([docPromise, timeoutPromise]);
-          } catch (error) {
-            console.warn("Firestore request timed out, retrying once...");
-            noticeBar.textContent = "Retrying user info...";
-            userDocSnap = await getDoc(userDocRef);
-          }
-
-          let username = "User";
-          if (userDocSnap.exists() && userDocSnap.data().username) {
-            username = userDocSnap.data().username;
-            console.log("Username retrieved:", username);
-          } else {
-            console.warn("User document missing or no username found");
-          }
-
-          // Update UI with "Welcome Username"
-          noticeBar.textContent = `Welcome ${username}`;
-          authButtons.innerHTML = `
-            <span>Welcome ${username}</span>
-            <button class="logout-btn" id="logoutBtn">Logout</button>
-          `;
-
-          // Add logout event listener
-          document.getElementById("logoutBtn").addEventListener("click", async () => {
-            try {
-              await signOut(auth);
-              console.log("User signed out successfully");
-              window.location.href = "Login.html";
-            } catch (error) {
-              console.error("Logout error:", error);
-              noticeBar.textContent = "Error logging out. Please try again.";
-            }
-          });
-
-          // Render page content
-          pageContent.innerHTML = `
-            <h2>Latest News</h2>
-            <div class="news-box">
-              <div class="news-title">Welcome to Venux!</div>
-              <div class="news-date">Posted: 8th October, 2025</div>
-              <div class="news-body">
-                This is for news happening in Venux!
-              </div>
-            </div>
-            <div class="news-box">
-              <div class="news-title">Update Log</div>
-              <div class="news-date">Posted: 8th October, 2025</div>
-              <div class="news-body">
-                - Added more pages<br>
-                - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
-                - Our website is live!
-              </div>
-            </div>
-          `;
-        } catch (error) {
-          console.error("Error loading user data:", error);
-          noticeBar.textContent = "Error loading user info.";
-          pageContent.innerHTML = `<div class="error-message">Failed to load content: ${error.message}</div>`;
+        if (!user) {
+          window.location.href = "Login.html";
+          return;
         }
+
+        // One-time read of Firestore user doc
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        let username = "User";
+        if (userDocSnap.exists() && userDocSnap.data().username) {
+          username = userDocSnap.data().username;
+        }
+
+        // Update UI
+        noticeBar.textContent = `Welcome ${username}`;
+        authButtons.innerHTML = `<span>Welcome ${username}</span><button class="logout-btn" id="logoutBtn">Logout</button>`;
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.href = "Login.html";
+        });
+
+        // Render page content
+        pageContent.innerHTML = `
+          <h2>Latest News</h2>
+          <div class="news-box">
+            <div class="news-title">Welcome to Venux!</div>
+            <div class="news-date">Posted: 8th October, 2025</div>
+            <div class="news-body">
+              This is for news happening in Venux!
+            </div>
+          </div>
+          <div class="news-box">
+            <div class="news-title">Update Log</div>
+            <div class="news-date">Posted: 8th October, 2025</div>
+            <div class="news-body">
+              - Added more pages<br>
+              - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
+              - Our website is live!
+            </div>
+          </div>
+        `;
+
       } catch (error) {
-        console.error("Firebase initialization error:", error);
-        document.getElementById("notice").textContent = "Failed to initialize Firebase.";
-        document.getElementById("page-content").innerHTML = `<div class="error-message">Firebase error: ${error.message}</div>`;
+        console.error(error);
+        document.getElementById("notice").textContent = "Error loading user info.";
+        document.getElementById("page-content").innerHTML = `<div class="error-message">${error.message}</div>`;
       }
     })();
   </script>
