@@ -6,123 +6,112 @@
   <style>
     body {
       margin: 0;
-      background-color: #d4d4d4;
-      font-family: Arial, sans-serif;
-      font-size: 13px;
-      color: #222;
+      background-color: #ffffff;
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     #main-header {
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      padding: 10px 20px;
-      border-bottom: 2px solid #071b36;
-      display: flex;
-      align-items: center;
+      background-color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
     }
 
     #main-header img {
-      height: 52px;
+      height: 40px;
       object-fit: contain;
     }
 
-    #sub-header {
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      padding: 8px 15px;
-      border-bottom: 1px solid #000000;
-    }
-
-    #sub-header a {
-      color: white;
-      text-decoration: none;
-      margin-right: 20px;
-      font-weight: bold;
-    }
-
-    #sub-header a:hover {
-      text-decoration: underline;
-    }
-
-    #notice {
-      background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 2px solid #a85f00;
-    }
-
     #page-content {
-      padding: 40px;
+      flex: 1;
       display: flex;
       justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
     .signup-box {
-      background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
-      border: 2px solid #999;
-      box-shadow: 2px 2px 0px #aaa;
-      padding: 25px 35px;
-      width: 420px;
-      border-radius: 6px;
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 8px;
     }
 
     .signup-box h2 {
       text-align: center;
-      font-size: 16px;
+      font-size: 24px;
+      font-weight: 500;
       margin-bottom: 20px;
-      border-bottom: 1px solid #aaa;
-      padding-bottom: 8px;
+      color: #333;
     }
 
     .signup-box label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #333;
     }
 
     .signup-box input[type="text"],
-    .signup-box input[type="password"] {
+    .signup-box input[type="password"],
+    .signup-box input[type="email"] {
       width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #999;
-      border-radius: 3px;
-      font-size: 13px;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .signup-box input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
     }
 
     .signup-box button {
       width: 100%;
-      padding: 10px;
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      color: white;
+      padding: 12px;
+      background-color: #007bff;
+      color: #ffffff;
       border: none;
       border-radius: 4px;
-      font-weight: bold;
+      font-size: 16px;
+      font-weight: 500;
       cursor: pointer;
-      margin-top: 10px;
+      transition: background-color 0.2s;
     }
 
     .signup-box button:hover {
-      background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
+      background-color: #0056b3;
     }
 
     .signup-box button:disabled {
-      background: #cccccc;
+      background-color: #cccccc;
       cursor: not-allowed;
     }
 
     .error-message {
-      color: red;
-      font-size: 12px;
-      margin-top: -5px;
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: -10px;
       margin-bottom: 10px;
       display: none;
     }
 
     .success-message {
-      color: green;
-      font-size: 12px;
-      margin-top: -5px;
+      color: #28a745;
+      font-size: 14px;
+      margin-top: -10px;
       margin-bottom: 10px;
       display: none;
     }
@@ -130,12 +119,13 @@
     .signup-links {
       text-align: center;
       margin-top: 15px;
+      font-size: 14px;
     }
 
     .signup-links a {
-      color: #0b2c5a;
+      color: #007bff;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 500;
     }
 
     .signup-links a:hover {
@@ -144,39 +134,39 @@
 
     #footer {
       text-align: center;
-      font-size: 12px;
-      color: #444;
-      padding: 10px;
-      border-top: 2px solid #999;
-      background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
-      margin-top: 40px;
+      font-size: 14px;
+      color: #666;
+      padding: 20px;
+      border-top: 1px solid #e0e0e0;
+      background-color: #f8f9fa;
     }
 
     .turnstile-wrapper {
       text-align: center;
-      margin: 15px 0;
+      margin: 20px 0;
+    }
+
+    #notice {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      border-bottom: 1px solid #e0e0e0;
     }
   </style>
 
+  <!-- Google Fonts for Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3.11.0/dist/email.min.js"></script>
 </head>
 <body>
 
   <div id="main-header">
     <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  </div>
-
-  <div id="sub-header">
-    <a href="Home.html">Home</a>
-    <a href="unfinished.html">Games</a>
-    <a href="unfinished.html">Catalog</a>
-    <a href="unfinished.html">Users</a>
-    <a href="unfinished.html">Forum</a>
-    <a href="unfinished.html">Clans</a>
-    <a href="unfinished.html">Help</a>
-    <a href="unfinished.html">Downloads</a>
-    <a href="Create.html">Create</a>
   </div>
 
   <!-- Dynamic notice -->
@@ -190,6 +180,9 @@
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
         <div id="usernameError" class="error-message"></div>
 
+        <label for="email">Email (Optional)</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email (optional)">
+
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Create a password" required>
 
@@ -198,6 +191,10 @@
 
         <div id="passwordError" class="error-message">Passwords do not match or are too short (min 6 characters).</div>
         <div id="passwordSuccess" class="success-message">Passwords match!</div>
+
+        <div class="signup-links">
+          <a href="TermsOfService.html">Make sure you read our Terms of Service.</a>
+        </div>
 
         <div class="turnstile-wrapper">
           <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ"></div>
@@ -221,6 +218,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
     import { getFirestore, setDoc, doc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    // Initialize EmailJS with your public key
+    emailjs.init("CUiSvj8vXafdUcDc4");
 
     // Your Firebase configuration
     const firebaseConfig = {
@@ -249,6 +249,7 @@
     // --- Sign-up logic ---
     const form = document.getElementById('signupForm');
     const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
     const usernameError = document.getElementById('usernameError');
@@ -323,6 +324,7 @@
       if (!checkPasswords()) return;
 
       const username = usernameInput.value.trim();
+      const email = emailInput.value.trim();
 
       // Final validation
       const isUsernameAvailable = await checkUsernameAvailability(username);
@@ -331,6 +333,16 @@
         usernameError.style.display = 'block';
         usernameError.textContent = 'Username is already taken.';
         return;
+      }
+
+      // Validate email if provided
+      if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          usernameError.style.display = 'block';
+          usernameError.textContent = 'Please enter a valid email address.';
+          return;
+        }
       }
 
       // Check Cloudflare CAPTCHA
@@ -346,8 +358,7 @@
       signupBtn.textContent = 'Creating Account...';
 
       try {
-        // Generate a unique email for Firebase Auth (since it requires email)
-        // Use a consistent domain and clean the username
+        // Generate a unique email for Firebase Auth
         const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
         const timestamp = Date.now();
         const uniqueEmail = `${cleanUsername}_${timestamp}@venux.local`;
@@ -360,15 +371,32 @@
 
         console.log("Firebase Auth user created:", user.uid);
 
-        // Save username to Firestore
-        await setDoc(doc(db, "users", user.uid), {
+        // Save user data to Firestore
+        const userData = {
           username: username,
-          authEmail: uniqueEmail, // Store the generated email for login
+          authEmail: uniqueEmail,
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString()
-        });
+        };
+        if (email) userData.email = email;
+
+        await setDoc(doc(db, "users", user.uid), userData);
 
         console.log("Firestore document created");
+
+        // Send welcome email if email is provided
+        if (email) {
+          const welcomeMessage = `Welcome ${username}! Thank you for registering at Venux!\n\n[EMAIL LINK]\n\nMake sure you read our Terms Of Service.`;
+          const emailParams = {
+            to_email: email,
+            username: username,
+            message: welcomeMessage
+          };
+
+          await emailjs.send('service_8g22ns8', 'template_welcome', emailParams)
+            .then(() => console.log('Welcome email sent successfully'))
+            .catch(err => console.error('Failed to send welcome email:', err));
+        }
 
         // Force redirect to home page
         window.location.href = "Home.html";
