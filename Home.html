@@ -212,19 +212,26 @@
           if (!user) {
             console.log("No user found, redirecting to Login.html");
             window.location.href = "Login.html";
-            return; // ✅ valid now inside async function
+            return;
           }
 
-          // Fetch user document with timeout
+          // Fetch user document with safer timeout + retry
           const userDocRef = doc(db, "users", user.uid);
           console.log("Attempting Firestore query for user:", user.uid);
 
-          const docPromise = getDoc(userDocRef);
-          const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error("Firestore query timed out")), 5000);
-          });
+          let userDocSnap;
+          try {
+            const docPromise = getDoc(userDocRef);
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Firestore query timed out")), 15000)
+            );
+            userDocSnap = await Promise.race([docPromise, timeoutPromise]);
+          } catch (error) {
+            console.warn("Firestore request timed out, retrying once...");
+            noticeBar.textContent = "Retrying user info...";
+            userDocSnap = await getDoc(userDocRef);
+          }
 
-          const userDocSnap = await Promise.race([docPromise, timeoutPromise]);
           let username = "User";
           if (userDocSnap.exists() && userDocSnap.data().username) {
             username = userDocSnap.data().username;
