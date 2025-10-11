@@ -167,8 +167,7 @@
       getFirestore, 
       doc, 
       getDoc, 
-      setLogLevel,
-      disableNetwork 
+      setLogLevel
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     (async () => {
@@ -190,9 +189,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // Disable real-time listeners to avoid Listen/channel errors
-        await disableNetwork(db);
         console.log("Firebase initialized successfully");
 
         const noticeBar = document.getElementById("notice");
