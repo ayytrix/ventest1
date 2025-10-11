@@ -161,8 +161,8 @@
       setLogLevel 
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-    // ✅ Suppress Firestore WebChannel "Listen" transport warnings
-    setLogLevel('error'); // Only log real errors
+    // ✅ Suppress unnecessary Firestore network warnings
+    setLogLevel("error");
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -176,63 +176,66 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
+
     const noticeBar = document.getElementById("notice");
     const authButtons = document.getElementById("authButtons");
     const pageContent = document.getElementById("page-content");
 
+    // ✅ Wait until user state is known before touching Firestore
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
-
-          let username = "User";
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            if (data.username) username = data.username;
-          }
-
-          noticeBar.textContent = `Welcome, ${username}!`;
-
-          authButtons.innerHTML = `
-            <span>Hello, ${username}</span>
-            <button class="logout-btn" id="logoutBtn">Logout</button>
-          `;
-
-          document.getElementById("logoutBtn").addEventListener("click", async () => {
-            await signOut(auth);
-            window.location.href = "Login.html";
-          });
-
-          pageContent.innerHTML = `
-            <h2>Latest News</h2>
-            <div class="news-box">
-              <div class="news-title">Welcome to Venux!</div>
-              <div class="news-date">Posted: 8th October, 2025</div>
-              <div class="news-body">
-                This is for news happening in Venux!
-              </div>
-            </div>
-            <div class="news-box">
-              <div class="news-title">Update Log</div>
-              <div class="news-date">Posted: 8th October, 2025</div>
-              <div class="news-body">
-                - Added more pages<br>
-                - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
-                - Our website is live!
-              </div>
-            </div>
-          `;
-        } catch (error) {
-          console.error("Error loading user data:", error);
-          noticeBar.textContent = "Error loading user info.";
-        }
-      } else {
+      if (!user) {
         window.location.href = "Login.html";
+        return;
+      }
+
+      try {
+        const db = getFirestore(app);
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        let username = "User";
+        if (userDocSnap.exists() && userDocSnap.data().username) {
+          username = userDocSnap.data().username;
+        }
+
+        // ✅ Update notice bar and UI
+        noticeBar.textContent = `Welcome, ${username}!`;
+
+        authButtons.innerHTML = `
+          <span>Hello, ${username}</span>
+          <button class="logout-btn" id="logoutBtn">Logout</button>
+        `;
+
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.href = "Login.html";
+        });
+
+        // ✅ Render page content
+        pageContent.innerHTML = `
+          <h2>Latest News</h2>
+          <div class="news-box">
+            <div class="news-title">Welcome to Venux!</div>
+            <div class="news-date">Posted: 8th October, 2025</div>
+            <div class="news-body">
+              This is for news happening in Venux!
+            </div>
+          </div>
+          <div class="news-box">
+            <div class="news-title">Update Log</div>
+            <div class="news-date">Posted: 8th October, 2025</div>
+            <div class="news-body">
+              - Added more pages<br>
+              - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
+              - Our website is live!
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        noticeBar.textContent = "Error loading user info.";
       }
     });
   </script>
-
 </body>
 </html>
