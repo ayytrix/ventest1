@@ -126,7 +126,7 @@ onAuthStateChanged(auth, async (user) => {
 
       let threadHTML = `<div class="thread-box" id="thread-${tDoc.id}">
         <div class="thread-title">${t.title}</div>
-        <div class="thread-meta"><a class="username-link" href="Profile.html?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
+        <div class="thread-meta"><a class="username-link" href="Profile?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
         <div class="thread-body">${t.body}</div>`;
 
       // Pin button for user 1 & 2
