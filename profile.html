@@ -30,6 +30,10 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 .badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
 /* Footer */
 #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
+.edit-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; }
+textarea { width:100%; padding:8px; font-size:13px; border:1px solid #999; border-radius:4px; }
+#saveDescription { margin-top:8px; padding:6px 12px; font-weight:bold; border:none; border-radius:4px; background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; cursor:pointer; transition:0.3s; }
+#saveDescription:hover { background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
 </style>
 </head>
 <body>
@@ -70,11 +74,10 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 <!-- Footer -->
 <div id="footer">© 2025, Venux All rights reserved</div>
 
-<!-- Firebase Script -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -101,7 +104,6 @@ fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
   .catch(() => noticeBar.textContent = dynamicNotice);
 
-// Get userId from URL
 const urlParams = new URLSearchParams(window.location.search);
 const viewingUserId = parseInt(urlParams.get('userId'), 10);
 
@@ -128,7 +130,7 @@ onAuthStateChanged(auth, async (user) => {
   if (viewingUserId) {
     userDoc = await getUserByNumericId(viewingUserId);
     if (!userDoc) {
-      noticeBar.textContent = dynamicNotice; // dynamic notice instead of static
+      noticeBar.textContent = dynamicNotice;
       return;
     }
   } else {
@@ -140,8 +142,28 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const data = userDoc.data();
+  const isOwner = user.uid === data.uid;
+
   profileUsername.textContent = data.username || "User";
-  descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
+  descriptionDiv.innerHTML = `<p id="descText">${data.description || "This user hasn't added a description yet."}</p>`;
+
+  if (isOwner) {
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.className = "edit-btn";
+    descriptionDiv.appendChild(editBtn);
+
+    editBtn.addEventListener("click", () => {
+      const currentText = data.description || "";
+      descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
+        <button id="saveDescription">Save</button>`;
+      document.getElementById("saveDescription").addEventListener("click", async () => {
+        const newDesc = document.getElementById("descTextarea").value;
+        await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
+        descriptionDiv.innerHTML = `<p id="descText">${newDesc}</p><button class="edit-btn">Edit</button>`;
+      });
+    });
+  }
 
   // 🏅 Badges assigned strictly by userId
   const badges = [];
@@ -174,6 +196,5 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 </script>
-
 </body>
 </html>
