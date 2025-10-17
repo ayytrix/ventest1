@@ -127,7 +127,7 @@ onAuthStateChanged(auth, async (user) => {
       const authorName = authorSnap.exists()?authorSnap.data().username:"User";
       const authorUserId = authorSnap.exists()?authorSnap.data().userId:t.uid;
       const usernameColor = (authorUserId===1||authorUserId===2)?"darkred":"black";
-      const adminBadge = (authorUserId===1||authorUserId===2)?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
+      const adminBadge = (authorUserId===1||authorUserId===2||authorUserId===5)?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
 
       let threadHTML = `<div class="thread-box" id="thread-${tDocId}">
         <div class="thread-title ${t.pinned?'pinned':''}">${t.title}</div>
