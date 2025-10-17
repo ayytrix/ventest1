@@ -139,8 +139,8 @@
         <label for="confirm-password">Confirm Password</label>
         <input type="password" id="confirm-password" placeholder="Re-enter your password" required>
 
-        <div id="passwordError" class="error-message">Passwords do not match or are too short (min 6 characters).</div>
-        <div id="passwordSuccess" class="success-message">Passwords match!</div>
+        <div id="passwordError" class="error-message"></div>
+        <div id="passwordSuccess" class="success-message"></div>
 
         <div class="signup-links">
           <a href="TermsOfService.html">Make sure you read our Terms of Service.</a>
@@ -150,7 +150,7 @@
           <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ"></div>
         </div>
 
-        <button type="submit" id="signupBtn" disabled>Create Account</button>
+        <button type="submit" id="signupBtn" enabled>Create Account</button>
       </form>
 
       <div class="signup-links">
@@ -194,34 +194,35 @@
     const passwordSuccess = document.getElementById('passwordSuccess');
     const signupBtn = document.getElementById('signupBtn');
 
-    // --- NOTICE BAR ---
+    // Dynamic notice
     fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
       .then(r => r.ok ? r.text() : "Failed to load")
       .then(data => document.getElementById("notice").textContent = data)
       .catch(()=>document.getElementById("notice").textContent = "Failed to load notice.");
 
-    // --- PASSWORD CHECK ---
     function checkPasswords() {
       if(passwordInput.value.length < 6){
         passwordSuccess.style.display = "none";
         passwordError.style.display = "block";
         passwordError.textContent = "Password must be at least 6 characters long.";
+        signupBtn.disabled = true;
         return false;
       }
       if(passwordInput.value !== confirmPassword.value){
         passwordSuccess.style.display = "none";
         passwordError.style.display = "block";
         passwordError.textContent = "Passwords do not match.";
+        signupBtn.disabled = true;
         return false;
       }
       passwordError.style.display = "none";
       passwordSuccess.style.display = "block";
       return true;
     }
-    passwordInput.addEventListener("input", checkPasswords);
-    confirmPassword.addEventListener("input", checkPasswords);
 
-    // --- CHECK USERNAME AVAILABILITY ---
+    passwordInput.addEventListener("input", () => { checkPasswords(); updateSignupBtn(); });
+    confirmPassword.addEventListener("input", () => { checkPasswords(); updateSignupBtn(); });
+
     async function checkUsernameAvailability(username){
       const usersRef = collection(db,"users");
       const q = query(usersRef, where("username","==",username));
@@ -229,40 +230,18 @@
       return snapshot.empty;
     }
 
-    usernameInput.addEventListener("input", async () => {
+    async function updateSignupBtn(){
       const username = usernameInput.value.trim();
-      if(username.length < 3 || username.length > 20){
-        usernameError.textContent = "Username must be 3-20 characters.";
-        usernameError.style.display = "block";
-        signupBtn.disabled = true;
-        return;
-      }
-      const forbiddenWords = ["nigga","nigger","niga","niger","nigeria","fuck","shit","bitch","hoe"];
-      if(forbiddenWords.includes(username.toLowerCase())){
-        usernameError.textContent = "Invalid username";
-        usernameError.style.display = "block";
-        signupBtn.disabled = true;
-        return;
-      }
-      const regex = /^[a-zA-Z0-9_]+$/;
-      if(!regex.test(username)){
-        usernameError.textContent = "Invalid characters";
-        usernameError.style.display = "block";
-        signupBtn.disabled = true;
-        return;
-      }
-      const available = await checkUsernameAvailability(username);
-      if(!available){
-        usernameError.textContent = "Username taken";
-        usernameError.style.display = "block";
-        signupBtn.disabled = true;
+      if(username.length >=3 && username.length <=20 && checkPasswords()){
+        const available = await checkUsernameAvailability(username);
+        signupBtn.disabled = !available;
       } else {
-        usernameError.style.display = "none";
-        signupBtn.disabled = !checkPasswords();
+        signupBtn.disabled = true;
       }
-    });
+    }
 
-    // --- GET NEXT USER ID ---
+    usernameInput.addEventListener("input", updateSignupBtn);
+
     async function getNextUserId(){
       const usersRef = collection(db,"users");
       const q = query(usersRef, orderBy("userId","desc"), limit(1));
@@ -273,7 +252,6 @@
       return 1;
     }
 
-    // --- SIGNUP FORM SUBMIT ---
     document.getElementById("signupForm").addEventListener("submit", async (e)=>{
       e.preventDefault();
       if(!checkPasswords()) return;
@@ -282,7 +260,6 @@
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
-      // CAPTCHA
       const captchaToken = document.querySelector('input[name="cf-turnstile-response"]');
       if(!captchaToken || !captchaToken.value){
         alert("Please complete the CAPTCHA");
@@ -307,7 +284,8 @@
           authEmail: uniqueEmail,
           email: email || null,
           createdAt: new Date().toISOString(),
-          userId: userId
+          userId: userId,
+          badges: []  // <- empty badges array
         });
 
         window.location.href = "Home.html";
