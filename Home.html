@@ -18,8 +18,8 @@
       padding: 10px 20px;
       border-bottom: 2px solid #071b36;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
     }
 
     #main-header img {
@@ -48,7 +48,7 @@
     #sub-header {
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
       padding: 8px 15px;
-      border-bottom: 1px solid #000000;
+      border-bottom: 1px solid #000;
     }
 
     #sub-header a {
@@ -91,7 +91,7 @@
     }
 
     .news-box {
-      background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
+      background: linear-gradient(to bottom, #fff 0%, #e2e2e2 100%);
       border: 2px solid #999;
       padding: 12px;
       margin-bottom: 15px;
@@ -146,7 +146,6 @@
   </div>
 
   <div id="notice">Loading...</div>
-
   <div id="page-content">
     <div class="loading">Checking authentication...</div>
   </div>
@@ -195,7 +194,7 @@
           await setDoc(userDocRef, { username: "User", createdAt: new Date() });
         }
       } catch (err) {
-        console.error("Error fetching user doc:", err);
+        console.error(err);
         noticeBar.textContent = "Error loading user info.";
       }
 
@@ -213,8 +212,8 @@
       });
 
       // Pull public news collection
-      const newsRef = collection(db, "news");
       try {
+        const newsRef = collection(db, "news");
         const newsSnap = await getDocs(newsRef);
         let newsHTML = "<h2>Latest News</h2>";
         newsSnap.forEach(doc => {
@@ -234,6 +233,5 @@
       }
     });
   </script>
-
 </body>
 </html>
