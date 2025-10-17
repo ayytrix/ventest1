@@ -37,6 +37,10 @@ body{
   font-size:12px;
   background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
   color:white;
+  transition: all 0.3s ease;
+}
+.logout-btn:hover{
+  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
 }
 #sub-header{
   background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
@@ -48,9 +52,13 @@ body{
   text-decoration:none;
   margin-right:20px;
   font-weight:bold;
+  padding:6px 10px;
+  border-radius:4px;
+  transition: all 0.3s ease;
 }
 #sub-header a:hover{
-  text-decoration:underline;
+  background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
+  text-decoration:none;
 }
 #notice{
   background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
@@ -190,7 +198,10 @@ onAuthStateChanged(auth, async (user)=>{
 
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
 
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn.addEventListener("click", async ()=>{
+    logoutBtn.disabled = true;
+    logoutBtn.textContent = "Logging out...";
     await signOut(auth);
     window.location.href="Login.html";
   });
