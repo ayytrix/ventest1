@@ -113,12 +113,13 @@ onAuthStateChanged(auth, async (user) => {
 
   async function loadThreads(){
     threadsContainer.innerHTML = "";
-    const threadsSnap = await getDocs(collection(db,"threads"));
+    const threadsSnap = await getDocs(query(collection(db,"threads"), orderBy("date","desc")));
     let threadsArray = [];
     threadsSnap.forEach(docSnap => threadsArray.push({ id: docSnap.id, data: docSnap.data() }));
+    
     // Sort pinned on top
     threadsArray.sort((a,b) => (b.data.pinned?1:0) - (a.data.pinned?1:0));
-    
+
     for(const tObj of threadsArray){
       const tDocId = tObj.id;
       const t = tObj.data;
