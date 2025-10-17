@@ -28,12 +28,11 @@ input, textarea { width:100%; padding:6px; margin-bottom:6px; font-size:13px; bo
 button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-right:5px; }
 .submit-btn { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; }
 .submit-btn:hover { background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
-.view-replies-btn { background:#888; color:white; }
-.view-replies-btn:hover { background:#555; }
-.pin-btn { background:#b8860b; color:white; }
-.delete-btn { background:#f44336; color:white; }
-.reply-btn { background:#1a4a84; color:white; margin-top:5px; }
-.replies-frame { display:none; margin-top:6px; margin-left:10px; }
+.pin-btn { background:orange; color:white; margin-left:5px; }
+.delete-btn { background:red; color:white; margin-left:5px; }
+.reply-btn { background:#1a4a84; color:white; margin-top:4px; }
+.view-replies-btn { background:#555; color:white; margin-top:4px; margin-left:5px; }
+.replies-container { display:none; margin-top:6px; margin-left:12px; border-left:2px solid #aaa; padding-left:6px; }
 </style>
 </head>
 <body>
@@ -84,7 +83,6 @@ const pageContent = document.getElementById("page-content");
 
 let currentUser = null;
 
-// Dynamic notice
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : "Welcome to Venux Forums!")
   .then(t => noticeBar.textContent = t)
@@ -96,11 +94,11 @@ onAuthStateChanged(auth, async (user) => {
 
   const userSnap = await getDoc(doc(db,"users",user.uid));
   const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
+  const numericUserId = userSnap.exists() && userSnap.data().userId ? userSnap.data().userId : 0;
 
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
-  // Thread form
   pageContent.innerHTML = `
     <h2>Forums</h2>
     <div>
@@ -115,53 +113,59 @@ onAuthStateChanged(auth, async (user) => {
 
   async function loadThreads(){
     threadsContainer.innerHTML = "";
-    const threadsSnap = await getDocs(query(collection(db,"threads"), orderBy("pinned","desc"), orderBy("date","desc")));
-
-    let html = "";
-    for(const tDoc of threadsSnap.docs){
-      const t = tDoc.data();
+    const threadsSnap = await getDocs(collection(db,"threads"));
+    let threadsArray = [];
+    threadsSnap.forEach(docSnap => threadsArray.push({ id: docSnap.id, data: docSnap.data() }));
+    // Sort pinned on top
+    threadsArray.sort((a,b) => (b.data.pinned?1:0) - (a.data.pinned?1:0));
+    
+    for(const tObj of threadsArray){
+      const tDocId = tObj.id;
+      const t = tObj.data;
       const authorSnap = await getDoc(doc(db,"users",t.uid));
       const authorName = authorSnap.exists()?authorSnap.data().username:"User";
-      const isAdmin = (t.uid==="1"||t.uid==="2");
-      const usernameColor = isAdmin?"darkred":"black";
-      const adminBadge = isAdmin?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
-      const pinnedClass = t.pinned?"pinned":"";
-      const replyCount = t.replies?.length||0;
+      const authorUserId = authorSnap.exists()?authorSnap.data().userId:t.uid;
+      const usernameColor = (authorUserId===1||authorUserId===2)?"darkred":"black";
+      const adminBadge = (authorUserId===1||authorUserId===2)?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
 
-      html += `<div class="thread-box" id="thread-${tDoc.id}">
-        <div class="thread-title ${pinnedClass}">${t.title}</div>
-        <div class="thread-meta"><a class="username-link" href="Profile.html?userId=${t.uid}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
-        <button class="view-replies-btn" data-threadid="${tDoc.id}">View Replies (${replyCount})</button>
-        <div class="replies-frame" id="replies-${tDoc.id}">`;
+      let threadHTML = `<div class="thread-box" id="thread-${tDocId}">
+        <div class="thread-title ${t.pinned?'pinned':''}">${t.title}</div>
+        <div class="thread-meta"><a class="username-link" href="Profile.html?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
+        <div class="thread-body">${t.body}</div>`;
+
+      if(numericUserId===1||numericUserId===2){
+        threadHTML += `<button class="pin-btn" data-threadid="${tDocId}">${t.pinned?"Unpin":"Pin"}</button>`;
+      }
+      if(user.uid===t.uid){
+        threadHTML += `<button class="delete-btn" data-threadid="${tDocId}">Delete</button>`;
+      }
+
+      const replyCount = t.replies?.length || 0;
+      threadHTML += `<button class="view-replies-btn" data-threadid="${tDocId}">View Replies (${replyCount})</button>
+        <div class="replies-container" id="replies-${tDocId}">`;
 
       t.replies?.forEach(r=>{
-        html += `<div class="reply-box"><a class="username-link" href="Profile.html?userId=${r.uid}" style="color:${(r.uid==="1"||r.uid==="2")?'darkred':'black'}">${r.username}</a>: ${r.text}</div>`;
+        threadHTML += `<div class="reply-box"><a class="username-link" href="Profile.html?userId=${r.userId}" style="color:${(r.userId===1||r.userId===2)?'darkred':'black'}">${r.username}</a>: ${r.text}</div>`;
       });
 
-      html += `</div>`;
-      if(isAdmin) html += `<button class="pin-btn" data-threadid="${tDoc.id}">${t.pinned?"Unpin":"Pin"}</button>`;
-      if(t.uid===currentUser.uid) html += `<button class="delete-btn" data-threadid="${tDoc.id}">Delete</button>`;
-      html += `<textarea placeholder="Reply..." data-threadid="${tDoc.id}" class="reply-input"></textarea><button class="reply-btn" data-threadid="${tDoc.id}">Reply</button></div>`;
+      threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDocId}" class="reply-input"></textarea>
+        <button class="reply-btn" data-threadid="${tDocId}">Reply</button></div></div>`;
+
+      threadsContainer.innerHTML += threadHTML;
     }
 
-    threadsContainer.innerHTML = html;
-
-    // Event listeners
-    document.querySelectorAll(".view-replies-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const id = btn.dataset.threadid;
-        const frame = document.getElementById(`replies-${id}`);
-        frame.style.display = frame.style.display==="none"?"block":"none";
-      });
-    });
+    // Listeners
     document.querySelectorAll(".pin-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         const ref = doc(db,"threads",btn.dataset.threadid);
-        const tDoc = await getDoc(ref);
-        await updateDoc(ref, { pinned: !(tDoc.data().pinned||false) });
-        loadThreads();
+        const tSnap = await getDoc(ref);
+        if(tSnap.exists()){
+          await updateDoc(ref,{ pinned: !(tSnap.data().pinned||false) });
+          loadThreads();
+        }
       });
     });
+
     document.querySelectorAll(".delete-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         if(confirm("Delete this thread?")){
@@ -170,17 +174,23 @@ onAuthStateChanged(auth, async (user) => {
         }
       });
     });
+
     document.querySelectorAll(".reply-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
-        const tid = btn.dataset.threadid;
-        const input = document.querySelector(`.reply-input[data-threadid='${tid}']`);
+        const threadId = btn.dataset.threadid;
+        const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
         const text = input.value.trim();
         if(!text) return;
-        const userSnap = await getDoc(doc(db,"users",currentUser.uid));
-        const uname = userSnap.exists()?userSnap.data().username:"User";
-        await updateDoc(doc(db,"threads",tid), { replies: arrayUnion({ uid:currentUser.uid, username:uname, text }) });
+        await updateDoc(doc(db,"threads",threadId), { replies: arrayUnion({ userId:numericUserId, username, text }) });
         input.value="";
         loadThreads();
+      });
+    });
+
+    document.querySelectorAll(".view-replies-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const container = document.getElementById(`replies-${btn.dataset.threadid}`);
+        container.style.display = container.style.display==="none"?"block":"none";
       });
     });
   }
@@ -191,11 +201,12 @@ onAuthStateChanged(auth, async (user) => {
     const title = document.getElementById("threadTitle").value.trim();
     const body = document.getElementById("threadBody").value.trim();
     if(!title || !body) return alert("Enter title and body");
-    await addDoc(collection(db,"threads"), { uid:currentUser.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false });
+    await addDoc(collection(db,"threads"),{ uid:user.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false });
     document.getElementById("threadTitle").value="";
     document.getElementById("threadBody").value="";
     loadThreads();
   });
+
 });
 </script>
 </body>
