@@ -277,7 +277,7 @@
         usernameError.style.display = "block";
         return;
       }
-      const regex = /^[a-zA-Z0-9_ ]+$/;
+      const regex = /^[a-zA-Z0-9_]+$/;
       if(!regex.test(username)){
         usernameError.textContent = "Invalid characters";
         usernameError.style.display = "block";
