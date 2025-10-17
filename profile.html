@@ -5,46 +5,29 @@
 <title>Venux - Profile</title>
 <style>
 body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
-/* Header */
 #main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
 #main-header img { height:52px; }
-/* Navigation bar */
 .nav-links { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; }
 .nav-links a:hover { text-decoration:underline; }
-/* Buttons like Home.html */
 .button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; transition:0.3s; }
 .logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
 .logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-/* Notice */
 #notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-/* Profile Content */
 #page-content { padding:20px; transition: background 0.3s; }
 .profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
 .avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
 .profile-username { font-weight:bold; font-size:20px; }
 #description { margin-bottom:20px; }
 #badges { margin-top:20px; }
-/* Badge styling */
 .badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
 .badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
-/* Footer */
+.edit-btn, .theme-btn { margin-right:10px; padding:4px 8px; font-size:12px; cursor:pointer; }
 #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
-.edit-btn, .theme-btn { margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; }
-textarea { width:100%; padding:8px; font-size:13px; border:1px solid #999; border-radius:4px; }
-#saveDescription { margin-top:8px; padding:6px 12px; font-weight:bold; border:none; border-radius:4px; background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; cursor:pointer; transition:0.3s; }
-#saveDescription:hover { background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
-/* Color picker modal */
-#colorPickerModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-#colorPickerContent { background:white; padding:20px; border-radius:8px; text-align:center; }
-#colorPickerContent input[type=color] { width:100px; height:50px; border:none; cursor:pointer; margin-bottom:10px; }
-#colorPickerContent button { margin-top:10px; padding:6px 12px; font-weight:bold; border:none; border-radius:4px; cursor:pointer; background:#1a4a84; color:white; }
-#colorPickerContent button:hover { background:#0d3268; }
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
   <div class="nav-links">
@@ -61,34 +44,24 @@ textarea { width:100%; padding:8px; font-size:13px; border:1px solid #999; borde
   </div>
 </div>
 
-<!-- Notice -->
 <div id="notice">Loading...</div>
 
-<!-- Profile Content -->
 <div id="page-content">
   <div class="profile-header">
     <div class="avatar-placeholder"></div>
     <div class="profile-username" id="profileUsername"></div>
+  </div>
+  <div id="description"></div>
+  <div>
     <button class="edit-btn" id="editDescriptionBtn" style="display:none;">Edit Description</button>
     <button class="theme-btn" id="editThemeBtn" style="display:none;">Edit Theme</button>
   </div>
-  <div id="description"></div>
   <div id="badges">
     <strong>Player Badges:</strong>
     <span id="badgeContainer"></span>
   </div>
 </div>
 
-<!-- Color Picker Modal -->
-<div id="colorPickerModal">
-  <div id="colorPickerContent">
-    <p>Pick a profile color:</p>
-    <input type="color" id="profileColorPicker" value="#d4d4d4"><br>
-    <button id="applyColorBtn">Done</button>
-  </div>
-</div>
-
-<!-- Footer -->
 <div id="footer">© 2025, Venux All rights reserved</div>
 
 <script type="module">
@@ -116,9 +89,7 @@ const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 const editDescriptionBtn = document.getElementById("editDescriptionBtn");
 const editThemeBtn = document.getElementById("editThemeBtn");
-const colorPickerModal = document.getElementById("colorPickerModal");
-const profileColorPicker = document.getElementById("profileColorPicker");
-const applyColorBtn = document.getElementById("applyColorBtn");
+const pageContent = document.getElementById("page-content");
 
 let dynamicNotice = "Welcome to Venux!";
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
@@ -138,10 +109,7 @@ async function getUserByNumericId(userId) {
 }
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "Login.html";
-    return;
-  }
+  if (!user) { window.location.href = "Login.html"; return; }
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
@@ -151,10 +119,7 @@ onAuthStateChanged(auth, async (user) => {
   let userDoc;
   if (viewingUserId) {
     userDoc = await getUserByNumericId(viewingUserId);
-    if (!userDoc) {
-      noticeBar.textContent = dynamicNotice;
-      return;
-    }
+    if (!userDoc) { noticeBar.textContent = dynamicNotice; return; }
   } else {
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("uid", "==", user.uid));
@@ -164,47 +129,52 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const data = userDoc.data();
-  const isOwner = user.uid === data.uid;
-
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p id="descText">${data.description || "This user hasn't added a description yet."}</p>`;
 
+  // Only show edit buttons for the profile owner
+  const isOwner = user.uid === data.uid;
   if (isOwner) {
     editDescriptionBtn.style.display = "inline-block";
     editThemeBtn.style.display = "inline-block";
 
     editDescriptionBtn.addEventListener("click", () => {
       const currentText = data.description || "";
-      descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
-        <button id="saveDescription">Save</button>`;
-      document.getElementById("saveDescription").addEventListener("click", async () => {
+      descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea><br>
+      <button id="saveDescriptionBtn">Save</button>`;
+      document.getElementById("saveDescriptionBtn").addEventListener("click", async () => {
         const newDesc = document.getElementById("descTextarea").value;
-        await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
+        await setDoc(doc(db, "users", user.uid), { ...data, description: newDesc }, { merge: true });
         descriptionDiv.innerHTML = `<p id="descText">${newDesc}</p>`;
       });
     });
 
     editThemeBtn.addEventListener("click", () => {
-      colorPickerModal.style.display = "flex";
-    });
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = "#d4d4d4";
+      const doneBtn = document.createElement("button");
+      doneBtn.textContent = "Done";
+      doneBtn.style.marginLeft = "8px";
+      descriptionDiv.appendChild(colorInput);
+      descriptionDiv.appendChild(doneBtn);
 
-    applyColorBtn.addEventListener("click", () => {
-      document.getElementById("page-content").style.background = profileColorPicker.value;
-      colorPickerModal.style.display = "none";
+      doneBtn.addEventListener("click", () => {
+        pageContent.style.background = colorInput.value;
+        descriptionDiv.removeChild(colorInput);
+        descriptionDiv.removeChild(doneBtn);
+      });
     });
   }
 
-  // 🏅 Badges assigned strictly by userId
+  // Badges by userId
   const badges = [];
   const badgeDefinitions = [
     { userId: 1, name: "Admin Badge", icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color: "#8b0000" },
     { userId: 2, name: "VIP Badge", icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png", color: "#f59e0b" },
     { userId: 3, name: "Mod Badge", icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png", color: "#2563eb" }
   ];
-
-  badgeDefinitions.forEach(bd => {
-    if (bd.userId === data.userId) badges.push(bd);
-  });
+  badgeDefinitions.forEach(bd => { if (bd.userId === data.userId) badges.push(bd); });
 
   badgeContainer.innerHTML = "";
   if (badges.length === 0) badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
@@ -225,5 +195,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 </script>
+
 </body>
 </html>
