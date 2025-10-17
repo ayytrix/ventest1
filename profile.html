@@ -4,137 +4,32 @@
 <meta charset="UTF-8">
 <title>Venux - Profile</title>
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #d4d4d4;
-  color: #222;
-  font-size: 13px;
-}
-
-/* Header styling (matches Home.html) */
-#main-header {
-  background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-#main-header img {
-  height: 52px;
-}
-
+body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
+/* Header */
+#main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+#main-header img { height:52px; }
 /* Navigation bar */
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 13px;
-}
-.nav-links a:hover {
-  text-decoration: underline;
-}
-
-/* Button styles from Home.html */
-.button {
-  padding: 7px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  color: white;
-  transition: 0.3s;
-}
-.login-btn {
-  background: linear-gradient(to bottom, #4CAF50 0%, #357a38 100%);
-}
-.login-btn:hover {
-  background: linear-gradient(to bottom, #5fd35f 0%, #46a046 100%);
-}
-.signup-btn {
-  background: linear-gradient(to bottom, #2196F3 0%, #0b79d0 100%);
-}
-.signup-btn:hover {
-  background: linear-gradient(to bottom, #42a5f5 0%, #1e88e5 100%);
-}
-.logout-btn {
-  background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
-}
-.logout-btn:hover {
-  background: linear-gradient(to bottom, #da190b 0%, #f44336 100%);
-}
-
-/* Notice bar */
-#notice {
-  background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
-  color: white;
-  padding: 10px 20px;
-  font-weight: bold;
-  text-align: center;
-  border-bottom: 2px solid #a85f00;
-}
-
-/* Page content */
-#page-content {
-  padding: 20px;
-}
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-.avatar-placeholder {
-  width: 80px;
-  height: 80px;
-  background: #ccc;
-  border: 2px solid #999;
-}
-.profile-username {
-  font-weight: bold;
-  font-size: 20px;
-}
-#description {
-  margin-bottom: 20px;
-}
-#badges {
-  margin-top: 20px;
-}
-
-/* Badges (customizable background color) */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  margin-right: 6px;
-  font-size: 12px;
-  color: white;
-  font-weight: bold;
-}
-.badge img {
-  width: 16px;
-  height: 16px;
-  margin-right: 4px;
-  vertical-align: middle;
-}
-
+.nav-links { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; }
+.nav-links a:hover { text-decoration:underline; }
+/* Buttons like Home.html */
+.button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; transition:0.3s; }
+.logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
+.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
+/* Notice */
+#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+/* Profile Content */
+#page-content { padding:20px; }
+.profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
+.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
+.profile-username { font-weight:bold; font-size:20px; }
+#description { margin-bottom:20px; }
+#badges { margin-top:20px; }
+/* Badge styling */
+.badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
+.badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
 /* Footer */
-#footer {
-  text-align: center;
-  font-size: 12px;
-  color: #444;
-  padding: 10px;
-  border-top: 2px solid #999;
-  background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
-  margin-top: 40px;
-}
+#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
 </style>
 </head>
 <body>
@@ -167,7 +62,7 @@ body {
   </div>
   <div id="description"></div>
   <div id="badges">
-    <strong>Player Badges:</strong> 
+    <strong>Player Badges:</strong>
     <span id="badgeContainer"></span>
   </div>
 </div>
@@ -200,11 +95,11 @@ const profileUsername = document.getElementById("profileUsername");
 const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 
-// Load notice from GitHub
+let dynamicNotice = "Welcome to Venux!";
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r => r.ok ? r.text() : "Welcome to Venux!")
-  .then(t => noticeBar.textContent = t)
-  .catch(() => noticeBar.textContent = "Welcome to Venux!");
+  .then(r => r.ok ? r.text() : dynamicNotice)
+  .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
+  .catch(() => noticeBar.textContent = dynamicNotice);
 
 // Get userId from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -233,70 +128,40 @@ onAuthStateChanged(auth, async (user) => {
   if (viewingUserId) {
     userDoc = await getUserByNumericId(viewingUserId);
     if (!userDoc) {
-      noticeBar.textContent = "User not found.";
+      noticeBar.textContent = dynamicNotice; // dynamic notice instead of static
       return;
     }
   } else {
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("uid", "==", user.uid));
     const snapshot = await getDocs(q);
-    if (snapshot.empty) {
-      noticeBar.textContent = "Profile not found.";
-      return;
-    }
+    if (snapshot.empty) { noticeBar.textContent = dynamicNotice; return; }
     userDoc = snapshot.docs[0];
   }
 
   const data = userDoc.data();
-  const username = data.username || "User";
-  profileUsername.textContent = username;
-  const descText = data.description || "This user hasn't added a description yet.";
-  descriptionDiv.innerHTML = `<p>${descText}</p>`;
+  profileUsername.textContent = data.username || "User";
+  descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
-  // 🎖️ Custom badge setup with colors
+  // 🏅 Badges assigned strictly by userId
   const badges = [];
+  const badgeDefinitions = [
+    { userId: 1, name: "Admin Badge", icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color: "#8b0000" },
+    { userId: 2, name: "VIP Badge", icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png", color: "#f59e0b" },
+    { userId: 3, name: "Mod Badge", icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png", color: "#2563eb" }
+  ];
 
-  if (username.toLowerCase() === "Brick Dude") {
-    badges.push({
-      name: "Admin Badge",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png",
-      color: "#8b0000" // red
-    });
-  }
+  badgeDefinitions.forEach(bd => {
+    if (bd.userId === data.userId) badges.push(bd);
+  });
 
-    if (username.toLowerCase() === "lead") {
-    badges.push({
-      name: "Admin Badge",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png",
-      color: "#8b0000" // red
-    });
-  }
-  
-  if (username.toLowerCase() === "lead") {
-    badges.push({
-      name: "VIP",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png",
-      color: "#f59e0b" // gold
-    });
-  }
-
-  if (username.toLowerCase() === "moduser") {
-    badges.push({
-      name: "idka",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png",
-      color: "#2563eb" // blue
-    });
-  }
-
-  // 🧩 Render badges
   badgeContainer.innerHTML = "";
-  if (badges.length === 0) {
-    badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
-  } else {
+  if (badges.length === 0) badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
+  else {
     badges.forEach(b => {
       const badgeEl = document.createElement("span");
       badgeEl.className = "badge";
-      badgeEl.style.background = b.color || "#1a4a84"; // default dark blue
+      badgeEl.style.background = b.color || "#1a4a84";
       if (b.icon) {
         const img = document.createElement("img");
         img.src = b.icon;
@@ -309,5 +174,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 </script>
+
 </body>
 </html>
