@@ -12,7 +12,6 @@
       font-size: 13px;
       color: #222;
     }
-
     #main-header {
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
       padding: 10px 20px;
@@ -21,19 +20,8 @@
       justify-content: space-between;
       align-items: center;
     }
-
-    #main-header img {
-      height: 52px;
-      object-fit: contain;
-    }
-
-    .auth-buttons {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: white;
-    }
-
+    #main-header img { height: 52px; object-fit: contain; }
+    .auth-buttons { display: flex; align-items: center; gap: 10px; color: white; }
     .logout-btn {
       padding: 8px 15px;
       border: none;
@@ -44,24 +32,13 @@
       background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
       color: white;
     }
-
     #sub-header {
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
       padding: 8px 15px;
       border-bottom: 1px solid #000;
     }
-
-    #sub-header a {
-      color: white;
-      text-decoration: none;
-      margin-right: 20px;
-      font-weight: bold;
-    }
-
-    #sub-header a:hover {
-      text-decoration: underline;
-    }
-
+    #sub-header a { color: white; text-decoration: none; margin-right: 20px; font-weight: bold; }
+    #sub-header a:hover { text-decoration: underline; }
     #notice {
       background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
       color: white;
@@ -70,26 +47,9 @@
       text-align: center;
       border-bottom: 2px solid #a85f00;
     }
-
-    #page-content {
-      padding: 20px;
-    }
-
-    .error-message {
-      color: red;
-      font-size: 12px;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    h2 {
-      font-size: 15px;
-      margin-bottom: 15px;
-      color: #1a1a1a;
-      border-bottom: 1px solid #aaa;
-      padding-bottom: 5px;
-    }
-
+    #page-content { padding: 20px; }
+    .error-message { color: red; font-size: 12px; text-align: center; margin-bottom: 10px; }
+    h2 { font-size: 15px; margin-bottom: 15px; color: #1a1a1a; border-bottom: 1px solid #aaa; padding-bottom: 5px; }
     .news-box {
       background: linear-gradient(to bottom, #fff 0%, #e2e2e2 100%);
       border: 2px solid #999;
@@ -98,23 +58,9 @@
       width: 600px;
       box-shadow: 2px 2px 0px #aaa;
     }
-
-    .news-title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .news-date {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 10px;
-    }
-
-    .news-body {
-      font-size: 13px;
-    }
-
+    .news-title { font-weight: bold; font-size: 14px; margin-bottom: 6px; }
+    .news-date { font-size: 11px; color: #666; margin-bottom: 10px; }
+    .news-body { font-size: 13px; }
     #footer {
       text-align: center;
       font-size: 12px;
@@ -129,7 +75,7 @@
 <body>
 
   <div id="main-header">
-    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux" onerror="this.src='https://via.placeholder.com/150x52?text=Venux'">
+    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
     <div class="auth-buttons" id="authButtons"></div>
   </div>
 
@@ -146,8 +92,26 @@
   </div>
 
   <div id="notice">Loading...</div>
+
   <div id="page-content">
-    <div class="loading">Checking authentication...</div>
+    <!-- Static fallback news -->
+    <h2>Latest News</h2>
+    <div class="news-box">
+      <div class="news-title">Welcome to Venux!</div>
+      <div class="news-date">Posted: 8th October, 2025</div>
+      <div class="news-body">
+        This is for news happening in Venux!
+      </div>
+    </div>
+    <div class="news-box">
+      <div class="news-title">Update Log</div>
+      <div class="news-date">Posted: 8th October, 2025</div>
+      <div class="news-body">
+        - Added more pages<br>
+        - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
+        - Our website is live!
+      </div>
+    </div>
   </div>
 
   <div id="footer">
@@ -178,10 +142,7 @@
     const pageContent = document.getElementById("page-content");
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "Login.html";
-        return;
-      }
+      if (!user) { window.location.href = "Login.html"; return; }
 
       const userDocRef = doc(db, "users", user.uid);
       let username = "User";
@@ -193,8 +154,8 @@
         } else {
           await setDoc(userDocRef, { username: "User", createdAt: new Date() });
         }
-      } catch (err) {
-        console.error(err);
+      } catch(err) {
+        console.error("User fetch error:", err);
         noticeBar.textContent = "Error loading user info.";
       }
 
@@ -205,33 +166,35 @@
         try {
           await signOut(auth);
           window.location.href = "Login.html";
-        } catch (err) {
+        } catch(err) {
           console.error("Logout failed:", err);
           noticeBar.textContent = "Logout failed. Try again.";
         }
       });
 
-      // Pull public news collection
+      // Pull news from Firestore (replace static fallback)
       try {
         const newsRef = collection(db, "news");
         const newsSnap = await getDocs(newsRef);
-        let newsHTML = "<h2>Latest News</h2>";
-        newsSnap.forEach(doc => {
-          const data = doc.data();
-          newsHTML += `
-            <div class="news-box">
-              <div class="news-title">${data.title}</div>
-              <div class="news-date">Posted: ${data.date}</div>
-              <div class="news-body">${data.body}</div>
-            </div>
-          `;
-        });
-        pageContent.innerHTML = newsHTML;
-      } catch (err) {
-        console.error("Error fetching news:", err);
-        pageContent.innerHTML = `<div class="error-message">Could not load news.</div>`;
+        if (!newsSnap.empty) {
+          let newsHTML = "<h2>Latest News</h2>";
+          newsSnap.forEach(doc => {
+            const data = doc.data();
+            newsHTML += `
+              <div class="news-box">
+                <div class="news-title">${data.title}</div>
+                <div class="news-date">Posted: ${data.date}</div>
+                <div class="news-body">${data.body}</div>
+              </div>
+            `;
+          });
+          pageContent.innerHTML = newsHTML;
+        }
+      } catch(err) {
+        console.error("News fetch error:", err);
       }
     });
   </script>
+
 </body>
 </html>
