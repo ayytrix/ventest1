@@ -4,35 +4,137 @@
 <meta charset="UTF-8">
 <title>Venux - Profile</title>
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#d4d4d4;
+  color:#222;
+  font-size:13px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
 /* Header */
-#main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
-#main-header img { height:52px; }
-/* Navigation bar */
-.nav-links { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; }
-.nav-links a:hover { text-decoration:underline; }
+#main-header {
+  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+#main-header img {
+  height:52px;
+  object-fit:contain;
+}
+/* Nav bar */
+.nav-links {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.nav-links a {
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:13px;
+  padding:6px 10px;
+  border-radius:4px;
+  transition: all 0.3s ease;
+}
+.nav-links a:hover {
+  background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
+}
 /* Buttons */
-.button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; transition:0.3s; }
-.logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
-.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-.edit-btn, .theme-btn { background:#1a4a84; color:white; border:none; border-radius:4px; padding:5px 10px; cursor:pointer; transition:0.3s; }
-.edit-btn:hover, .theme-btn:hover { background:#255da3; }
+.button {
+  padding:7px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:12px;
+  color:white;
+  transition: all 0.3s ease;
+}
+.logout-btn {
+  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
+}
+.logout-btn:hover {
+  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
+}
+.edit-btn {
+  margin-top:10px;
+  padding:5px 10px;
+  font-size:12px;
+  cursor:pointer;
+}
+.theme-btn {
+  margin-top:10px;
+  padding:5px 10px;
+  font-size:12px;
+  cursor:pointer;
+}
 /* Notice */
-#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-/* Profile Content */
-#page-content { padding:20px; }
-.profile-header { display:flex; align-items:center; gap:15px; margin-bottom:10px; }
-.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
-.profile-username { font-weight:bold; font-size:20px; }
-#description { margin-bottom:10px; }
-#profileButtons { display:flex; gap:10px; margin-bottom:20px; }
-/* Badges */
-#badges { margin-top:20px; }
-.badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
-.badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
+#notice {
+  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
+  color:white;
+  padding:10px 20px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:2px solid #a85f00;
+}
+/* Page content */
+#page-content {
+  padding:20px;
+  flex:1;
+}
+.profile-header {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+.avatar-placeholder {
+  width:80px;
+  height:80px;
+  background:#ccc;
+  border:2px solid #999;
+}
+.profile-username {
+  font-weight:bold;
+  font-size:20px;
+}
+#description {
+  margin-bottom:20px;
+}
+#badges {
+  margin-top:20px;
+}
+.badge {
+  display:inline-flex;
+  align-items:center;
+  padding:4px 8px;
+  border-radius:4px;
+  margin-right:6px;
+  font-size:12px;
+  color:white;
+  font-weight:bold;
+}
+.badge img {
+  width:16px;
+  height:16px;
+  margin-right:4px;
+  vertical-align:middle;
+}
 /* Footer */
-#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
+#footer {
+  text-align:center;
+  font-size:12px;
+  color:#444;
+  padding:10px;
+  border-top:2px solid #999;
+  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
+}
 </style>
 </head>
 <body>
@@ -40,18 +142,7 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 <!-- Header -->
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  <div class="nav-links">
-    <a href="Home.html">Home</a> |
-    <a href="Games.html">Games</a> |
-    <a href="Catalog.html">Catalog</a> |
-    <a href="Users.html">Users</a> |
-    <a href="Forums.html">Forum</a> |
-    <a href="Clans.html">Clans</a> |
-    <a href="Help.html">Help</a> |
-    <a href="Downloads.html">Downloads</a> |
-    <a href="Create.html">Create</a>
-    <button class="button logout-btn" id="logoutBtn">Logout</button>
-  </div>
+  <div class="nav-links" id="authNavLinks"></div>
 </div>
 
 <!-- Notice -->
@@ -66,7 +157,6 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 
   <div id="description"></div>
 
-  <!-- Buttons -->
   <div id="profileButtons">
     <button class="edit-btn" id="editDescriptionBtn" style="display:none;">Edit Description</button>
     <button class="theme-btn" id="editThemeBtn" style="display:none;">Edit Theme</button>
@@ -81,10 +171,11 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 <!-- Footer -->
 <div id="footer">© 2025, Venux All rights reserved</div>
 
+<!-- Firebase Script -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -101,18 +192,21 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const noticeBar = document.getElementById("notice");
+const authNavLinks = document.getElementById("authNavLinks");
 const profileUsername = document.getElementById("profileUsername");
 const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 const editDescriptionBtn = document.getElementById("editDescriptionBtn");
 const editThemeBtn = document.getElementById("editThemeBtn");
 
+// Dynamic notice
 let dynamicNotice = "Welcome to Venux!";
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : dynamicNotice)
   .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
   .catch(() => noticeBar.textContent = dynamicNotice);
 
+// Get userId from URL
 const urlParams = new URLSearchParams(window.location.search);
 const viewingUserId = parseInt(urlParams.get('userId'), 10);
 
@@ -130,86 +224,115 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
+  authNavLinks.innerHTML = `
+    <a href="Home.html">Home</a>
+    <a href="Games.html">Games</a>
+    <a href="Catalog.html">Catalog</a>
+    <a href="Users.html">Users</a>
+    <a href="Forums.html">Forum</a>
+    <a href="Clans.html">Clans</a>
+    <a href="Help.html">Help</a>
+    <a href="Downloads.html">Downloads</a>
+    <a href="Create.html">Create</a>
+    <button class="button logout-btn" id="logoutBtn">Logout</button>
+  `;
+
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
     await signOut(auth);
-    window.location.href = "Login.html";
+    window.location.href="Login.html";
   });
 
   let userDoc;
-  if (viewingUserId) {
+  if(viewingUserId){
     userDoc = await getUserByNumericId(viewingUserId);
-    if (!userDoc) {
+    if(!userDoc){
       noticeBar.textContent = dynamicNotice;
       return;
     }
   } else {
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("uid", "==", user.uid));
+    const usersRef = collection(db,"users");
+    const q = query(usersRef, where("uid","==",user.uid));
     const snapshot = await getDocs(q);
-    if (snapshot.empty) { noticeBar.textContent = dynamicNotice; return; }
+    if(snapshot.empty){ noticeBar.textContent=dynamicNotice; return; }
     userDoc = snapshot.docs[0];
   }
 
   const data = userDoc.data();
+  const isOwner = user.uid === userDoc.id;
+
   profileUsername.textContent = data.username || "User";
+  descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
-  descriptionDiv.innerHTML = `<p id="descText">${data.description || "This user hasn't added a description yet."}</p>`;
-
-  // Show buttons only if viewing own profile
-  const isOwnProfile = user.uid === userDoc.id;
-  if (isOwnProfile) {
+  // Show buttons only for owner
+  if(isOwner){
     editDescriptionBtn.style.display = "inline-block";
     editThemeBtn.style.display = "inline-block";
-
-    editDescriptionBtn.addEventListener("click", () => {
-      const currentText = data.description || "";
-      descriptionDiv.innerHTML = `<textarea id="descTextarea" style="width:100%; padding:8px;">${currentText}</textarea>
-      <button id="saveDescriptionBtn" class="edit-btn">Save</button>`;
-      document.getElementById("saveDescriptionBtn").addEventListener("click", async () => {
-        const newDesc = document.getElementById("descTextarea").value;
-        await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
-        descriptionDiv.innerHTML = `<p id="descText">${newDesc}</p>`;
-      });
-    });
-
-    editThemeBtn.addEventListener("click", () => {
-      descriptionDiv.insertAdjacentHTML("afterend",
-        `<input type="color" id="themeColorPicker" value="${data.themeColor || '#d4d4d4'}">
-        <button id="saveThemeBtn" class="theme-btn">Done</button>`);
-      const colorPicker = document.getElementById("themeColorPicker");
-      document.getElementById("saveThemeBtn").addEventListener("click", async () => {
-        const newColor = colorPicker.value;
-        document.body.style.background = newColor;
-        await setDoc(doc(db,"users",user.uid), {...data, themeColor:newColor}, {merge:true});
-        colorPicker.remove();
-        document.getElementById("saveThemeBtn").remove();
-      });
-    });
   }
 
-  // Render badges
-  const badgeContainerEl = document.getElementById("badgeContainer");
-  badgeContainerEl.innerHTML = "";
-  const badges = data.badges || []; // allow multiple badges
-  if (badges.length === 0) badgeContainerEl.innerHTML = "<span>No badges earned yet.</span>";
+  // Edit description
+  editDescriptionBtn.addEventListener("click", ()=>{
+    const currentText = data.description || "";
+    descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
+      <button class="edit-btn" id="saveDescription">Save</button>`;
+    document.getElementById("saveDescription").addEventListener("click", async ()=>{
+      const newDesc = document.getElementById("descTextarea").value;
+      await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
+      descriptionDiv.innerHTML = `<p>${newDesc}</p>`;
+    });
+  });
+
+  // Edit theme
+  editThemeBtn.addEventListener("click", ()=>{
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.value = data.themeColor || "#d4d4d4";
+    const doneBtn = document.createElement("button");
+    doneBtn.textContent = "Done";
+    doneBtn.className = "edit-btn";
+    descriptionDiv.appendChild(document.createElement("br"));
+    descriptionDiv.appendChild(colorInput);
+    descriptionDiv.appendChild(doneBtn);
+
+    doneBtn.addEventListener("click", async ()=>{
+      const newColor = colorInput.value;
+      document.body.style.background = newColor;
+      await setDoc(doc(db,"users",user.uid), {...data, themeColor:newColor}, {merge:true});
+      colorInput.remove();
+      doneBtn.remove();
+    });
+  });
+
+  // Apply saved theme for this profile only
+  if(data.themeColor){
+    document.body.style.background = data.themeColor;
+  }
+
+  // Badges (multiple)
+  const badges = [];
+  const badgeDefs = [
+    { userId: 1, name:"Admin Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
+    { userId: 2, name:"VIP Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png", color:"#f59e0b"},
+    { userId: 3, name:"Mod Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png", color:"#2563eb"}
+  ];
+  badgeDefs.forEach(bd => { if(bd.userId === data.userId) badges.push(bd); });
+
+  badgeContainer.innerHTML = "";
+  if(badges.length === 0) badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
   else {
-    badges.forEach(b => {
+    badges.forEach(b=>{
       const badgeEl = document.createElement("span");
       badgeEl.className = "badge";
       badgeEl.style.background = b.color || "#1a4a84";
-      if (b.icon) {
+      if(b.icon){
         const img = document.createElement("img");
         img.src = b.icon;
         img.alt = b.name;
         badgeEl.appendChild(img);
       }
       badgeEl.appendChild(document.createTextNode(b.name));
-      badgeContainerEl.appendChild(badgeEl);
+      badgeContainer.appendChild(badgeEl);
     });
   }
-
-  // Apply stored theme if exists
-  if (data.themeColor) document.body.style.background = data.themeColor;
 });
 </script>
 
