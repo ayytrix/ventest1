@@ -1,118 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Venux - Sign Up</title>
-<link rel="icon" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    background: #d4d4d4;
-    color: #222;
-  }
-  #main-header {
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-  }
-  #main-header img { height: 52px; }
-  #sub-header {
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    padding: 8px 15px;
-    border-bottom: 1px solid #000;
-  }
-  #sub-header a {
-    color: white;
-    text-decoration: none;
-    margin-right: 20px;
-    font-weight: bold;
-  }
-  #sub-header a:hover { text-decoration: underline; }
-  #notice {
-    background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
-    color: white;
-    padding: 10px 20px;
-    font-weight: bold;
-    text-align: center;
-    border-bottom: 2px solid #a85f00;
-  }
-  #page-content { padding: 40px; display: flex; justify-content: center; }
-  .signup-box {
-    background: linear-gradient(to bottom, #fff 0%, #e2e2e2 100%);
-    border: 2px solid #999;
-    box-shadow: 2px 2px 0 #aaa;
-    padding: 25px 35px;
-    width: 420px;
-    border-radius: 6px;
-  }
-  .signup-box h2 { text-align: center; font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid #aaa; padding-bottom: 8px; }
-  .signup-box input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #999; border-radius: 3px; font-size: 13px; }
-  .signup-box button {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  .signup-box button:hover {
-    background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
-  }
-  .error-message { color: red; font-size: 12px; margin-bottom: 10px; display: none; }
-  .success-message { color: green; font-size: 12px; margin-bottom: 10px; display: none; }
-  .signup-links { text-align: center; margin-top: 15px; }
-  .signup-links a { color: #0b2c5a; text-decoration: none; font-weight: bold; }
-  .signup-links a:hover { text-decoration: underline; }
-  #footer {
-    text-align: center;
-    font-size: 12px;
-    color: #444;
-    padding: 10px;
-    border-top: 2px solid #999;
-    background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
-    margin-top: 40px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Venux - Sign Up</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #222;
+      background-color: #d4d4d4;
+    }
+
+    /* Header */
+    #main-header {
+      background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+      padding: 10px 20px;
+      border-bottom: 2px solid #071b36;
+      display: flex;
+      align-items: center;
+    }
+
+    #main-header img {
+      height: 52px;
+      object-fit: contain;
+    }
+
+    /* Navigation */
+    #sub-header {
+      background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+      padding: 8px 15px;
+      border-bottom: 1px solid #000;
+    }
+
+    #sub-header a {
+      color: white;
+      text-decoration: none;
+      margin-right: 20px;
+      font-weight: bold;
+    }
+
+    #sub-header a:hover {
+      text-decoration: underline;
+    }
+
+    /* Notice Bar */
+    #notice {
+      background: linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 2px solid #a85f00;
+    }
+
+    /* Page Content */
+    #page-content {
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .signup-box {
+      width: 420px;
+      padding: 25px 35px;
+      background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%);
+      border: 2px solid #999;
+      border-radius: 6px;
+      box-shadow: 2px 2px 0 #aaa;
+    }
+
+    .signup-box h2 {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 8px;
+    }
+
+    .signup-box label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .signup-box input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #999;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+
+    .signup-box button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+      color: white;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    .signup-box button:hover {
+      background: linear-gradient(to bottom,#255da3 0%,#0d3268 100%);
+    }
+
+    .signup-box button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 12px;
+      margin-top: -5px;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .success-message {
+      color: green;
+      font-size: 12px;
+      margin-top: -5px;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .signup-links {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .signup-links a {
+      color: #0b2c5a;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .signup-links a:hover {
+      text-decoration: underline;
+    }
+
+    #footer {
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      padding: 10px;
+      border-top: 2px solid #999;
+      background: linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
+      margin-top: 40px;
+    }
+
+    .turnstile-wrapper {
+      text-align: center;
+      margin: 15px 0;
+    }
+  </style>
+
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3.11.0/dist/email.min.js"></script>
 </head>
 <body>
 
 <div id="main-header">
-  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux Logo">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
 </div>
 
 <div id="sub-header">
   <a href="Home.html">Home</a>
-  <a href="Games.html">Games</a>
-  <a href="Catalog.html">Catalog</a>
-  <a href="Users.html">Users</a>
-  <a href="Forums.html">Forum</a>
-  <a href="Clans.html">Clans</a>
-  <a href="Help.html">Help</a>
-  <a href="Downloads.html">Downloads</a>
+  <a href="unfinished.html">Games</a>
+  <a href="unfinished.html">Catalog</a>
+  <a href="unfinished.html">Users</a>
+  <a href="unfinished.html">Forum</a>
+  <a href="unfinished.html">Clans</a>
+  <a href="unfinished.html">Help</a>
+  <a href="unfinished.html">Downloads</a>
   <a href="Create.html">Create</a>
 </div>
 
-<div id="notice">Welcome! Fill out the form below to create an account.</div>
+<div id="notice">Loading...</div>
 
 <div id="page-content">
   <div class="signup-box">
     <h2>Sign Up</h2>
     <form id="signupForm">
-      <input type="text" id="username" placeholder="Username" required>
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Choose a username" required>
       <div id="usernameError" class="error-message"></div>
-      <input type="email" id="email" placeholder="Email (optional)">
-      <input type="password" id="password" placeholder="Password" required>
-      <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+
+      <label for="email">Email (Optional)</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email (optional)">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Create a password" required>
+
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" id="confirm-password" name="confirm-password" placeholder="Re-enter your password" required>
+
       <div id="passwordError" class="error-message"></div>
-      <div id="passwordSuccess" class="success-message"></div>
-      <button type="submit" id="signupBtn">Create Account</button>
+      <div id="passwordSuccess" class="success-message">Passwords match!</div>
+
+      <div class="signup-links">
+        <a href="TermsOfService.html">Make sure you read our Terms of Service.</a>
+      </div>
+
+      <div class="turnstile-wrapper">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ"></div>
+      </div>
+
+      <button type="submit" id="signupBtn" disabled>Create Account</button>
     </form>
+
     <div class="signup-links">
       <a href="Login.html">Already have an account? Log in</a>
     </div>
@@ -122,122 +229,151 @@
 <div id="footer">© 2025, Venux All rights reserved</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDocs, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
-  authDomain: "venux1.firebaseapp.com",
-  projectId: "venux1",
-  storageBucket: "venux1.appspot.com",
-  messagingSenderId: "231055963335",
-  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
-  measurementId: "G-N36RRV95SW"
-};
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+    authDomain: "venux1.firebaseapp.com",
+    projectId: "venux1",
+    storageBucket: "venux1.appspot.com",
+    messagingSenderId: "231055963335",
+    appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+    measurementId: "G-N36RRV95SW"
+  };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-// Form elements
-const form = document.getElementById("signupForm");
-const usernameInput = document.getElementById("username");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const confirmPassword = document.getElementById("confirm-password");
-const usernameError = document.getElementById("usernameError");
-const passwordError = document.getElementById("passwordError");
-const passwordSuccess = document.getElementById("passwordSuccess");
-const signupBtn = document.getElementById("signupBtn");
+  const form = document.getElementById("signupForm");
+  const usernameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const confirmPassword = document.getElementById("confirm-password");
+  const usernameError = document.getElementById("usernameError");
+  const passwordError = document.getElementById("passwordError");
+  const passwordSuccess = document.getElementById("passwordSuccess");
+  const signupBtn = document.getElementById("signupBtn");
 
-// Helper: check password
-function checkPasswords() {
-  if(passwordInput.value.length < 6) {
-    passwordError.style.display = "block";
-    passwordError.textContent = "Password must be at least 6 characters.";
-    passwordSuccess.style.display = "none";
-    return false;
+  // Fetch dynamic notice
+  fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+    .then(r => r.ok ? r.text() : "Welcome to Venux!")
+    .then(data => document.getElementById("notice").textContent = data)
+    .catch(() => document.getElementById("notice").textContent = "Welcome to Venux!");
+
+  // Password check
+  function validatePasswords() {
+    if (passwordInput.value.length < 6) {
+      passwordError.style.display = "block";
+      passwordError.textContent = "Password must be at least 6 characters";
+      passwordSuccess.style.display = "none";
+      return false;
+    }
+    if (passwordInput.value !== confirmPassword.value) {
+      passwordError.style.display = "block";
+      passwordError.textContent = "Passwords do not match";
+      passwordSuccess.style.display = "none";
+      return false;
+    }
+    passwordError.style.display = "none";
+    passwordSuccess.style.display = "block";
+    return true;
   }
-  if(passwordInput.value !== confirmPassword.value) {
-    passwordError.style.display = "block";
-    passwordError.textContent = "Passwords do not match.";
-    passwordSuccess.style.display = "none";
-    return false;
-  }
-  passwordError.style.display = "none";
-  passwordSuccess.style.display = "block";
-  passwordSuccess.textContent = "Passwords match!";
-  return true;
-}
 
-passwordInput.addEventListener("input", checkPasswords);
-confirmPassword.addEventListener("input", checkPasswords);
-
-// Assign numeric userId
-async function getNextUserId() {
-  const usersRef = collection(db, "users");
-  const q = query(usersRef, orderBy("userId", "desc"), limit(1));
-  const snapshot = await getDocs(q);
-  if(snapshot.empty) return 1;
-  return snapshot.docs[0].data().userId + 1;
-}
-
-// Check username availability
-async function checkUsernameAvailability(username) {
-  const usersRef = collection(db,"users");
-  const q = query(usersRef, where("username","==",username));
-  const snapshot = await getDocs(q);
-  return snapshot.empty;
-}
-
-// Form submission
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if(!checkPasswords()) return;
-
-  const username = usernameInput.value.trim();
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+  passwordInput.addEventListener("input", validatePasswords);
+  confirmPassword.addEventListener("input", validatePasswords);
 
   // Check username availability
-  const available = await checkUsernameAvailability(username);
-  if(!available) {
-    usernameError.textContent = "Username already taken";
-    usernameError.style.display = "block";
-    return;
+  async function checkUsernameAvailability(username) {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("username", "==", username));
+    const snapshot = await getDocs(q);
+    return snapshot.empty;
   }
 
-  signupBtn.disabled = true;
-  signupBtn.textContent = "Creating Account...";
+  usernameInput.addEventListener("input", async () => {
+    const username = usernameInput.value.trim();
+    if (username.length < 3 || username.length > 20) {
+      usernameError.textContent = "Username must be 3-20 characters";
+      usernameError.style.display = "block";
+      signupBtn.disabled = true;
+      return;
+    }
+    const regex = /^[a-zA-Z0-9_]+$/;
+    if (!regex.test(username)) {
+      usernameError.textContent = "Invalid characters";
+      usernameError.style.display = "block";
+      signupBtn.disabled = true;
+      return;
+    }
+    const forbidden = ["nigga","nigger","fuck","shit","bitch","hoe"];
+    if (forbidden.includes(username.toLowerCase())) {
+      usernameError.textContent = "Invalid username";
+      usernameError.style.display = "block";
+      signupBtn.disabled = true;
+      return;
+    }
+    const available = await checkUsernameAvailability(username);
+    if (!available) {
+      usernameError.textContent = "Username taken";
+      usernameError.style.display = "block";
+      signupBtn.disabled = true;
+      return;
+    }
+    usernameError.style.display = "none";
+    signupBtn.disabled = !validatePasswords();
+  });
 
-  try {
-    const userId = await getNextUserId(); // numeric ID
-    const uniqueEmail = `${username.toLowerCase()}_${Date.now()}@venux.local`;
+  // Handle form submission
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!validatePasswords()) return;
 
-    const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, password);
-    const user = userCredential.user;
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
-    await setDoc(doc(db, "users", user.uid), {
-      username,
-      email: email || null,
-      authEmail: uniqueEmail,
-      createdAt: new Date().toISOString(),
-      userId, // <-- numeric ID
-      description: ""
-    });
+    const captcha = document.querySelector('input[name="cf-turnstile-response"]');
+    if (!captcha || !captcha.value) {
+      alert("Please complete CAPTCHA");
+      return;
+    }
 
-    alert(`Account created! Your profile URL: https://venux.fun/profile?userId=${userId}`);
-    window.location.href = "Home.html";
+    signupBtn.disabled = true;
+    signupBtn.textContent = "Creating Account...";
 
-  } catch(err) {
-    console.error(err);
-    alert("Error: " + (err.message || JSON.stringify(err)));
-    signupBtn.disabled = false;
-    signupBtn.textContent = "Create Account";
-  }
-});
+    try {
+      const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const timestamp = Date.now();
+      const uniqueEmail = `${cleanUsername}_${timestamp}@venux.local`;
+
+      const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, password);
+      const user = userCredential.user;
+
+      // Assign numeric userId
+      const usersRef = collection(db, "users");
+      const snapshot = await getDocs(usersRef);
+      let userId = snapshot.size + 1; // simple increment, can be improved
+
+      await setDoc(doc(db, "users", user.uid), {
+        username: username,
+        authEmail: uniqueEmail,
+        email: email || null,
+        userId: userId,
+        createdAt: new Date().toISOString()
+      });
+
+      window.location.href = "Home.html";
+    } catch (err) {
+      console.error(err);
+      alert("Error: " + (err.message || JSON.stringify(err)));
+      signupBtn.disabled = false;
+      signupBtn.textContent = "Create Account";
+    }
+  });
 </script>
 
 </body>
