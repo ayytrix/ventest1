@@ -4,25 +4,114 @@
 <meta charset="UTF-8">
 <title>Venux - Home</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#d4d4d4;color:#222;font-size:13px;}
-#main-header{background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
-#main-header img{height:52px;object-fit:contain;}
-.auth-buttons{display:flex;align-items:center;gap:10px;color:white;}
-.logout-btn{padding:8px 15px;border:none;border-radius:4px;font-weight:bold;cursor:pointer;font-size:12px;background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);color:white;}
-#notice{background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);color:white;padding:10px 20px;font-weight:bold;text-align:center;border-bottom:2px solid #a85f00;}
-#page-content{padding:20px;}
-.news-box{background:linear-gradient(to bottom,#fff 0%,#e2e2e2 100%);border:2px solid #999;padding:12px;margin-bottom:15px;width:600px;box-shadow:2px 2px 0 #aaa;}
-.news-title{font-weight:bold;font-size:14px;margin-bottom:6px;}
-.news-date{font-size:11px;color:#666;margin-bottom:10px;}
-.news-body{font-size:13px;}
-#footer{text-align:center;font-size:12px;color:#444;padding:10px;border-top:2px solid #999;background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);margin-top:40px;}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#d4d4d4;
+  color:#222;
+  font-size:13px;
+}
+#main-header{
+  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+#main-header img{
+  height:52px;
+  object-fit:contain;
+}
+.auth-buttons{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:white;
+}
+.logout-btn{
+  padding:8px 15px;
+  border:none;
+  border-radius:4px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:12px;
+  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
+  color:white;
+}
+#sub-header{
+  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+  padding:8px 15px;
+  border-bottom:1px solid #000000;
+}
+#sub-header a{
+  color:white;
+  text-decoration:none;
+  margin-right:20px;
+  font-weight:bold;
+}
+#sub-header a:hover{
+  text-decoration:underline;
+}
+#notice{
+  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
+  color:white;
+  padding:10px 20px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:2px solid #a85f00;
+}
+#page-content{
+  padding:20px;
+}
+.news-box{
+  background:linear-gradient(to bottom,#fff 0%,#e2e2e2 100%);
+  border:2px solid #999;
+  padding:12px;
+  margin-bottom:15px;
+  width:600px;
+  box-shadow:2px 2px 0 #aaa;
+}
+.news-title{
+  font-weight:bold;
+  font-size:14px;
+  margin-bottom:6px;
+}
+.news-date{
+  font-size:11px;
+  color:#666;
+  margin-bottom:10px;
+}
+.news-body{
+  font-size:13px;
+}
+#footer{
+  text-align:center;
+  font-size:12px;
+  color:#444;
+  padding:10px;
+  border-top:2px solid #999;
+  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
+  margin-top:40px;
+}
 </style>
 </head>
 <body>
 
 <div id="main-header">
-<img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-<div class="auth-buttons" id="authButtons"></div>
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+  <div class="auth-buttons" id="authButtons"></div>
+</div>
+
+<div id="sub-header">
+  <a href="Home.html">Home</a>
+  <a href="Games.html">Games</a>
+  <a href="Catalog.html">Catalog</a>
+  <a href="Users.html">Users</a>
+  <a href="Forums.html">Forum</a>
+  <a href="Clans.html">Clans</a>
+  <a href="Help.html">Help</a>
+  <a href="Downloads.html">Downloads</a>
+  <a href="Create.html">Create</a>
 </div>
 
 <div id="notice">Loading...</div>
@@ -52,7 +141,7 @@ const noticeBar = document.getElementById("notice");
 const authButtons = document.getElementById("authButtons");
 const pageContent = document.getElementById("page-content");
 
-// Static fallback news
+// Load static news as fallback
 function loadStaticNews(){
   pageContent.innerHTML = `
     <h2>Latest News</h2>
@@ -85,10 +174,23 @@ onAuthStateChanged(auth, async (user)=>{
     username = userSnap.data().username;
   }
 
-  noticeBar.textContent = `Welcome, ${username}`;
+  // Fetch dynamic notice text from GitHub
+  try {
+    const response = await fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc");
+    if(response.ok){
+      const noticeText = await response.text();
+      noticeBar.textContent = noticeText;
+    } else {
+      noticeBar.textContent = `Welcome, ${username}`;
+    }
+  } catch(err){
+    console.error("Failed to fetch notice:", err);
+    noticeBar.textContent = `Welcome, ${username}`;
+  }
+
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
 
-  document.getElementById("logoutBtn").addEventListener("click",async ()=>{
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
     await signOut(auth);
     window.location.href="Login.html";
   });
