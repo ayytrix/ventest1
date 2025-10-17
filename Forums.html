@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Venux - Forums</title>
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
+html, body { margin:0; padding:0; height:100%; font-family:Arial,sans-serif; font-size:13px; background:#d4d4d4; color:#222; }
 #main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
 #main-header img { height:52px; object-fit:contain; }
 .auth-buttons { display:flex; align-items:center; gap:10px; color:white; }
@@ -15,14 +15,13 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 #sub-header a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); text-decoration:none; }
 .nav-separator { color:white; margin:0 10px 0 0; }
 #notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-#page-content { padding:20px; }
+#content-wrapper { min-height:calc(100% - 156px); padding:20px; } /* Adjust for headers + footer */
 .thread-box { background:linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; width:700px; box-shadow:2px 2px 0 #aaa; }
 .thread-title { font-weight:bold; font-size:14px; margin-bottom:6px; }
 .thread-meta { font-size:11px; color:#666; margin-bottom:6px; }
 .thread-body { font-size:13px; margin-bottom:10px; }
 .reply-box { background:#f0f0f0; border:1px solid #bbb; padding:6px; margin-bottom:6px; }
 .username-link { font-weight:bold; text-decoration:none; }
-#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
 input, textarea { width:100%; padding:6px; margin-bottom:6px; font-size:13px; border-radius:4px; border:1px solid #999; }
 button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; }
 .submit-btn { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; }
@@ -30,6 +29,7 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 .reply-btn, .delete-btn, .pin-btn, .view-replies-btn { margin-top:4px; font-size:12px; }
 .pinned { color: gold; font-weight:bold; }
 .replies-frame { background:#e8e8e8; padding:6px; margin-top:6px; display:none; border:1px solid #bbb; }
+#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
 </style>
 </head>
 <body>
@@ -52,7 +52,9 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 </div>
 
 <div id="notice">Loading...</div>
-<div id="page-content"></div>
+<div id="content-wrapper">
+  <div id="page-content"></div>
+</div>
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script type="module">
@@ -60,16 +62,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebas
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
-  authDomain: "venux1.firebaseapp.com",
-  projectId: "venux1",
-  storageBucket: "venux1.appspot.com",
-  messagingSenderId: "231055963335",
-  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
-  measurementId: "G-N36RRV95SW"
-};
-
+const firebaseConfig = { apiKey:"AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg", authDomain:"venux1.firebaseapp.com", projectId:"venux1", storageBucket:"venux1.appspot.com", messagingSenderId:"231055963335", appId:"1:231055963335:web:34c2f52fca2191b3d0bae2", measurementId:"G-N36RRV95SW" };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -80,23 +73,17 @@ const pageContent = document.getElementById("page-content");
 
 let currentUser = null;
 
-// Load notice
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r=>r.ok?r.text():"Welcome to Venux Forums!")
-  .then(t=>noticeBar.textContent = t)
+  .then(r=>r.ok?r.text():"Welcome to Venux Forums!").then(t=>noticeBar.textContent = t)
   .catch(()=>noticeBar.textContent="Welcome to Venux Forums!");
 
 onAuthStateChanged(auth, async (user)=>{
   if(!user){ window.location.href="Login.html"; return; }
   currentUser = user;
-
   const userSnap = await getDoc(doc(db,"users",user.uid));
-  const username = userSnap.exists() ? userSnap.data().username : "User";
-
+  const username = userSnap.exists()?userSnap.data().username:"User";
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-    await signOut(auth); window.location.href="Login.html";
-  });
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
   pageContent.innerHTML = `
     <h2>Forums</h2>
@@ -107,106 +94,88 @@ onAuthStateChanged(auth, async (user)=>{
     </div>
     <div id="threadsContainer"></div>
   `;
-
   const threadsContainer = document.getElementById("threadsContainer");
 
   async function loadThreads(){
-    threadsContainer.innerHTML = "";
+    threadsContainer.innerHTML="";
     const threadsSnap = await getDocs(query(collection(db,"threads"), orderBy("pinned","desc"), orderBy("date","desc")));
     threadsSnap.forEach(async tDoc=>{
       const t = tDoc.data();
       const authorSnap = await getDoc(doc(db,"users",t.uid));
-      const authorName = authorSnap.exists() ? authorSnap.data().username : "User";
-      const isAdmin = (t.uid==="1" || t.uid==="2");
+      const authorName = authorSnap.exists()?authorSnap.data().username:"User";
+      const isAdmin = (t.uid==="1"||t.uid==="2");
       const usernameColor = isAdmin?"darkred":"black";
       const adminBadge = isAdmin?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
       const pinnedClass = t.pinned?"pinned":"";
-      const replyCount = t.replies?.length || 0;
+      const replyCount = t.replies?.length||0;
 
       let threadHTML = `<div class="thread-box" id="thread-${tDoc.id}">
         <div class="thread-title ${pinnedClass}">${t.title}</div>
-        <div class="thread-meta">
-          <a class="username-link" href="Profile.html?userId=${t.uid}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}
-        </div>
+        <div class="thread-meta"><a class="username-link" href="Profile.html?userId=${t.uid}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
         <div class="thread-body">${t.body}</div>
         <button class="view-replies-btn" data-threadid="${tDoc.id}">View Replies (${replyCount})</button>
         <div class="replies-frame" id="replies-${tDoc.id}">`;
 
       t.replies?.forEach(r=>{
-        threadHTML += `<div class="reply-box">
-          <a class="username-link" href="Profile.html?userId=${r.uid}" style="color:${(r.uid==="1"||r.uid==="2")?'darkred':'black'}">${r.username}</a>: ${r.text}
-        </div>`;
+        threadHTML += `<div class="reply-box"><a class="username-link" href="Profile.html?userId=${r.uid}" style="color:${(r.uid==="1"||r.uid==="2")?'darkred':'black'}">${r.username}</a>: ${r.text}</div>`;
       });
-
       threadHTML += `</div>`;
-
       if(isAdmin) threadHTML += `<button class="pin-btn" data-threadid="${tDoc.id}">${t.pinned?"Unpin":"Pin"}</button>`;
       if(t.uid===currentUser.uid) threadHTML += `<button class="delete-btn" data-threadid="${tDoc.id}">Delete</button>`;
-
-      threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDoc.id}" class="reply-input"></textarea>
-        <button class="reply-btn" data-threadid="${tDoc.id}">Reply</button>
-      </div>`;
+      threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDoc.id}" class="reply-input"></textarea><button class="reply-btn" data-threadid="${tDoc.id}">Reply</button></div>`;
 
       threadsContainer.innerHTML += threadHTML;
     });
 
-    // Reply toggle
-    document.querySelectorAll(".view-replies-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const id = btn.dataset.threadid;
-        const frame = document.getElementById(`replies-${id}`);
-        frame.style.display = frame.style.display==="none"?"block":"none";
+    // Add listeners
+    setTimeout(()=>{ // allow DOM to render
+      document.querySelectorAll(".view-replies-btn").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.dataset.threadid;
+          const frame = document.getElementById(`replies-${id}`);
+          frame.style.display = frame.style.display==="none"?"block":"none";
+        });
       });
-    });
-
-    // Pin button
-    document.querySelectorAll(".pin-btn").forEach(async btn=>{
-      btn.addEventListener("click", async ()=>{
-        const threadRef = doc(db,"threads",btn.dataset.threadid);
-        const tDoc = await getDoc(threadRef);
-        await updateDoc(threadRef,{ pinned: !tDoc.data().pinned });
-        loadThreads();
-      });
-    });
-
-    // Delete button
-    document.querySelectorAll(".delete-btn").forEach(btn=>{
-      btn.addEventListener("click", async ()=>{
-        if(confirm("Delete this thread?")){
-          await deleteDoc(doc(db,"threads",btn.dataset.threadid));
+      document.querySelectorAll(".pin-btn").forEach(async btn=>{
+        btn.addEventListener("click", async ()=>{
+          const ref = doc(db,"threads",btn.dataset.threadid);
+          const tDoc = await getDoc(ref);
+          await updateDoc(ref,{ pinned: !(tDoc.data().pinned||false) });
           loadThreads();
-        }
+        });
       });
-    });
-
-    // Reply button
-    document.querySelectorAll(".reply-btn").forEach(btn=>{
-      btn.addEventListener("click", async ()=>{
-        const threadId = btn.dataset.threadid;
-        const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
-        const text = input.value.trim();
-        if(!text) return;
-        const userSnap = await getDoc(doc(db,"users",currentUser.uid));
-        const username = userSnap.exists() ? userSnap.data().username : "User";
-        await updateDoc(doc(db,"threads",threadId), { replies: arrayUnion({ uid: currentUser.uid, username, text }) });
-        input.value = "";
-        loadThreads();
+      document.querySelectorAll(".delete-btn").forEach(async btn=>{
+        btn.addEventListener("click", async ()=>{
+          if(confirm("Delete this thread?")){ await deleteDoc(doc(db,"threads",btn.dataset.threadid)); loadThreads(); }
+        });
       });
-    });
+      document.querySelectorAll(".reply-btn").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const tid = btn.dataset.threadid;
+          const input = document.querySelector(`.reply-input[data-threadid='${tid}']`);
+          const text = input.value.trim();
+          if(!text) return;
+          const userSnap = await getDoc(doc(db,"users",currentUser.uid));
+          const uname = userSnap.exists()?userSnap.data().username:"User";
+          await updateDoc(doc(db,"threads",tid), { replies: arrayUnion({ uid:currentUser.uid, username:uname, text }) });
+          input.value="";
+          loadThreads();
+        });
+      });
+    }, 200);
   }
 
   loadThreads();
 
-  // Post new thread
   document.getElementById("postThread").addEventListener("click", async ()=>{
     const title = document.getElementById("threadTitle").value.trim();
     const body = document.getElementById("threadBody").value.trim();
     if(!title || !body) return alert("Enter title and body");
     await addDoc(collection(db,"threads"), { uid:currentUser.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false });
-    document.getElementById("threadTitle").value="";
-    document.getElementById("threadBody").value="";
+    document.getElementById("threadTitle").value=""; document.getElementById("threadBody").value="";
     loadThreads();
   });
+
 });
 </script>
 </body>
