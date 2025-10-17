@@ -158,102 +158,81 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setLogLevel, enableNetwork } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-    (async () => {
-      try {
-        setLogLevel("error");
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+      authDomain: "venux1.firebaseapp.com",
+      projectId: "venux1",
+      storageBucket: "venux1.appspot.com",
+      messagingSenderId: "231055963335",
+      appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+      measurementId: "G-N36RRV95SW"
+    };
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
-          authDomain: "venux1.firebaseapp.com",
-          projectId: "venux1",
-          storageBucket: "venux1.appspot.com",
-          messagingSenderId: "231055963335",
-          appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
-          measurementId: "G-N36RRV95SW"
-        };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const noticeBar = document.getElementById("notice");
+    const authButtons = document.getElementById("authButtons");
+    const pageContent = document.getElementById("page-content");
 
-        const noticeBar = document.getElementById("notice");
-        const authButtons = document.getElementById("authButtons");
-        const pageContent = document.getElementById("page-content");
-
-        const user = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error("Auth timed out")), 10000);
-          onAuthStateChanged(auth, (user) => {
-            clearTimeout(timeout);
-            resolve(user);
-          }, reject);
-        });
-
-        if (!user) {
-          window.location.href = "Login.html";
-          return;
-        }
-
-        // Ensure Firestore is online
-        if (enableNetwork) {
-          await enableNetwork(db);
-        }
-
-        const userDocRef = doc(db, "users", user.uid);
-        let username = "User";
-
-        try {
-          const userDocSnap = await getDoc(userDocRef);
-          if (userDocSnap.exists() && userDocSnap.data().username) {
-            username = userDocSnap.data().username;
-          } else {
-            console.warn("User document missing or no username field");
-          }
-        } catch (error) {
-          console.error("Failed to fetch user document:", error);
-          noticeBar.textContent = "Could not load user info.";
-        }
-
-        noticeBar.textContent = `Welcome ${username}`;
-        authButtons.innerHTML = `<span>Welcome ${username}</span><button class="logout-btn" id="logoutBtn">Logout</button>`;
-
-        document.getElementById("logoutBtn").addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "Login.html";
-          } catch (err) {
-            console.error("Logout failed:", err);
-            noticeBar.textContent = "Logout failed. Try again.";
-          }
-        });
-
-        pageContent.innerHTML = `
-          <h2>Latest News</h2>
-          <div class="news-box">
-            <div class="news-title">Welcome to Venux!</div>
-            <div class="news-date">Posted: 8th October, 2025</div>
-            <div class="news-body">
-              This is for news happening in Venux!
-            </div>
-          </div>
-          <div class="news-box">
-            <div class="news-title">Update Log</div>
-            <div class="news-date">Posted: 8th October, 2025</div>
-            <div class="news-body">
-              - Added more pages<br>
-              - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
-              - Our website is live!
-            </div>
-          </div>
-        `;
-
-      } catch (error) {
-        console.error(error);
-        noticeBar.textContent = "Error loading user info.";
-        pageContent.innerHTML = `<div class="error-message">${error.message}</div>`;
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "Login.html";
+        return;
       }
-    })();
+
+      const userDocRef = doc(db, "users", user.uid);
+      let username = "User";
+
+      try {
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists()) {
+          username = userSnap.data().username || "User";
+        } else {
+          await setDoc(userDocRef, { username: "User", createdAt: new Date() });
+        }
+      } catch (err) {
+        console.error("Error fetching user doc:", err);
+        noticeBar.textContent = "Error loading user info.";
+      }
+
+      noticeBar.textContent = `Welcome ${username}`;
+      authButtons.innerHTML = `<span>Welcome ${username}</span><button class="logout-btn" id="logoutBtn">Logout</button>`;
+
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+          window.location.href = "Login.html";
+        } catch (err) {
+          console.error("Logout failed:", err);
+          noticeBar.textContent = "Logout failed. Try again.";
+        }
+      });
+
+      // Pull public news collection
+      const newsRef = collection(db, "news");
+      try {
+        const newsSnap = await getDocs(newsRef);
+        let newsHTML = "<h2>Latest News</h2>";
+        newsSnap.forEach(doc => {
+          const data = doc.data();
+          newsHTML += `
+            <div class="news-box">
+              <div class="news-title">${data.title}</div>
+              <div class="news-date">Posted: ${data.date}</div>
+              <div class="news-body">${data.body}</div>
+            </div>
+          `;
+        });
+        pageContent.innerHTML = newsHTML;
+      } catch (err) {
+        console.error("Error fetching news:", err);
+        pageContent.innerHTML = `<div class="error-message">Could not load news.</div>`;
+      }
+    });
   </script>
 
 </body>
