@@ -4,32 +4,142 @@
 <meta charset="UTF-8">
 <title>Venux - Profile</title>
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
-#main-header{ background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
-#main-header img{ height:52px; }
-.nav-links { color:white; font-weight:bold; display:flex; align-items:center; gap:10px; }
-.nav-links a{ color:white; text-decoration:none; }
-.nav-links a:hover{ text-decoration:underline; }
-.logout-btn{ padding:8px 15px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); color:white; transition:0.3s; }
-.logout-btn:hover{ background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-#notice{ background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-#page-content{ padding:20px; }
-.profile-header{ display:flex; align-items:center; gap:15px; margin-bottom:20px; }
-.avatar-placeholder{ width:80px; height:80px; background:#ccc; border:2px solid #999; }
-.profile-username{ font-weight:bold; font-size:20px; }
-#description{ margin-bottom:20px; }
-#badges{ margin-top:20px; }
-.badge{ display:inline-flex; align-items:center; padding:4px 8px; background:#1a4a84; color:white; border-radius:4px; margin-right:6px; font-size:12px; }
-.badge img{ width:16px; height:16px; margin-right:4px; vertical-align:middle; }
-.edit-btn{ margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; }
-textarea{ width:100%; padding:8px; font-size:13px; border:1px solid #999; border-radius:4px; }
-#saveDescription{ margin-top:8px; padding:6px 12px; font-weight:bold; border:none; border-radius:4px; background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; cursor:pointer; transition:0.3s; }
-#saveDescription:hover{ background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
-#footer{ text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #d4d4d4;
+  color: #222;
+  font-size: 13px;
+}
+
+/* Header styling (matches Home.html) */
+#main-header {
+  background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#main-header img {
+  height: 52px;
+}
+
+/* Navigation bar */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 13px;
+}
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* Button styles from Home.html */
+.button {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  color: white;
+  transition: 0.3s;
+}
+.login-btn {
+  background: linear-gradient(to bottom, #4CAF50 0%, #357a38 100%);
+}
+.login-btn:hover {
+  background: linear-gradient(to bottom, #5fd35f 0%, #46a046 100%);
+}
+.signup-btn {
+  background: linear-gradient(to bottom, #2196F3 0%, #0b79d0 100%);
+}
+.signup-btn:hover {
+  background: linear-gradient(to bottom, #42a5f5 0%, #1e88e5 100%);
+}
+.logout-btn {
+  background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
+}
+.logout-btn:hover {
+  background: linear-gradient(to bottom, #da190b 0%, #f44336 100%);
+}
+
+/* Notice bar */
+#notice {
+  background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid #a85f00;
+}
+
+/* Page content */
+#page-content {
+  padding: 20px;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  background: #ccc;
+  border: 2px solid #999;
+}
+.profile-username {
+  font-weight: bold;
+  font-size: 20px;
+}
+#description {
+  margin-bottom: 20px;
+}
+#badges {
+  margin-top: 20px;
+}
+
+/* Badges (customizable background color) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-right: 6px;
+  font-size: 12px;
+  color: white;
+  font-weight: bold;
+}
+.badge img {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Footer */
+#footer {
+  text-align: center;
+  font-size: 12px;
+  color: #444;
+  padding: 10px;
+  border-top: 2px solid #999;
+  background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
+  margin-top: 40px;
+}
 </style>
 </head>
 <body>
 
+<!-- Header -->
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
   <div class="nav-links">
@@ -42,23 +152,30 @@ textarea{ width:100%; padding:8px; font-size:13px; border:1px solid #999; border
     <a href="Help.html">Help</a> |
     <a href="Downloads.html">Downloads</a> |
     <a href="Create.html">Create</a>
-    <button class="logout-btn" id="logoutBtn" style="margin-left:10px;">Logout</button>
+    <button class="button logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
+<!-- Notice -->
 <div id="notice">Loading...</div>
 
+<!-- Profile Content -->
 <div id="page-content">
   <div class="profile-header">
     <div class="avatar-placeholder"></div>
     <div class="profile-username" id="profileUsername"></div>
   </div>
   <div id="description"></div>
-  <div id="badges"><strong>Player Badges:</strong> <span id="badgeContainer"></span></div>
+  <div id="badges">
+    <strong>Player Badges:</strong> 
+    <span id="badgeContainer"></span>
+  </div>
 </div>
 
+<!-- Footer -->
 <div id="footer">© 2025, Venux All rights reserved</div>
 
+<!-- Firebase Script -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
@@ -83,13 +200,13 @@ const profileUsername = document.getElementById("profileUsername");
 const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 
-// Load notice
+// Load notice from GitHub
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : "Welcome to Venux!")
   .then(t => noticeBar.textContent = t)
   .catch(() => noticeBar.textContent = "Welcome to Venux!");
 
-// URL param
+// Get userId from URL
 const urlParams = new URLSearchParams(window.location.search);
 const viewingUserId = parseInt(urlParams.get('userId'), 10);
 
@@ -133,43 +250,43 @@ onAuthStateChanged(auth, async (user) => {
   const data = userDoc.data();
   const username = data.username || "User";
   profileUsername.textContent = username;
-
   const descText = data.description || "This user hasn't added a description yet.";
   descriptionDiv.innerHTML = `<p>${descText}</p>`;
 
-  // 🎖️ Custom badge assignment by username
+  // 🎖️ Custom badge setup with colors
   const badges = [];
 
-  if (username.toLowerCase() === "testaccount") {
+  if (username.toLowerCase() === "Brick Dude") {
     badges.push({
       name: "Admin Badge",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png"
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png",
+      color: "#8b0000" // red
     });
   }
 
-  if (username.toLowerCase() === "ayytrix") {
+    if (username.toLowerCase() === "lead") {
     badges.push({
-      name: "Special Badge",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png"
+      name: "Admin Badge",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png",
+      color: "#8b0000" // red
+    });
+  }
+  
+  if (username.toLowerCase() === "lead") {
+    badges.push({
+      name: "VIP",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png",
+      color: "#f59e0b" // gold
     });
   }
 
   if (username.toLowerCase() === "moduser") {
     badges.push({
-      name: "Moderator Badge",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png"
+      name: "idk",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png",
+      color: "#2563eb" // blue
     });
   }
-
-  // You can keep adding more like this 👇
-  /*
-  if (username.toLowerCase() === "vipguy") {
-    badges.push({
-      name: "VIP Badge",
-      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/vipbadge.png"
-    });
-  }
-  */
 
   // 🧩 Render badges
   badgeContainer.innerHTML = "";
@@ -179,6 +296,7 @@ onAuthStateChanged(auth, async (user) => {
     badges.forEach(b => {
       const badgeEl = document.createElement("span");
       badgeEl.className = "badge";
+      badgeEl.style.background = b.color || "#1a4a84"; // default dark blue
       if (b.icon) {
         const img = document.createElement("img");
         img.src = b.icon;
