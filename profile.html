@@ -5,115 +5,34 @@
 <title>Venux - Profile</title>
 <style>
 body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
-#main-header{
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:10px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+#main-header{ background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
 #main-header img{ height:52px; }
-.nav-links{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-.nav-links a{
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-  font-size:13px;
-}
-.nav-links a:hover{
-  text-decoration:underline;
-}
-.logout-btn{
-  padding:6px 12px;
-  border:none;
-  border-radius:4px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
-  color:white;
-  transition:0.3s;
-}
-.logout-btn:hover{
-  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
-}
-#notice{
-  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
-  color:white;
-  padding:10px 20px;
-  font-weight:bold;
-  text-align:center;
-  border-bottom:2px solid #a85f00;
-}
+.nav-links { color:white; font-weight:bold; display:flex; align-items:center; gap:10px; }
+.nav-links a{ color:white; text-decoration:none; }
+.nav-links a:hover{ text-decoration:underline; }
+.logout-btn{ padding:8px 15px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); color:white; transition:0.3s; }
+.logout-btn:hover{ background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
+#notice{ background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
 #page-content{ padding:20px; }
 .profile-header{ display:flex; align-items:center; gap:15px; margin-bottom:20px; }
 .avatar-placeholder{ width:80px; height:80px; background:#ccc; border:2px solid #999; }
 .profile-username{ font-weight:bold; font-size:20px; }
 #description{ margin-bottom:20px; }
 #badges{ margin-top:20px; }
-.badge{
-  display:inline-flex;
-  align-items:center;
-  padding:2px 6px;
-  background:#1a4a84;
-  color:white;
-  border-radius:4px;
-  margin-right:5px;
-  font-size:12px;
-}
-.badge img{
-  width:16px;
-  height:16px;
-  margin-right:4px;
-  vertical-align:middle;
-}
-.edit-btn{
-  margin-left:10px;
-  padding:4px 8px;
-  font-size:12px;
-  cursor:pointer;
-}
-textarea{
-  width:100%;
-  padding:8px;
-  font-size:13px;
-  border:1px solid #999;
-  border-radius:4px;
-}
-#saveDescription{
-  margin-top:8px;
-  padding:6px 12px;
-  font-weight:bold;
-  border:none;
-  border-radius:4px;
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  color:white;
-  cursor:pointer;
-  transition:0.3s;
-}
-#saveDescription:hover{
-  background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%);
-}
-#footer{
-  text-align:center;
-  font-size:12px;
-  color:#444;
-  padding:10px;
-  border-top:2px solid #999;
-  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
-  margin-top:40px;
-}
+.badge{ display:inline-flex; align-items:center; padding:4px 8px; background:#1a4a84; color:white; border-radius:4px; margin-right:6px; font-size:12px; }
+.badge img{ width:16px; height:16px; margin-right:4px; vertical-align:middle; }
+.edit-btn{ margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer; }
+textarea{ width:100%; padding:8px; font-size:13px; border:1px solid #999; border-radius:4px; }
+#saveDescription{ margin-top:8px; padding:6px 12px; font-weight:bold; border:none; border-radius:4px; background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; cursor:pointer; transition:0.3s; }
+#saveDescription:hover{ background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
+#footer{ text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
 </style>
 </head>
 <body>
 
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  <div class="nav-links" id="navLinks">
+  <div class="nav-links">
     <a href="Home.html">Home</a> |
     <a href="Games.html">Games</a> |
     <a href="Catalog.html">Catalog</a> |
@@ -123,6 +42,7 @@ textarea{
     <a href="Help.html">Help</a> |
     <a href="Downloads.html">Downloads</a> |
     <a href="Create.html">Create</a>
+    <button class="logout-btn" id="logoutBtn" style="margin-left:10px;">Logout</button>
   </div>
 </div>
 
@@ -142,7 +62,7 @@ textarea{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -158,111 +78,118 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const navLinks = document.getElementById("navLinks");
 const noticeBar = document.getElementById("notice");
 const profileUsername = document.getElementById("profileUsername");
 const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 
-// Fetch dynamic notice
+// Load notice
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r=>r.ok ? r.text() : "Welcome to Venux!")
-  .then(t=>noticeBar.textContent = t)
-  .catch(()=>noticeBar.textContent = "Welcome to Venux!");
+  .then(r => r.ok ? r.text() : "Welcome to Venux!")
+  .then(t => noticeBar.textContent = t)
+  .catch(() => noticeBar.textContent = "Welcome to Venux!");
 
-// Get userId from URL
+// URL param
 const urlParams = new URLSearchParams(window.location.search);
-const viewingUserId = parseInt(urlParams.get('userId'),10);
+const viewingUserId = parseInt(urlParams.get('userId'), 10);
 
-async function getUserByNumericId(userId){
-  const usersRef = collection(db,"users");
-  const q = query(usersRef, where("userId","==",userId));
+async function getUserByNumericId(userId) {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("userId", "==", userId));
   const snapshot = await getDocs(q);
-  if(!snapshot.empty) return snapshot.docs[0];
+  if (!snapshot.empty) return snapshot.docs[0];
   return null;
 }
 
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
     window.location.href = "Login.html";
     return;
   }
 
-  // Add logout button
-  const logoutBtn = document.createElement("button");
-  logoutBtn.textContent = "Logout";
-  logoutBtn.className = "logout-btn";
-  navLinks.appendChild(logoutBtn);
-  logoutBtn.addEventListener("click", async ()=>{
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "Login.html";
   });
 
-  // Load user profile
   let userDoc;
-  if(viewingUserId){
+  if (viewingUserId) {
     userDoc = await getUserByNumericId(viewingUserId);
-    if(!userDoc){
+    if (!userDoc) {
       noticeBar.textContent = "User not found.";
       return;
     }
   } else {
-    const usersRef = collection(db,"users");
-    const q = query(usersRef, where("uid","==",user.uid));
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("uid", "==", user.uid));
     const snapshot = await getDocs(q);
-    if(snapshot.empty){ noticeBar.textContent="Profile not found."; return; }
+    if (snapshot.empty) {
+      noticeBar.textContent = "Profile not found.";
+      return;
+    }
     userDoc = snapshot.docs[0];
   }
 
   const data = userDoc.data();
-  profileUsername.textContent = data.username || "User";
+  const username = data.username || "User";
+  profileUsername.textContent = username;
 
-  // Description
-  let descText = data.description || "This user hasn't added a description yet.";
-  descriptionDiv.innerHTML = `<p id="descText">${descText}</p>`;
+  const descText = data.description || "This user hasn't added a description yet.";
+  descriptionDiv.innerHTML = `<p>${descText}</p>`;
 
-  // Editing own profile
-  if(user.uid === userDoc.id){
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    editBtn.className = "edit-btn";
-    descriptionDiv.appendChild(editBtn);
+  // 🎖️ Custom badge assignment by username
+  const badges = [];
 
-    editBtn.addEventListener("click",()=>{
-      const currentText = data.description || "";
-      descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
-        <button id="saveDescription">Save</button>`;
-      document.getElementById("saveDescription").addEventListener("click", async ()=>{
-        const newDesc = document.getElementById("descTextarea").value;
-        await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
-        descriptionDiv.innerHTML = `<p id="descText">${newDesc}</p><button class="edit-btn">Edit</button>`;
-      });
+  if (username.toLowerCase() === "testaccount") {
+    badges.push({
+      name: "Admin Badge",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png"
     });
   }
 
-  // Display badges with icons
+  if (username.toLowerCase() === "ayytrix") {
+    badges.push({
+      name: "Special Badge",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png"
+    });
+  }
+
+  if (username.toLowerCase() === "moduser") {
+    badges.push({
+      name: "Moderator Badge",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png"
+    });
+  }
+
+  // You can keep adding more like this 👇
+  /*
+  if (username.toLowerCase() === "vipguy") {
+    badges.push({
+      name: "VIP Badge",
+      icon: "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/vipbadge.png"
+    });
+  }
+  */
+
+  // 🧩 Render badges
   badgeContainer.innerHTML = "";
-  const badges = data.badges || [];
-  badges.forEach(b => {
-    const badgeEl = document.createElement("span");
-    badgeEl.className = "badge";
-
-    let iconUrl = "";
-    if(b === "AdminBadge") iconUrl = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png";
-    if(b === "SpecialBadge") iconUrl = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png"; // your custom icon here
-
-    if(iconUrl){
-      const img = document.createElement("img");
-      img.src = iconUrl;
-      img.alt = b;
-      badgeEl.appendChild(img);
-    }
-
-    badgeEl.appendChild(document.createTextNode(b));
-    badgeContainer.appendChild(badgeEl);
-  });
+  if (badges.length === 0) {
+    badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
+  } else {
+    badges.forEach(b => {
+      const badgeEl = document.createElement("span");
+      badgeEl.className = "badge";
+      if (b.icon) {
+        const img = document.createElement("img");
+        img.src = b.icon;
+        img.alt = b.name;
+        badgeEl.appendChild(img);
+      }
+      badgeEl.appendChild(document.createTextNode(b.name));
+      badgeContainer.appendChild(badgeEl);
+    });
+  }
 });
 </script>
-
 </body>
 </html>
