@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Venux - Sign Up</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
+
   <style>
     body {
       margin: 0;
@@ -12,6 +13,8 @@
       font-size: 13px;
       color: #222;
     }
+
+    /* Header */
     #main-header {
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
       padding: 10px 20px;
@@ -23,10 +26,12 @@
       height: 52px;
       object-fit: contain;
     }
+
+    /* Navbar */
     #sub-header {
       background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
       padding: 8px 15px;
-      border-bottom: 1px solid #000000;
+      border-bottom: 1px solid #000;
     }
     #sub-header a {
       color: white;
@@ -37,6 +42,8 @@
     #sub-header a:hover {
       text-decoration: underline;
     }
+
+    /* Notice Bar */
     #notice {
       background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
       color: white;
@@ -45,19 +52,24 @@
       text-align: center;
       border-bottom: 2px solid #a85f00;
     }
+
+    /* Page Content */
     #page-content {
       padding: 40px;
       display: flex;
       justify-content: center;
     }
+
+    /* Signup Box */
     .signup-box {
-      background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
+      background: linear-gradient(to bottom, #fff 0%, #e2e2e2 100%);
       border: 2px solid #999;
-      box-shadow: 2px 2px 0px #aaa;
+      box-shadow: 2px 2px 0 #aaa;
       padding: 25px 35px;
       width: 420px;
       border-radius: 6px;
     }
+
     .signup-box h2 {
       text-align: center;
       font-size: 16px;
@@ -65,14 +77,16 @@
       border-bottom: 1px solid #aaa;
       padding-bottom: 8px;
     }
+
     .signup-box label {
       display: block;
       font-weight: bold;
       margin-bottom: 5px;
     }
+
     .signup-box input[type="text"],
-    .signup-box input[type="password"],
-    .signup-box input[type="email"] {
+    .signup-box input[type="email"],
+    .signup-box input[type="password"] {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -80,6 +94,7 @@
       border-radius: 3px;
       font-size: 13px;
     }
+
     .signup-box button {
       width: 100%;
       padding: 10px;
@@ -98,6 +113,8 @@
       background: #cccccc;
       cursor: not-allowed;
     }
+
+    /* Messages */
     .error-message {
       color: red;
       font-size: 12px;
@@ -112,6 +129,7 @@
       margin-bottom: 10px;
       display: none;
     }
+
     .signup-links {
       text-align: center;
       margin-top: 15px;
@@ -124,6 +142,8 @@
     .signup-links a:hover {
       text-decoration: underline;
     }
+
+    /* Footer */
     #footer {
       text-align: center;
       font-size: 12px;
@@ -133,6 +153,8 @@
       background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
       margin-top: 40px;
     }
+
+    /* Cloudflare CAPTCHA wrapper */
     .turnstile-wrapper {
       text-align: center;
       margin: 15px 0;
@@ -146,10 +168,12 @@
 </head>
 <body>
 
+  <!-- Main Header -->
   <div id="main-header">
     <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
   </div>
 
+  <!-- Navbar -->
   <div id="sub-header">
     <a href="Home.html">Home</a>
     <a href="unfinished.html">Games</a>
@@ -162,12 +186,15 @@
     <a href="Create.html">Create</a>
   </div>
 
+  <!-- Notice -->
   <div id="notice">Loading...</div>
 
+  <!-- Signup Form -->
   <div id="page-content">
     <div class="signup-box">
       <h2>Sign Up</h2>
       <form id="signupForm">
+
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
         <div id="usernameError" class="error-message"></div>
@@ -181,11 +208,11 @@
         <label for="confirm-password">Confirm Password</label>
         <input type="password" id="confirm-password" name="confirm-password" placeholder="Re-enter your password" required>
 
-        <div id="passwordError" class="error-message">Passwords do not match or are too short (min 6 characters).</div>
+        <div id="passwordError" class="error-message"></div>
         <div id="passwordSuccess" class="success-message">Passwords match!</div>
 
         <div class="signup-links">
-          <a href="TermsOfService.html">Make sure you read our Terms of Service.</a>
+          <a href="TermsOfService.html">Read our Terms of Service</a>
         </div>
 
         <div class="turnstile-wrapper">
@@ -201,14 +228,13 @@
     </div>
   </div>
 
-  <div id="footer">
-    © 2025, Venux All rights reserved
-  </div>
+  <!-- Footer -->
+  <div id="footer">© 2025, Venux All rights reserved</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, setDoc, doc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     // Initialize EmailJS
     emailjs.init("CUiSvj8vXafdUcDc4");
@@ -237,8 +263,9 @@
     const passwordSuccess = document.getElementById('passwordSuccess');
     const signupBtn = document.getElementById('signupBtn');
 
+    // Check password match & length
     function checkPasswords() {
-      if(passwordInput.value.length < 8){
+      if(passwordInput.value.length < 6){
         passwordSuccess.style.display = "none";
         passwordError.style.display = "block";
         passwordError.textContent = "Password must be at least 6 characters long.";
@@ -258,6 +285,7 @@
     passwordInput.addEventListener("input", checkPasswords);
     confirmPassword.addEventListener("input", checkPasswords);
 
+    // Check username availability
     async function checkUsernameAvailability(username){
       const usersRef = collection(db,"users");
       const q = query(usersRef, where("username","==",username));
@@ -265,48 +293,31 @@
       return snapshot.empty;
     }
 
-    usernameInput.addEventListener("blur", async ()=>{
+    usernameInput.addEventListener("blur", async () => {
       const username = usernameInput.value.trim();
-
-      if(username.length < 3){
-        usernameError.textContent = "Username too short";
-        usernameError.style.display = "block";
-        return;
-      }
-      if(username.length > 20){
-        usernameError.textContent = "Username too long";
-        usernameError.style.display = "block";
-        return;
-      }
-
-      const regex = /^[a-zA-Z0-9_]+$/;
-      if(!regex.test(username)){
-        usernameError.textContent = "Invalid characters";
-        usernameError.style.display = "block";
-        return;
-      }
-
-      // --- FORBIDDEN WORDS CHECK ---
+      if(username.length < 3){ usernameError.textContent = "Username too short"; usernameError.style.display="block"; return; }
+      if(username.length > 20){ usernameError.textContent = "Username too long"; usernameError.style.display="block"; return; }
+      if(!/^[a-zA-Z0-9_]+$/.test(username)){ usernameError.textContent = "Invalid characters"; usernameError.style.display="block"; return; }
       const forbiddenWords = ["nigga","nigger","niga","niger","nigeria","fuck","shit","bitch","hoe"];
-      if(forbiddenWords.includes(username.toLowerCase())){
-        usernameError.textContent = "Invalid username";
-        usernameError.style.display = "block";
-        return;
-      }
-      // --- END FORBIDDEN WORDS CHECK ---
-
+      if(forbiddenWords.includes(username.toLowerCase())){ usernameError.textContent = "Invalid username"; usernameError.style.display="block"; return; }
       const available = await checkUsernameAvailability(username);
-      if(!available){
-        usernameError.textContent = "Username taken";
-        usernameError.style.display = "block";
-      }else{
-        usernameError.style.display = "none";
-      }
+      usernameError.style.display = available ? "none" : "block";
+      if(!available) usernameError.textContent = "Username taken";
     });
 
-    form.addEventListener("submit", async (e)=>{
-      e.preventDefault();
+    // Generate next numeric userId
+    async function getNextUserId() {
+      const metaDoc = doc(db,"metadata","userCounter");
+      const snap = await getDoc(metaDoc);
+      let nextId = 1;
+      if(snap.exists()){ nextId = snap.data().lastId + 1; }
+      await setDoc(metaDoc,{lastId: nextId},{merge:true});
+      return nextId;
+    }
 
+    // Form submit
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
       if(!checkPasswords()) return;
 
       const username = usernameInput.value.trim();
@@ -315,10 +326,7 @@
 
       // CAPTCHA check
       const captchaToken = document.querySelector('input[name="cf-turnstile-response"]');
-      if(!captchaToken || !captchaToken.value){
-        alert("Please complete the CAPTCHA");
-        return;
-      }
+      if(!captchaToken || !captchaToken.value){ alert("Please complete the CAPTCHA"); return; }
 
       signupBtn.disabled = true;
       signupBtn.textContent = "Creating Account...";
@@ -331,18 +339,19 @@
         const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, pass);
         const user = userCredential.user;
 
+        const userId = await getNextUserId();
+
         await setDoc(doc(db,"users",user.uid),{
           username: username,
           authEmail: uniqueEmail,
           email: email || null,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          userId: userId,
+          description: "",
+          badges: []
         });
 
-        // Optional email (EmailJS)
-        // await emailjs.send("SERVICE_ID","TEMPLATE_ID",{to_email: email, username: username, message: `Welcome ${username}!`});
-
         window.location.href = "Home.html";
-
       } catch(err){
         console.error(err);
         alert("Error: " + (err.message || JSON.stringify(err)));
@@ -351,12 +360,11 @@
       }
     });
 
-    // Dynamic notice
+    // Load dynamic notice text
     fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
       .then(r => r.ok ? r.text() : "Failed to load")
       .then(data => document.getElementById("notice").textContent = data)
       .catch(()=>document.getElementById("notice").textContent = "Failed to load notice.");
   </script>
-
 </body>
 </html>
