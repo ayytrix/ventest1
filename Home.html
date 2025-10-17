@@ -142,25 +142,30 @@
     const pageContent = document.getElementById("page-content");
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) { window.location.href = "Login.html"; return; }
+      if (!user) {
+        window.location.href = "Login.html";
+        return;
+      }
 
+      // Fetch username from Firestore
       const userDocRef = doc(db, "users", user.uid);
       let username = "User";
 
       try {
         const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists()) {
-          username = userSnap.data().username || "User";
+        if (userSnap.exists() && userSnap.data().username) {
+          username = userSnap.data().username;
         } else {
           await setDoc(userDocRef, { username: "User", createdAt: new Date() });
         }
       } catch(err) {
-        console.error("User fetch error:", err);
+        console.error("Error fetching user:", err);
         noticeBar.textContent = "Error loading user info.";
       }
 
-      noticeBar.textContent = `Welcome ${username}`;
-      authButtons.innerHTML = `<span>Welcome ${username}</span><button class="logout-btn" id="logoutBtn">Logout</button>`;
+      // Update welcome message dynamically
+      noticeBar.textContent = `Welcome, ${username}`;
+      authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
 
       document.getElementById("logoutBtn").addEventListener("click", async () => {
         try {
@@ -172,7 +177,7 @@
         }
       });
 
-      // Pull news from Firestore (replace static fallback)
+      // Pull news dynamically from Firestore (replaces static news if available)
       try {
         const newsRef = collection(db, "news");
         const newsSnap = await getDocs(newsRef);
