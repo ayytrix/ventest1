@@ -4,157 +4,158 @@
 <meta charset="UTF-8">
 <title>Venux - Profile</title>
 <style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#d4d4d4;
-  color:#222;
-  font-size:13px;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  background: #d4d4d4;
+  color: #222;
 }
-#main-header{
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:10px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+
+/* Header */
+#main-header {
+  background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-#main-header img{
-  height:52px;
+#main-header img { height: 52px; }
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
 }
-.auth-buttons{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  color:white;
+.logout-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 12px;
+  background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
+  color: white;
+  transition: 0.3s;
 }
-.logout-btn{
-  padding:8px 15px;
-  border:none;
-  border-radius:4px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
-  color:white;
-  transition:0.3s;
+.logout-btn:hover {
+  background: linear-gradient(to bottom, #da190b 0%, #f44336 100%);
 }
-.logout-btn:hover{
-  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
+
+/* Navigation */
+#sub-header {
+  background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+  padding: 8px 15px;
+  border-bottom: 1px solid #000;
 }
-#sub-header{
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:8px 15px;
-  border-bottom:1px solid #000;
+#sub-header a {
+  color: white;
+  text-decoration: none;
+  margin-right: 20px;
+  font-weight: bold;
 }
-#sub-header a{
-  color:white;
-  text-decoration:none;
-  margin-right:20px;
-  font-weight:bold;
+#sub-header a:hover { text-decoration: underline; }
+
+/* Notice */
+#notice {
+  background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid #a85f00;
 }
-#sub-header a:hover{
-  text-decoration:underline;
+
+/* Page content */
+#page-content { padding: 20px; }
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
 }
-#notice{
-  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
-  color:white;
-  padding:10px 20px;
-  font-weight:bold;
-  text-align:center;
-  border-bottom:2px solid #a85f00;
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  background: #ccc;
+  border: 2px solid #999;
 }
-#page-content{
-  padding:20px;
+.profile-username {
+  font-weight: bold;
+  font-size: 20px;
 }
-.profile-header{
-  display:flex;
-  align-items:center;
-  gap:15px;
-  margin-bottom:20px;
+#description { margin-bottom: 20px; }
+#badges { margin-top: 20px; }
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  background: #1a4a84;
+  color: white;
+  border-radius: 4px;
+  margin-right: 5px;
+  font-size: 12px;
 }
-.avatar-placeholder{
-  width:80px;
-  height:80px;
-  background:#ccc;
-  border:2px solid #999;
+.edit-btn {
+  margin-left: 10px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
 }
-.profile-username{
-  font-weight:bold;
-  font-size:20px;
+textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid #999;
+  border-radius: 4px;
 }
-#description{
-  margin-bottom:20px;
+#saveDescription {
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
 }
-#badges{
-  margin-top:20px;
+#saveDescription:hover {
+  background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
 }
-.badge{
-  display:inline-block;
-  padding:5px 10px;
-  background:#1a4a84;
-  color:white;
-  border-radius:4px;
-  margin-right:5px;
-  font-size:12px;
-}
-.edit-btn{
-  margin-left:10px;
-  padding:4px 8px;
-  font-size:12px;
-  cursor:pointer;
-}
-textarea{
-  width:100%;
-  padding:8px;
-  font-size:13px;
-  border:1px solid #999;
-  border-radius:4px;
-}
-#saveDescription{
-  margin-top:8px;
-  padding:6px 12px;
-  font-weight:bold;
-  border:none;
-  border-radius:4px;
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  color:white;
-  cursor:pointer;
-  transition:0.3s;
-}
-#saveDescription:hover{
-  background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%);
-}
-#footer{
-  text-align:center;
-  font-size:12px;
-  color:#444;
-  padding:10px;
-  border-top:2px solid #999;
-  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
-  margin-top:40px;
+
+/* Footer */
+#footer {
+  text-align: center;
+  font-size: 12px;
+  color: #444;
+  padding: 10px;
+  border-top: 2px solid #999;
+  background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
+  margin-top: 40px;
 }
 </style>
 </head>
 <body>
 
 <div id="main-header">
-<img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-<div class="auth-buttons" id="authButtons"></div>
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+  <div class="auth-buttons" id="authButtons"></div>
 </div>
 
 <div id="sub-header">
-<a href="Home.html">Home</a>
-<a href="Games.html">Games</a>
-<a href="Catalog.html">Catalog</a>
-<a href="Users.html">Users</a>
-<a href="Forums.html">Forum</a>
-<a href="Clans.html">Clans</a>
-<a href="Help.html">Help</a>
-<a href="Downloads.html">Downloads</a>
-<a href="Create.html">Create</a>
+  <a href="/Home.html">Home</a>
+  <a href="/Games.html">Games</a>
+  <a href="/Catalog.html">Catalog</a>
+  <a href="/Users.html">Users</a>
+  <a href="/Forums.html">Forum</a>
+  <a href="/Clans.html">Clans</a>
+  <a href="/Help.html">Help</a>
+  <a href="/Downloads.html">Downloads</a>
+  <a href="/Create.html">Create</a>
 </div>
 
 <div id="notice">Loading...</div>
+
 <div id="page-content">
   <div class="profile-header">
     <div class="avatar-placeholder"></div>
@@ -169,7 +170,7 @@ textarea{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, query, where, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -191,63 +192,59 @@ const profileUsername = document.getElementById("profileUsername");
 const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 
-// Get userId from URL
-const urlParams = new URLSearchParams(window.location.search);
-let viewingUserId = urlParams.get('userId'); // numeric ID assigned to user
+// Extract numeric userId from path: /profile/2
+const pathParts = window.location.pathname.split("/");
+const viewingUserId = pathParts[pathParts.length - 1]; // e.g., "2"
 
-async function getUserByUserId(userId){
-  const usersRef = collection(db,"users");
-  const q = query(usersRef, where("userId","==",parseInt(userId)));
+async function getUserByUserId(userId) {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("userId", "==", parseInt(userId)));
   const snapshot = await getDocs(q);
-  if(!snapshot.empty) return snapshot.docs[0];
-  return null;
+  return snapshot.empty ? null : snapshot.docs[0];
 }
 
-// Auth state
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){
-    window.location.href="Login.html";
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "/Login.html";
     return;
   }
 
+  // Logout button
   authButtons.innerHTML = `<button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
-    window.location.href="Login.html";
+    window.location.href = "/Login.html";
   });
 
-  let userDoc;
-  if(viewingUserId){
-    userDoc = await getUserByUserId(viewingUserId);
-    if(!userDoc){
-      noticeBar.textContent = "User not found.";
-      return;
-    }
-  }else{
-    userDoc = await getUserByUserId(parseInt(user.uid)); // fallback to own profile
+  // Fetch profile
+  const userDoc = await getUserByUserId(viewingUserId);
+  if (!userDoc) {
+    noticeBar.textContent = "User not found.";
+    return;
   }
 
   const data = userDoc.data();
   profileUsername.textContent = data.username || "User";
 
   // Description
-  let descText = data.description || "This user hasn't added a description yet.";
+  const descText = data.description || "This user hasn't added a description yet.";
   descriptionDiv.innerHTML = `<p id="descText">${descText}</p>`;
 
-  // If viewing own profile, allow editing
-  if(user.uid === userDoc.id){
+  // Allow editing for self
+  if (user.uid === userDoc.id) {
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.className = "edit-btn";
     descriptionDiv.appendChild(editBtn);
 
-    editBtn.addEventListener("click",()=>{
-      const currentText = data.description || "";
-      descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
-        <button id="saveDescription">Save</button>`;
-      document.getElementById("saveDescription").addEventListener("click", async ()=>{
+    editBtn.addEventListener("click", () => {
+      descriptionDiv.innerHTML = `
+        <textarea id="descTextarea">${data.description || ""}</textarea>
+        <button id="saveDescription">Save</button>
+      `;
+      document.getElementById("saveDescription").addEventListener("click", async () => {
         const newDesc = document.getElementById("descTextarea").value;
-        await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
+        await setDoc(doc(db, "users", user.uid), { ...data, description: newDesc }, { merge: true });
         descriptionDiv.innerHTML = `<p id="descText">${newDesc}</p><button class="edit-btn">Edit</button>`;
       });
     });
@@ -255,20 +252,18 @@ onAuthStateChanged(auth, async (user)=>{
 
   // Badges example
   badgeContainer.innerHTML = "";
-  if(data.username === "Admin"){ // Example condition
+  if (data.username === "Admin") {
     const badge = document.createElement("span");
     badge.className = "badge";
     badge.textContent = "Admin Badge";
     badgeContainer.appendChild(badge);
-  } else if(data.username === "SpecialUser"){
+  } else if (data.username === "SpecialUser") {
     const badge = document.createElement("span");
     badge.className = "badge";
     badge.textContent = "Special Badge";
     badgeContainer.appendChild(badge);
   }
 });
-
-// Assign numeric userId on signup (not included here, must be done on signup page)
 </script>
 
 </body>
