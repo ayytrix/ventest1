@@ -139,8 +139,8 @@
         <label for="confirm-password">Confirm Password</label>
         <input type="password" id="confirm-password" placeholder="Re-enter your password" required>
 
-        <div id="passwordError" class="error-message"></div>
-        <div id="passwordSuccess" class="success-message"></div>
+        <div id="passwordError" class="error-message">Passwords do not match or are too short (min 6 characters).</div>
+        <div id="passwordSuccess" class="success-message">Passwords match!</div>
 
         <div class="signup-links">
           <a href="TermsOfService.html">Make sure you read our Terms of Service.</a>
@@ -194,12 +194,13 @@
     const passwordSuccess = document.getElementById('passwordSuccess');
     const signupBtn = document.getElementById('signupBtn');
 
-    // Dynamic notice
+    // --- NOTICE BAR ---
     fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-      .then(r => r.ok ? r.text() : "Failed to load")
+      .then(r => r.ok ? r.text() : "Welcome to Venux!")
       .then(data => document.getElementById("notice").textContent = data)
-      .catch(()=>document.getElementById("notice").textContent = "Failed to load notice.");
+      .catch(()=>document.getElementById("notice").textContent = "Welcome to Venux!");
 
+    // --- PASSWORD CHECK ---
     function checkPasswords() {
       if(passwordInput.value.length < 6){
         passwordSuccess.style.display = "none";
@@ -219,10 +220,10 @@
       passwordSuccess.style.display = "block";
       return true;
     }
+    passwordInput.addEventListener("input", checkPasswords);
+    confirmPassword.addEventListener("input", checkPasswords);
 
-    passwordInput.addEventListener("input", () => { checkPasswords(); updateSignupBtn(); });
-    confirmPassword.addEventListener("input", () => { checkPasswords(); updateSignupBtn(); });
-
+    // --- CHECK USERNAME AVAILABILITY ---
     async function checkUsernameAvailability(username){
       const usersRef = collection(db,"users");
       const q = query(usersRef, where("username","==",username));
@@ -230,18 +231,40 @@
       return snapshot.empty;
     }
 
-    async function updateSignupBtn(){
+    usernameInput.addEventListener("input", async () => {
       const username = usernameInput.value.trim();
-      if(username.length >=3 && username.length <=20 && checkPasswords()){
-        const available = await checkUsernameAvailability(username);
-        signupBtn.disabled = !available;
-      } else {
+      if(username.length < 3 || username.length > 20){
+        usernameError.textContent = "Username must be 3-20 characters.";
+        usernameError.style.display = "block";
         signupBtn.disabled = true;
+        return;
       }
-    }
+      const forbiddenWords = ["nigga","nigger","niga","niger","nigeria","fuck","shit","bitch","hoe"];
+      if(forbiddenWords.includes(username.toLowerCase())){
+        usernameError.textContent = "Invalid username";
+        usernameError.style.display = "block";
+        signupBtn.disabled = true;
+        return;
+      }
+      const regex = /^[a-zA-Z0-9_]+$/;
+      if(!regex.test(username)){
+        usernameError.textContent = "Invalid characters";
+        usernameError.style.display = "block";
+        signupBtn.disabled = true;
+        return;
+      }
+      const available = await checkUsernameAvailability(username);
+      if(!available){
+        usernameError.textContent = "Username taken";
+        usernameError.style.display = "block";
+        signupBtn.disabled = true;
+      } else {
+        usernameError.style.display = "none";
+        signupBtn.disabled = !checkPasswords();
+      }
+    });
 
-    usernameInput.addEventListener("input", updateSignupBtn);
-
+    // --- GET NEXT USER ID ---
     async function getNextUserId(){
       const usersRef = collection(db,"users");
       const q = query(usersRef, orderBy("userId","desc"), limit(1));
@@ -252,6 +275,7 @@
       return 1;
     }
 
+    // --- SIGNUP FORM SUBMIT ---
     document.getElementById("signupForm").addEventListener("submit", async (e)=>{
       e.preventDefault();
       if(!checkPasswords()) return;
@@ -260,6 +284,7 @@
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
+      // CAPTCHA
       const captchaToken = document.querySelector('input[name="cf-turnstile-response"]');
       if(!captchaToken || !captchaToken.value){
         alert("Please complete the CAPTCHA");
@@ -279,13 +304,14 @@
 
         const userId = await getNextUserId();
 
+        // Add user with empty badges array
         await setDoc(doc(db,"users",user.uid),{
           username: username,
           authEmail: uniqueEmail,
           email: email || null,
           createdAt: new Date().toISOString(),
           userId: userId,
-          badges: []  // <- empty badges array
+          badges: [] // <-- NEW: empty badges array
         });
 
         window.location.href = "Home.html";
