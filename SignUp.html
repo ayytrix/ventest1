@@ -267,6 +267,7 @@
 
     usernameInput.addEventListener("blur", async ()=>{
       const username = usernameInput.value.trim();
+
       if(username.length < 3){
         usernameError.textContent = "Username too short";
         usernameError.style.display = "block";
@@ -277,12 +278,23 @@
         usernameError.style.display = "block";
         return;
       }
+
       const regex = /^[a-zA-Z0-9_]+$/;
       if(!regex.test(username)){
         usernameError.textContent = "Invalid characters";
         usernameError.style.display = "block";
         return;
       }
+
+      // --- FORBIDDEN WORDS CHECK ---
+      const forbiddenWords = ["nigga","nigger","niga","niger","nigeria","fuck","shit","bitch","hoe"];
+      if(forbiddenWords.includes(username.toLowerCase())){
+        usernameError.textContent = "Invalid username";
+        usernameError.style.display = "block";
+        return;
+      }
+      // --- END FORBIDDEN WORDS CHECK ---
+
       const available = await checkUsernameAvailability(username);
       if(!available){
         usernameError.textContent = "Username taken";
