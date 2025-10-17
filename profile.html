@@ -311,7 +311,8 @@ onAuthStateChanged(auth, async (user) => {
   const badges = [];
   const badgeDefs = [
     { userId: 1, name:"Admin Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
-    { userId: 2, name:"VIP Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/specialbadge.png", color:"#f59e0b"},
+    { userId: 2, name:"Admin Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
+    { userId: 2, name:"VIP Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
     { userId: 3, name:"Mod Badge", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/modbadge.png", color:"#2563eb"}
   ];
   badgeDefs.forEach(bd => { if(bd.userId === data.userId) badges.push(bd); });
