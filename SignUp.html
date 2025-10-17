@@ -238,7 +238,7 @@
     const signupBtn = document.getElementById('signupBtn');
 
     function checkPasswords() {
-      if(passwordInput.value.length < 6){
+      if(passwordInput.value.length < 8){
         passwordSuccess.style.display = "none";
         passwordError.style.display = "block";
         passwordError.textContent = "Password must be at least 6 characters long.";
@@ -277,7 +277,7 @@
         usernameError.style.display = "block";
         return;
       }
-      const regex = /^[a-zA-Z0-9_]+$/;
+      const regex = /^[a-zA-Z0-9_ ]+$/;
       if(!regex.test(username)){
         usernameError.textContent = "Invalid characters";
         usernameError.style.display = "block";
