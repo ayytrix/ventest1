@@ -4,51 +4,29 @@
 <meta charset="UTF-8">
 <title>Venux - Forums</title>
 <style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#d4d4d4;
-  color:#222;
-  font-size:13px;
-}
-#main-header{
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:10px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-#main-header img{ height:52px; object-fit:contain; }
-.auth-buttons{ display:flex; align-items:center; gap:10px; color:white; }
-.logout-btn{
-  padding:8px 15px; border:none; border-radius:4px;
-  font-weight:bold; cursor:pointer; font-size:12px;
-  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); color:white; transition:0.3s;
-}
-.logout-btn:hover{ background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-#sub-header{
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:8px 15px; border-bottom:1px solid #000;
-}
-#sub-header a{
-  color:white; text-decoration:none; margin:0 10px 0 0;
-  font-weight:bold; padding:6px 10px; border-radius:4px; transition:0.3s;
-}
-#sub-header a:hover{ background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
-.nav-separator{ color:white; margin:0 10px 0 0; }
-#notice{ background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-#page-content{ padding:20px; }
-.forum-thread{ background:#fff; border:2px solid #999; padding:12px; margin-bottom:15px; box-shadow:2px 2px 0 #aaa; }
-.thread-title{ font-weight:bold; font-size:14px; margin-bottom:4px; }
-.thread-meta{ font-size:11px; color:#666; margin-bottom:8px; }
-.thread-message{ font-size:13px; margin-bottom:8px; }
-.reply{ border-top:1px solid #ccc; padding-top:6px; margin-top:6px; }
-.reply-user{ font-weight:bold; margin-right:6px; }
-#footer{ text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
-.button{ padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; transition:0.3s; }
-.post-btn{ background:linear-gradient(to bottom,#4CAF50 0%,#357a38 100%); }
-.post-btn:hover{ background:linear-gradient(to bottom,#5fd35f 0%,#46a046 100%); }
-input, textarea{ width:100%; padding:6px; margin-bottom:6px; font-size:13px; border:1px solid #999; border-radius:4px; }
+body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
+#main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+#main-header img { height:52px; object-fit:contain; }
+.auth-buttons { display:flex; align-items:center; gap:10px; color:white; }
+.logout-btn { padding:8px 15px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); color:white; transition: all 0.3s ease; }
+.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
+#sub-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000000; }
+#sub-header a { color:white; text-decoration:none; margin:0 10px 0 0; font-weight:bold; padding:6px 10px; border-radius:4px; transition: all 0.3s ease; }
+#sub-header a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); text-decoration:none; }
+.nav-separator { color:white; margin:0 10px 0 0; }
+#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+#page-content { padding:20px; }
+.thread-box { background:linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; width:700px; box-shadow:2px 2px 0 #aaa; }
+.thread-title { font-weight:bold; font-size:14px; margin-bottom:6px; }
+.thread-meta { font-size:11px; color:#666; margin-bottom:6px; }
+.thread-body { font-size:13px; margin-bottom:10px; }
+.reply-box { background:#f0f0f0; border:1px solid #bbb; padding:6px; margin-bottom:6px; }
+.username-link { font-weight:bold; text-decoration:none; }
+#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
+input, textarea { width:100%; padding:6px; margin-bottom:6px; font-size:13px; border-radius:4px; border:1px solid #999; }
+button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; }
+.submit-btn { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; }
+.submit-btn:hover { background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
 </style>
 </head>
 <body>
@@ -77,7 +55,7 @@ input, textarea{ width:100%; padding:6px; margin-bottom:6px; font-size:13px; bor
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -97,132 +75,91 @@ const noticeBar = document.getElementById("notice");
 const authButtons = document.getElementById("authButtons");
 const pageContent = document.getElementById("page-content");
 
-let currentUser = null;
+// Dynamic notice
+let dynamicNotice = "Welcome to Venux Forums!";
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : dynamicNotice)
+  .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
+  .catch(() => noticeBar.textContent = dynamicNotice);
 
-// Helper for formatting thread/reply
-function renderUserLink(userId, username, isAdmin) {
-  const a = document.createElement("a");
-  a.href = `Profile.html?userId=${userId}`;
-  a.textContent = username;
-  a.style.fontWeight = "bold";
-  a.style.color = isAdmin ? "#8b0000" : "#222";
-  return a;
-}
+onAuthStateChanged(auth, async (user) => {
+  if(!user) { window.location.href="Login.html"; return; }
 
-// Display threads
-async function displayThreads(){
-  pageContent.innerHTML = "";
-  const threadsRef = collection(db,"forums");
-  const threadsSnap = await getDocs(threadsRef);
-  const threads = [];
-  threadsSnap.forEach(doc=>threads.push({id: doc.id, ...doc.data()}));
-  
-  // New thread form
-  const newThreadDiv = document.createElement("div");
-  newThreadDiv.className="forum-thread";
-  newThreadDiv.innerHTML = `<input type="text" id="threadTitle" placeholder="Thread Title">
-                            <textarea id="threadMessage" placeholder="Message"></textarea>
-                            <button class="button post-btn" id="postThreadBtn">Post Thread</button>`;
-  pageContent.appendChild(newThreadDiv);
+  // Load username
+  const userDocRef = doc(db,"users",user.uid);
+  const userSnap = await getDoc(userDocRef);
+  const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
 
-  document.getElementById("postThreadBtn").addEventListener("click", async ()=>{
-    const title = document.getElementById("threadTitle").value.trim();
-    const message = document.getElementById("threadMessage").value.trim();
-    if(title && message){
-      await addDoc(collection(db,"forums"),{
-        title, message, userId: currentUser.userId, username: currentUser.username,
-        timestamp: Date.now(), replies: []
+  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+    await signOut(auth); window.location.href="Login.html";
+  });
+
+  // Show thread form
+  pageContent.innerHTML = `
+    <h2>Forums</h2>
+    <div>
+      <input type="text" id="threadTitle" placeholder="Thread title">
+      <textarea id="threadBody" placeholder="Thread content"></textarea>
+      <button id="postThread" class="submit-btn">Post Thread</button>
+    </div>
+    <div id="threadsContainer"></div>
+  `;
+
+  const threadsContainer = document.getElementById("threadsContainer");
+
+  async function loadThreads(){
+    threadsContainer.innerHTML = "";
+    const threadsSnap = await getDocs(collection(db,"threads"));
+    threadsSnap.forEach(async tDoc=>{
+      const t = tDoc.data();
+      const authorRef = doc(db,"users",t.uid);
+      const authorSnap = await getDoc(authorRef);
+      let authorName = authorSnap.exists() && authorSnap.data().username ? authorSnap.data().username : "User";
+      let usernameColor = (t.uid===1 || t.uid===2) ? "darkred" : "black";
+      const adminBadge = (t.uid===1 || t.uid===2) ? " <span style='color:#8b0000;font-weight:bold'>(Admin)</span>" : "";
+      let threadHTML = `<div class="thread-box">
+        <div class="thread-title">${t.title}</div>
+        <div class="thread-meta"><a class="username-link" href="Profile.html?userId=${t.uid}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
+        <div class="thread-body">${t.body}</div>
+        <div class="replies">`;
+
+      t.replies?.forEach(r=>{
+        threadHTML += `<div class="reply-box"><a class="username-link" href="Profile.html?userId=${r.uid}" style="color:${(r.uid===1||r.uid===2)?'darkred':'black'}">${r.username}</a>: ${r.text}</div>`;
       });
-      displayThreads();
-    }
-  });
 
-  threads.sort((a,b)=>b.timestamp-a.timestamp);
-  threads.forEach(thread=>{
-    const threadDiv = document.createElement("div");
-    threadDiv.className="forum-thread";
-    
-    const isAdmin = thread.userId===1 || thread.userId===2;
-
-    const titleEl = document.createElement("div");
-    titleEl.className="thread-title";
-    titleEl.textContent = thread.title;
-    
-    const metaEl = document.createElement("div");
-    metaEl.className="thread-meta";
-    const userLink = renderUserLink(thread.userId, thread.username, isAdmin);
-    metaEl.appendChild(userLink);
-    metaEl.appendChild(document.createTextNode(` - ${new Date(thread.timestamp).toLocaleString()}`));
-
-    const msgEl = document.createElement("div");
-    msgEl.className="thread-message";
-    msgEl.textContent = thread.message;
-
-    // Replies
-    const repliesDiv = document.createElement("div");
-    thread.replies?.forEach(reply=>{
-      const replyDiv = document.createElement("div");
-      replyDiv.className="reply";
-      const rIsAdmin = reply.userId===1 || reply.userId===2;
-      const replyUserLink = renderUserLink(reply.userId, reply.username, rIsAdmin);
-      replyDiv.appendChild(replyUserLink);
-      replyDiv.appendChild(document.createTextNode(`: ${reply.message}`));
-      repliesDiv.appendChild(replyDiv);
+      threadHTML += `
+        <textarea placeholder="Reply..." data-threadid="${tDoc.id}" class="reply-input"></textarea>
+        <button class="reply-btn" data-threadid="${tDoc.id}">Reply</button>
+        </div></div>`;
+      threadsContainer.innerHTML += threadHTML;
     });
 
-    // Reply input
-    const replyInput = document.createElement("input");
-    replyInput.placeholder="Write a reply...";
-    const replyBtn = document.createElement("button");
-    replyBtn.className="button post-btn";
-    replyBtn.textContent="Reply";
-    replyBtn.addEventListener("click", async ()=>{
-      const replyMsg = replyInput.value.trim();
-      if(replyMsg){
-        const threadRef = doc(db,"forums",thread.id);
-        await updateDoc(threadRef,{
-          replies: arrayUnion({
-            userId: currentUser.userId,
-            username: currentUser.username,
-            message: replyMsg,
-            timestamp: Date.now()
-          })
-        });
-        displayThreads();
-      }
+    document.querySelectorAll(".reply-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const threadId = btn.dataset.threadid;
+        const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
+        const text = input.value.trim();
+        if(!text) return;
+        await updateDoc(doc(db,"threads",threadId), { replies: arrayUnion({ uid:user.uid, username, text }) });
+        input.value = "";
+        loadThreads();
+      });
     });
-
-    threadDiv.appendChild(titleEl);
-    threadDiv.appendChild(metaEl);
-    threadDiv.appendChild(msgEl);
-    threadDiv.appendChild(repliesDiv);
-    threadDiv.appendChild(replyInput);
-    threadDiv.appendChild(replyBtn);
-    pageContent.appendChild(threadDiv);
-  });
-}
-
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){
-    window.location.href="Login.html";
-    return;
   }
 
-  // Fetch user info from Firestore
-  const userDocRef = doc(db,"users",user.uid);
-  const userSnap = await getDocs(collection(db,"users"));
-  const userDataSnap = await getDoc(userDocRef);
-  currentUser = { username: userDataSnap.data().username, userId: userDataSnap.data().userId, uid: user.uid};
+  await loadThreads();
 
-  authButtons.innerHTML = `<span>Welcome, ${currentUser.username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-    await signOut(auth);
-    window.location.href="Login.html";
+  document.getElementById("postThread").addEventListener("click", async ()=>{
+    const title = document.getElementById("threadTitle").value.trim();
+    const body = document.getElementById("threadBody").value.trim();
+    if(!title || !body) return alert("Enter title and body");
+    await addDoc(collection(db,"threads"), { uid:user.uid, title, body, date:new Date().toLocaleString(), replies:[] });
+    document.getElementById("threadTitle").value="";
+    document.getElementById("threadBody").value="";
+    loadThreads();
   });
-
-  displayThreads();
 });
 </script>
-
 </body>
 </html>
