@@ -27,6 +27,9 @@ input, textarea { width:100%; padding:6px; margin-bottom:6px; font-size:13px; bo
 button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; }
 .submit-btn { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; }
 .submit-btn:hover { background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
+.pin-btn { background:orange; color:white; margin-left:5px; }
+.delete-btn { background:red; color:white; margin-left:5px; }
+.reply-btn { background:#1a4a84; color:white; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -85,28 +88,34 @@ fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
 onAuthStateChanged(auth, async (user) => {
   if(!user) { window.location.href="Login.html"; return; }
 
-  // Get user info
   const userDocRef = doc(db,"users",user.uid);
   const userSnap = await getDoc(userDocRef);
   const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
-  const numericUserId = userSnap.exists() && userSnap.data().userId ? userSnap.data().userId : null;
+  const numericUserId = userSnap.exists() && userSnap.data().userId ? userSnap.data().userId : 0;
 
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
+  // Forum form
   pageContent.innerHTML = `
     <h2>Forums</h2>
-    <input type="text" id="threadTitle" placeholder="Thread title">
-    <textarea id="threadBody" placeholder="Thread content"></textarea>
-    <button id="postThread" class="submit-btn">Post Thread</button>
+    <div>
+      <input type="text" id="threadTitle" placeholder="Thread title">
+      <textarea id="threadBody" placeholder="Thread content"></textarea>
+      <button id="postThread" class="submit-btn">Post Thread</button>
+    </div>
     <div id="threadsContainer"></div>
   `;
+
   const threadsContainer = document.getElementById("threadsContainer");
 
   async function loadThreads(){
     threadsContainer.innerHTML = "";
     const threadsSnap = await getDocs(collection(db,"threads"));
-    threadsSnap.forEach(async tDoc=>{
+    const threadsArray = [];
+    threadsSnap.forEach(tDoc => threadsArray.push(tDoc));
+
+    for(const tDoc of threadsArray){
       const t = tDoc.data();
       const authorRef = doc(db,"users",t.uid);
       const authorSnap = await getDoc(authorRef);
@@ -114,17 +123,18 @@ onAuthStateChanged(auth, async (user) => {
       const authorUserId = authorSnap.exists() && authorSnap.data().userId ? authorSnap.data().userId : t.uid;
       const usernameColor = (authorUserId===1||authorUserId===2)?"darkred":"black";
       const adminBadge = (authorUserId===1||authorUserId===2)?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
-      let threadHTML = `<div class="thread-box">
+
+      let threadHTML = `<div class="thread-box" id="thread-${tDoc.id}">
         <div class="thread-title">${t.title}</div>
         <div class="thread-meta"><a class="username-link" href="Profile.html?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}</div>
         <div class="thread-body">${t.body}</div>`;
 
-      // Pin button only for userId 1 & 2
+      // Pin button for user 1 & 2
       if(numericUserId===1 || numericUserId===2){
         threadHTML += `<button class="pin-btn" data-threadid="${tDoc.id}">${t.pinned?"Unpin":"Pin"}</button>`;
       }
 
-      // Delete button only for post author
+      // Delete button for thread author
       if(user.uid === t.uid){
         threadHTML += `<button class="delete-btn" data-threadid="${tDoc.id}">Delete</button>`;
       }
@@ -134,12 +144,13 @@ onAuthStateChanged(auth, async (user) => {
         threadHTML += `<div class="reply-box"><a class="username-link" href="Profile.html?userId=${r.userId}" style="color:${(r.userId===1||r.userId===2)?'darkred':'black'}">${r.username}</a>: ${r.text}</div>`;
       });
       threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDoc.id}" class="reply-input"></textarea>
-        <button class="reply-btn" data-threadid="${tDoc.id}">Reply</button>
-        </div></div>`;
-      threadsContainer.innerHTML += threadHTML;
-    });
+                     <button class="reply-btn" data-threadid="${tDoc.id}">Reply</button>
+                     </div></div>`;
 
-    // Add listeners for reply buttons
+      threadsContainer.innerHTML += threadHTML;
+    }
+
+    // Attach reply listeners
     document.querySelectorAll(".reply-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         const threadId = btn.dataset.threadid;
@@ -152,7 +163,7 @@ onAuthStateChanged(auth, async (user) => {
       });
     });
 
-    // Pin buttons
+    // Attach pin listeners
     document.querySelectorAll(".pin-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         const threadRef = doc(db,"threads",btn.dataset.threadid);
@@ -165,7 +176,7 @@ onAuthStateChanged(auth, async (user) => {
       });
     });
 
-    // Delete buttons
+    // Attach delete listeners
     document.querySelectorAll(".delete-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         await deleteDoc(doc(db,"threads",btn.dataset.threadid));
@@ -176,11 +187,12 @@ onAuthStateChanged(auth, async (user) => {
 
   await loadThreads();
 
+  // Post thread
   document.getElementById("postThread").addEventListener("click", async ()=>{
     const title = document.getElementById("threadTitle").value.trim();
     const body = document.getElementById("threadBody").value.trim();
     if(!title || !body) return alert("Enter title and body");
-    await addDoc(collection(db,"threads"), { uid:user.uid, userId:numericUserId, title, body, date:new Date().toLocaleString(), pinned:false, replies:[] });
+    await addDoc(collection(db,"threads"), { uid:user.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false });
     document.getElementById("threadTitle").value="";
     document.getElementById("threadBody").value="";
     loadThreads();
