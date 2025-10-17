@@ -5,10 +5,10 @@
   <title>Venux - Sign Up</title>
   <style>
     body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px;}
-    #main-header { background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; border-bottom:2px solid #071b36;}
+    #main-header { background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; border-bottom:2px solid #071b36; display:flex; align-items:center;}
     #main-header img { height:52px; object-fit:contain;}
     #page-content { padding:40px; display:flex; justify-content:center;}
-    .signup-box { background: #fff; border:2px solid #999; box-shadow:2px 2px 0 #aaa; padding:25px 35px; width:420px; border-radius:6px;}
+    .signup-box { background:#fff; border:2px solid #999; box-shadow:2px 2px 0 #aaa; padding:25px 35px; width:420px; border-radius:6px;}
     .signup-box h2 { text-align:center; font-size:16px; margin-bottom:20px; border-bottom:1px solid #aaa; padding-bottom:8px;}
     .signup-box label { display:block; font-weight:bold; margin-bottom:5px;}
     .signup-box input { width:100%; padding:8px; margin-bottom:10px; border:1px solid #999; border-radius:3px; font-size:13px;}
@@ -30,13 +30,14 @@
     <h2>Sign Up</h2>
     <form id="signupForm">
       <label for="username">Username</label>
-      <input type="text" id="username" name="username" placeholder="Choose a username" required>
+      <input type="text" id="username" placeholder="Choose a username" required>
       <div id="usernameError" class="error-message"></div>
 
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Create a password" required>
+      <input type="password" id="password" placeholder="Create a password" required>
+
       <label for="confirm-password">Confirm Password</label>
-      <input type="password" id="confirm-password" name="confirm-password" placeholder="Re-enter your password" required>
+      <input type="password" id="confirm-password" placeholder="Re-enter your password" required>
       <div id="passwordError" class="error-message"></div>
       <div id="passwordSuccess" class="success-message">Passwords match!</div>
 
@@ -45,9 +46,7 @@
   </div>
 </div>
 
-<div id="footer">
-  © 2025, Venux All rights reserved
-</div>
+<div id="footer">© 2025, Venux All rights reserved</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -79,24 +78,24 @@ const passwordSuccess = document.getElementById("passwordSuccess");
 const signupBtn = document.getElementById("signupBtn");
 
 // Check username availability
-async function checkUsernameAvailability(username){
+async function checkUsername(username){
   const usersRef = collection(db,"users");
   const q = query(usersRef,where("username","==",username));
-  const snapshot = await getDocs(q);
-  return snapshot.empty;
+  const snap = await getDocs(q);
+  return snap.empty;
 }
 
-// Check passwords
+// Password validation
 function checkPasswords(){
   if(passwordInput.value.length<6){
-    passwordError.style.display="block";
     passwordError.textContent="Password must be at least 6 characters";
+    passwordError.style.display="block";
     passwordSuccess.style.display="none";
     return false;
   }
   if(passwordInput.value !== confirmPassword.value){
-    passwordError.style.display="block";
     passwordError.textContent="Passwords do not match";
+    passwordError.style.display="block";
     passwordSuccess.style.display="none";
     return false;
   }
@@ -108,27 +107,36 @@ function checkPasswords(){
 passwordInput.addEventListener("input",checkPasswords);
 confirmPassword.addEventListener("input",checkPasswords);
 
-form.addEventListener("submit",async (e)=>{
+// Form submit
+form.addEventListener("submit", async (e)=>{
   e.preventDefault();
   if(!checkPasswords()) return;
 
   const username = usernameInput.value.trim();
-  const isAvailable = await checkUsernameAvailability(username);
-  if(!isAvailable){
+  if(username.length < 3){
+    usernameError.textContent = "Username must be at least 3 characters";
     usernameError.style.display="block";
-    usernameError.textContent="Username already taken";
     return;
   }
 
-  const uniqueEmail = `${username.toLowerCase().replace(/[^a-z0-9]/g,'')}_${Date.now()}@example.com`;
+  const available = await checkUsername(username);
+  if(!available){
+    usernameError.textContent = "Username already taken";
+    usernameError.style.display="block";
+    return;
+  }
+  usernameError.style.display="none";
+
   signupBtn.disabled = true;
   signupBtn.textContent = "Creating Account...";
 
+  // Generate temporary email
+  const uniqueEmail = `${username.toLowerCase().replace(/[^a-z0-9]/g,'')}_${Date.now()}@example.com`;
+
   try{
-    const userCredential = await createUserWithEmailAndPassword(auth,uniqueEmail,passwordInput.value);
+    const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, passwordInput.value);
     const user = userCredential.user;
 
-    // Save user info in Firestore
     await setDoc(doc(db,"users",user.uid),{
       username: username,
       authEmail: uniqueEmail,
@@ -138,8 +146,8 @@ form.addEventListener("submit",async (e)=>{
     window.location.href = "Home.html";
   }catch(err){
     alert("Error: "+err.message);
-    signupBtn.disabled=false;
-    signupBtn.textContent="Create Account";
+    signupBtn.disabled = false;
+    signupBtn.textContent = "Create Account";
   }
 });
 </script>
