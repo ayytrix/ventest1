@@ -22,29 +22,113 @@ body {
   justify-content:space-between;
   align-items:center;
 }
-#main-header img { height:52px; object-fit:contain; }
+#main-header img {
+  height:52px;
+  object-fit:contain;
+}
 /* Nav bar */
-.nav-links { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; padding:6px 10px; border-radius:4px; transition: all 0.3s ease; }
-.nav-links a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
+.nav-links {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.nav-links a {
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:13px;
+  padding:6px 10px;
+  border-radius:4px;
+  transition: all 0.3s ease;
+}
+.nav-links a:hover {
+  background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
+}
 /* Buttons */
-.button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; transition: all 0.3s ease; }
-.logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
-.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-.edit-btn, .theme-btn, .friend-btn { margin-top:10px; padding:5px 10px; font-size:12px; cursor:pointer; }
+.button {
+  padding:7px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:12px;
+  color:white;
+  transition: all 0.3s ease;
+}
+.logout-btn {
+  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
+}
+.logout-btn:hover {
+  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
+}
+.edit-btn, .theme-btn, .friend-btn {
+  margin-top:10px;
+  padding:5px 10px;
+  font-size:12px;
+  cursor:pointer;
+}
 /* Notice */
-#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+#notice {
+  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
+  color:white;
+  padding:10px 20px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:2px solid #a85f00;
+}
 /* Page content */
-#page-content { padding:20px; flex:1; }
-.profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
-.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
-.profile-username { font-weight:bold; font-size:20px; }
-#description { margin-bottom:20px; }
-#badges { margin-top:20px; }
-.badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
-.badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
+#page-content {
+  padding:20px;
+  flex:1;
+}
+.profile-header {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+.avatar-placeholder {
+  width:80px;
+  height:80px;
+  background:#ccc;
+  border:2px solid #999;
+}
+.profile-username {
+  font-weight:bold;
+  font-size:20px;
+}
+#description {
+  margin-bottom:20px;
+}
+#badges {
+  margin-top:20px;
+}
+.badge {
+  display:inline-flex;
+  align-items:center;
+  padding:4px 8px;
+  border-radius:4px;
+  margin-right:6px;
+  font-size:12px;
+  color:white;
+  font-weight:bold;
+}
+.badge img {
+  width:16px;
+  height:16px;
+  margin-right:4px;
+  vertical-align:middle;
+}
 /* Footer */
-#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
+#footer {
+  text-align:center;
+  font-size:12px;
+  color:#444;
+  padding:10px;
+  border-top:2px solid #999;
+  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
+}
 </style>
 </head>
 <body>
@@ -66,6 +150,7 @@ body {
   </div>
 
   <div id="description"></div>
+
   <div id="profileButtons">
     <button class="edit-btn" id="editDescriptionBtn" style="display:none;">Edit Description</button>
     <button class="theme-btn" id="editThemeBtn" style="display:none;">Edit Theme</button>
@@ -80,6 +165,7 @@ body {
 <!-- Footer -->
 <div id="footer">© 2025, Venux All rights reserved</div>
 
+<!-- Firebase Script -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
@@ -127,9 +213,14 @@ async function getUserByNumericId(userId) {
 }
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "Login.html"; return; }
+  if (!user) {
+    window.location.href = "Login.html";
+    return;
+  }
+
   const currentUserId = user.uid;
 
+  // Navigation links
   authNavLinks.innerHTML = `
     <a href="Home.html">Home</a>
     <a href="Games.html">Games</a>
@@ -142,14 +233,19 @@ onAuthStateChanged(auth, async (user) => {
     <a href="Create.html">Create</a>
     <button class="button logout-btn" id="logoutBtn">Logout</button>
   `;
+
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-    await signOut(auth); window.location.href="Login.html";
+    await signOut(auth);
+    window.location.href="Login.html";
   });
 
   let userDoc;
   if(viewingUserId){
     userDoc = await getUserByNumericId(viewingUserId);
-    if(!userDoc){ noticeBar.textContent = dynamicNotice; return; }
+    if(!userDoc){
+      noticeBar.textContent = dynamicNotice;
+      return;
+    }
   } else {
     const usersRef = collection(db,"users");
     const q = query(usersRef, where("uid","==",user.uid));
@@ -164,31 +260,37 @@ onAuthStateChanged(auth, async (user) => {
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
-  // Show buttons only for owner
+  // Owner buttons
   if(isOwner){
     editDescriptionBtn.style.display = "inline-block";
     editThemeBtn.style.display = "inline-block";
   }
 
-  // Add Friend button for other users
+  // Friend request button for other users
   if(!isOwner){
     const friendBtn = document.createElement("button");
     friendBtn.className = "friend-btn";
     friendBtn.textContent = "Add Friend";
     descriptionDiv.appendChild(friendBtn);
 
-    // Disable if already friends or request sent
-    if((data.friends || []).includes(currentUserId) || (data.friendRequests || []).includes(currentUserId)){
-      friendBtn.disabled = true;
-      friendBtn.textContent = (data.friends || []).includes(currentUserId) ? "Friends" : "Request Sent";
+    const alreadyFriends = (data.friends || []).includes(currentUserId);
+    const alreadyRequested = (data.friendRequests || []).includes(currentUserId);
+    if(alreadyFriends || alreadyRequested){
+        friendBtn.disabled = true;
+        friendBtn.textContent = alreadyFriends ? "Friends" : "Request Sent";
     }
 
     friendBtn.addEventListener("click", async ()=>{
-      await updateDoc(doc(db,"users",userDoc.id), {
-        friendRequests: arrayUnion(currentUserId)
-      });
-      friendBtn.disabled = true;
-      friendBtn.textContent = "Request Sent";
+        try {
+            await updateDoc(doc(db,"users",userDoc.id), {
+                friendRequests: arrayUnion(currentUserId)
+            });
+            friendBtn.disabled = true;
+            friendBtn.textContent = "Request Sent";
+        } catch(err) {
+            console.error("Failed to send friend request:", err.message);
+            alert("Could not send friend request. Please try again.");
+        }
     });
   }
 
@@ -225,7 +327,10 @@ onAuthStateChanged(auth, async (user) => {
     });
   });
 
-  if(data.themeColor) document.body.style.background = data.themeColor;
+  // Apply saved theme
+  if(data.themeColor){
+    document.body.style.background = data.themeColor;
+  }
 
   // Badges
   const badges = [];
@@ -257,5 +362,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 </script>
+
 </body>
 </html>
