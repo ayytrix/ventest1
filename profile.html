@@ -77,7 +77,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, setDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -143,41 +143,28 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "Login.html";
   });
 
-  // Set current user online
   await updateDoc(currentUserRef, { online: true, lastOnline: serverTimestamp() });
-
-  // Handle tab close offline
   window.addEventListener("beforeunload", async () => {
     await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
   });
 
-  let userDoc;
-  if (viewingUserId) {
-    userDoc = await getUserByNumericId(viewingUserId);
-    if (!userDoc) { noticeBar.textContent = dynamicNotice; return; }
-  } else {
-    userDoc = await getUserByNumericId(user.uid); // your numeric userId = uid
-  }
-
+  let userDoc = viewingUserId ? await getUserByNumericId(viewingUserId) : await getUserByNumericId(user.uid);
+  if (!userDoc) { noticeBar.textContent = dynamicNotice; return; }
   const data = userDoc.data();
   const isOwner = user.uid === userDoc.id;
 
-  // 🎨 Custom navbar color for userId 2
-if (data.userId === 2) {
-  document.getElementById("main-header").style.background = "linear-gradient(to bottom, #8b0000 0%, #4b0000 100%)"; // dark red
-}
+  // Apply theme
+  if (data.themeColor) document.body.style.background = data.themeColor;
 
-  // Profile info
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
-  // Edit buttons
   if (isOwner) {
     editDescriptionBtn.style.display = "inline-block";
     editThemeBtn.style.display = "inline-block";
-    editDescriptionBtn.addEventListener("click", async () => {
-      const currentText = data.description || "";
-      descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
+
+    editDescriptionBtn.addEventListener("click", () => {
+      descriptionDiv.innerHTML = `<textarea id="descTextarea">${data.description||""}</textarea>
       <button class="edit-btn" id="saveDescription">Save</button>`;
       document.getElementById("saveDescription").addEventListener("click", async () => {
         const newDesc = document.getElementById("descTextarea").value;
@@ -185,9 +172,29 @@ if (data.userId === 2) {
         descriptionDiv.innerHTML = `<p>${newDesc}</p>`;
       });
     });
+
+    editThemeBtn.addEventListener("click", () => {
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = data.themeColor||"#d4d4d4";
+      const doneBtn = document.createElement("button");
+      doneBtn.textContent = "Save Theme";
+      doneBtn.className = "edit-btn";
+      descriptionDiv.appendChild(document.createElement("br"));
+      descriptionDiv.appendChild(colorInput);
+      descriptionDiv.appendChild(doneBtn);
+
+      doneBtn.addEventListener("click", async () => {
+        const newColor = colorInput.value;
+        document.body.style.background = newColor;
+        await updateDoc(userDoc.ref, { themeColor: newColor });
+        colorInput.remove();
+        doneBtn.remove();
+      });
+    });
   }
 
-  // --- Friends system ---
+  // --- Friends ---
   friendBtn.style.display = "inline-block";
 
   async function updateFriendButton() {
@@ -196,16 +203,16 @@ if (data.userId === 2) {
     const friendsSnap = await getDocs(friendsRef);
     const frSnap = await getDocs(frRef);
 
-    const isFriend = friendsSnap.docs.some(d => d.id === user.uid);
-    const requestSent = frSnap.docs.some(d => d.id === user.uid);
+    const isFriend = friendsSnap.docs.some(d=>d.id===user.uid);
+    const requestSent = frSnap.docs.some(d=>d.id===user.uid);
 
-    if (isOwner) {
-      friendBtn.style.display = "none";
-    } else if (isFriend) {
+    if (isOwner) friendBtn.style.display="none";
+    else if (isFriend) { 
       friendBtn.textContent = "Unfriend";
+      friendBtn.disabled = false;
       friendBtn.onclick = async () => {
-        await updateDoc(doc(userDoc.ref, "friends", user.uid), { removed: true }); // optional for tracking
-        await updateDoc(doc(currentUserRef, "friends", data.uid), { removed: true });
+        await updateDoc(doc(userDoc.ref,"friends",user.uid),{removed:true});
+        await updateDoc(doc(currentUserRef,"friends",data.uid),{removed:true});
         await updateFriendButton();
       };
     } else if (requestSent) {
@@ -215,13 +222,12 @@ if (data.userId === 2) {
       friendBtn.textContent = "Add Friend";
       friendBtn.disabled = false;
       friendBtn.onclick = async () => {
-        await setDoc(doc(doc(userDoc.ref, "friendRequests"), user.uid), { from: user.uid, timestamp: serverTimestamp() });
+        await setDoc(doc(frRef,user.uid),{from:user.uid,timestamp:serverTimestamp()});
         friendBtn.textContent = "Friend Request Sent";
         friendBtn.disabled = true;
       };
     }
   }
-
   await updateFriendButton();
 
   // --- Badges ---
@@ -229,20 +235,21 @@ if (data.userId === 2) {
   const badgeDefs = [
     { userId: 1, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
     { userId: 2, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
+    { userId: 2, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
     { userId: 5, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"}
   ];
-  badgeDefs.forEach(b => { if (b.userId === data.userId) badges.push(b); });
+  badgeDefs.forEach(b=>{if(b.userId===data.userId) badges.push(b);});
 
-  badgeContainer.innerHTML = "";
-  if (badges.length === 0) badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
-  else badges.forEach(b => {
-    const el = document.createElement("span");
-    el.className = "badge";
-    el.style.background = b.color || "#1a4a84";
-    if (b.icon) {
-      const img = document.createElement("img");
-      img.src = b.icon;
-      img.alt = b.name;
+  badgeContainer.innerHTML="";
+  if(badges.length===0) badgeContainer.innerHTML="<span>No badges earned yet.</span>";
+  else badges.forEach(b=>{
+    const el=document.createElement("span");
+    el.className="badge";
+    el.style.background=b.color||"#1a4a84";
+    if(b.icon){
+      const img=document.createElement("img");
+      img.src=b.icon;
+      img.alt=b.name;
       el.appendChild(img);
     }
     el.appendChild(document.createTextNode(b.name));
