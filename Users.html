@@ -140,8 +140,8 @@ function renderUsers() {
     const isAdmin = [1, 2, 5].includes(u.userId);
 
     const usernameHTML = isAdmin
-      ? `<a href="Profile.html?userId=${u.userId}" style="color:red;">${u.username} <span style="color:red;font-weight:bold;">Admin</span></a>`
-      : `<a href="Profile.html?userId=${u.userId}">${u.username}</a>`;
+      ? `<a href="profile?userId=${u.userId}" style="color:red;">${u.username} <span style="color:red;font-weight:bold;">Admin</span></a>`
+      : `<a href="profile?userId=${u.userId}">${u.username}</a>`;
 
     const userHTML = `<div class="user-card">
       ${usernameHTML}
