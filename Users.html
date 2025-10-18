@@ -79,6 +79,7 @@ const offlineUsersDiv = document.getElementById("offlineUsers");
 const searchBar = document.getElementById("searchBar");
 
 let allUsers = [];
+let currentUserRef;
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -87,6 +88,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const username = user.displayName || "User";
+  currentUserRef = doc(db, "users", user.uid);
 
   // Dynamic notice like Home.html
   try {
@@ -104,13 +106,13 @@ onAuthStateChanged(auth, async (user) => {
 
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
   document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
     await signOut(auth);
     window.location.href = "Login.html";
   });
 
-  // Update current user online status
-  const userRef = doc(db, "users", user.uid);
-  await updateDoc(userRef, { online: true, lastOnline: serverTimestamp() });
+  // Set current user online
+  await updateDoc(currentUserRef, { online: true, lastOnline: serverTimestamp() });
 
   // Fetch all users
   try {
@@ -128,6 +130,13 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+// Set user offline when page is closed
+window.addEventListener("beforeunload", async (e) => {
+  if (currentUserRef) {
+    await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
+  }
+});
+
 function renderUsers() {
   const searchTerm = searchBar.value.toLowerCase();
   onlineUsersDiv.innerHTML = '<div class="online-header">Online Users</div>';
@@ -140,8 +149,8 @@ function renderUsers() {
     const isAdmin = [1, 2, 5].includes(u.userId);
 
     const usernameHTML = isAdmin
-      ? `<a href="profile?userId=${u.userId}" style="color:red;">${u.username} <span style="color:red;font-weight:bold;">Admin</span></a>`
-      : `<a href="profile?userId=${u.userId}">${u.username}</a>`;
+      ? `<a href="Profile.html?userId=${u.userId}" style="color:red;">${u.username} <span style="color:red;font-weight:bold;">Admin</span></a>`
+      : `<a href="Profile.html?userId=${u.userId}">${u.username}</a>`;
 
     const userHTML = `<div class="user-card">
       ${usernameHTML}
