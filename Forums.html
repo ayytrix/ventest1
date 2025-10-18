@@ -149,7 +149,7 @@ onAuthStateChanged(auth, async (user) => {
 
       t.replies?.forEach(r=>{
         threadHTML += `<div class="reply-box">
-          <a class="username-link" href="Profile?userId=${r.userId}" style="color:${(r.userId===1||r.userId===2)?'darkred':'black'}">${r.username}</a>: ${r.text}
+          <a class="username-link" href="profile?userId=${r.userId}" style="color:${(r.userId===1||r.userId===2)?'darkred':'black'}">${r.username}</a>: ${r.text}
         </div>`;
       });
 
