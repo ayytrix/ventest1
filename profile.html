@@ -133,16 +133,13 @@ body {
 </head>
 <body>
 
-<!-- Header -->
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
   <div class="nav-links" id="authNavLinks"></div>
 </div>
 
-<!-- Notice -->
 <div id="notice">Loading...</div>
 
-<!-- Profile Content -->
 <div id="page-content">
   <div class="profile-header">
     <div class="avatar-placeholder"></div>
@@ -162,10 +159,8 @@ body {
   </div>
 </div>
 
-<!-- Footer -->
 <div id="footer">© 2025, Venux All rights reserved</div>
 
-<!-- Firebase Script -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
@@ -193,14 +188,12 @@ const badgeContainer = document.getElementById("badgeContainer");
 const editDescriptionBtn = document.getElementById("editDescriptionBtn");
 const editThemeBtn = document.getElementById("editThemeBtn");
 
-// Dynamic notice
 let dynamicNotice = "Welcome to Venux!";
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : dynamicNotice)
   .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
   .catch(() => noticeBar.textContent = dynamicNotice);
 
-// Get userId from URL
 const urlParams = new URLSearchParams(window.location.search);
 const viewingUserId = parseInt(urlParams.get('userId'), 10);
 
@@ -220,7 +213,6 @@ onAuthStateChanged(auth, async (user) => {
 
   const currentUserId = user.uid;
 
-  // Navigation links
   authNavLinks.innerHTML = `
     <a href="Home.html">Home</a>
     <a href="Games.html">Games</a>
@@ -242,13 +234,10 @@ onAuthStateChanged(auth, async (user) => {
   let userDoc;
   if(viewingUserId){
     userDoc = await getUserByNumericId(viewingUserId);
-    if(!userDoc){
-      noticeBar.textContent = dynamicNotice;
-      return;
-    }
+    if(!userDoc){ noticeBar.textContent = dynamicNotice; return; }
   } else {
     const usersRef = collection(db,"users");
-    const q = query(usersRef, where("uid","==",user.uid));
+    const q = query(usersRef, where("uid","==",currentUserId));
     const snapshot = await getDocs(q);
     if(snapshot.empty){ noticeBar.textContent=dynamicNotice; return; }
     userDoc = snapshot.docs[0];
@@ -266,31 +255,29 @@ onAuthStateChanged(auth, async (user) => {
     editThemeBtn.style.display = "inline-block";
   }
 
-  // Friend request button for other users
+  // Friend button
   if(!isOwner){
     const friendBtn = document.createElement("button");
     friendBtn.className = "friend-btn";
     friendBtn.textContent = "Add Friend";
     descriptionDiv.appendChild(friendBtn);
 
-    const alreadyFriends = (data.friends || []).includes(currentUserId);
-    const alreadyRequested = (data.friendRequests || []).includes(currentUserId);
-    if(alreadyFriends || alreadyRequested){
-        friendBtn.disabled = true;
-        friendBtn.textContent = alreadyFriends ? "Friends" : "Request Sent";
+    if((data.friends || []).includes(currentUserId) || (data.friendRequests || []).includes(currentUserId)){
+      friendBtn.disabled = true;
+      friendBtn.textContent = (data.friends || []).includes(currentUserId) ? "Friends" : "Request Sent";
     }
 
     friendBtn.addEventListener("click", async ()=>{
-        try {
-            await updateDoc(doc(db,"users",userDoc.id), {
-                friendRequests: arrayUnion(currentUserId)
-            });
-            friendBtn.disabled = true;
-            friendBtn.textContent = "Request Sent";
-        } catch(err) {
-            console.error("Failed to send friend request:", err.message);
-            alert("Could not send friend request. Please try again.");
-        }
+      try {
+        await updateDoc(doc(db,"users",userDoc.id), {
+          friendRequests: arrayUnion(currentUserId)
+        });
+        friendBtn.disabled = true;
+        friendBtn.textContent = "Request Sent";
+      } catch(err) {
+        console.error("Failed to send friend request:", err.message);
+        alert("Could not send friend request: " + err.message);
+      }
     });
   }
 
@@ -327,10 +314,7 @@ onAuthStateChanged(auth, async (user) => {
     });
   });
 
-  // Apply saved theme
-  if(data.themeColor){
-    document.body.style.background = data.themeColor;
-  }
+  if(data.themeColor) document.body.style.background = data.themeColor;
 
   // Badges
   const badges = [];
