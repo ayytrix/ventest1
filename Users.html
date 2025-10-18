@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Venux - Users</title>
 <style>
-/* Reuse body, navbar, and sub-header styles from home.html */
 body{margin:0;font-family:Arial,sans-serif;background:#d4d4d4;color:#222;font-size:13px;}
 #main-header{background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
 #main-header img{height:52px;object-fit:contain;}
@@ -91,13 +90,14 @@ onAuthStateChanged(auth, async (user)=>{
     window.location.href="Login.html";
   });
 
-  // Fetch users from Firestore
   try {
     const usersRef = collection(db,"users");
     const usersSnap = await getDocs(usersRef);
     allUsers = [];
     usersSnap.forEach(doc=>{
-      allUsers.push({id: doc.id, ...doc.data()});
+      const data = doc.data();
+      // Force online to be boolean
+      allUsers.push({id: doc.id, ...data, online: !!data.online});
     });
     renderUsers();
   } catch(err){
@@ -114,12 +114,13 @@ function renderUsers(){
   allUsers.forEach(u=>{
     if(searchTerm && !u.username.toLowerCase().includes(searchTerm)) return;
 
+    const isOnline = u.online === true; // explicit boolean check
     const userHTML = `<div class="user-card">
       <span>${u.username}</span>
-      <span>${u.online ? "Online" : "Offline"}</span>
+      <span>${isOnline ? "Online" : "Offline"}</span>
     </div>`;
 
-    if(u.online){
+    if(isOnline){
       onlineUsersDiv.innerHTML += userHTML;
     } else {
       offlineUsersDiv.innerHTML += userHTML;
