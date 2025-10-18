@@ -80,6 +80,7 @@ const searchBar = document.getElementById("searchBar");
 
 let allUsers = [];
 let currentUserRef;
+let idleTimer;
 
 onAuthStateChanged(auth, async (user) => {
   if(!user) return window.location.href="Login.html";
@@ -95,54 +96,74 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   authButtons.innerHTML = `<span>Welcome, ${user.displayName || "User"}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn.addEventListener("click", async () => {
+    await setStatus("offline");
     await signOut(auth);
     window.location.href="Login.html";
   });
 
-  // Set current user online
-  await updateDoc(currentUserRef, { online: true, lastOnline: serverTimestamp() });
+  // Set online initially
+  await setStatus("online");
+
+  // Heartbeat for live presence
+  setInterval(() => setStatus("online"), 30000);
+
+  // Idle detection
+  const resetIdleTimer = () => {
+    clearTimeout(idleTimer);
+    setStatus("online");
+    idleTimer = setTimeout(() => setStatus("idle"), 3 * 60 * 1000); // 3 minutes idle
+  };
+  ["mousemove","keydown","scroll","click"].forEach(e => window.addEventListener(e, resetIdleTimer));
+  resetIdleTimer();
+
+  // Set offline on close tab
+  window.addEventListener("beforeunload", async () => { await setStatus("offline"); });
 
   // Live listener for all users
   const usersRef = collection(db, "users");
-  onSnapshot(usersRef, (snapshot) => {
+  onSnapshot(usersRef, snapshot => {
     allUsers = [];
-    snapshot.forEach(docSnap => {
-      allUsers.push({ id: docSnap.id, ...docSnap.data(), online: !!docSnap.data().online });
-    });
+    snapshot.forEach(docSnap => allUsers.push({id: docSnap.id, ...docSnap.data()}));
     renderUsers();
   });
 });
 
-function renderUsers(){
+async function setStatus(status) {
+  if(!currentUserRef) return;
+  await updateDoc(currentUserRef, {
+    status: status,
+    online: status !== "offline",
+    lastActive: serverTimestamp()
+  });
+}
+
+function renderUsers() {
   const searchTerm = searchBar.value.toLowerCase();
   onlineUsersDiv.innerHTML = '<div class="online-header">Online Users</div>';
   offlineUsersDiv.innerHTML = '<div class="offline-header">Offline Users</div>';
 
-  allUsers.forEach(u=>{
+  allUsers.forEach(u => {
     if(searchTerm && !u.username.toLowerCase().includes(searchTerm)) return;
 
-    const isOnline = u.online===true;
+    let statusText = u.status === "idle" ? "🌙 Idle" : (u.status === "online" ? "Online" : "Offline");
     const isAdmin = [1,2,5].includes(u.userId);
 
     const usernameHTML = isAdmin
       ? `<a href="Profile.html?userId=${u.userId}" style="color:red;">${u.username} <span style="color:red;font-weight:bold;">Admin</span></a>`
       : `<a href="Profile.html?userId=${u.userId}">${u.username}</a>`;
 
-    const userHTML = `<div class="user-card">
-      ${usernameHTML}
-      <span>${isOnline?"Online":"Offline"}</span>
-    </div>`;
+    const userHTML = `<div class="user-card">${usernameHTML}<span>${statusText}</span></div>`;
 
-    if(isOnline) onlineUsersDiv.innerHTML += userHTML;
-    else offlineUsersDiv.innerHTML += userHTML;
+    if(u.status === "offline") offlineUsersDiv.innerHTML += userHTML;
+    else onlineUsersDiv.innerHTML += userHTML;
   });
 }
 
-// Filter users on search input
+// Search filter
 searchBar.addEventListener("input", renderUsers);
-
 </script>
 
 </body>
