@@ -162,6 +162,11 @@ onAuthStateChanged(auth, async (user) => {
   const data = userDoc.data();
   const isOwner = user.uid === userDoc.id;
 
+  // 🎨 Custom navbar color for userId 2
+if (data.userId === 2) {
+  document.getElementById("main-header").style.background = "linear-gradient(to bottom, #8b0000 0%, #4b0000 100%)"; // dark red
+}
+
   // Profile info
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
