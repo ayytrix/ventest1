@@ -132,7 +132,7 @@ onAuthStateChanged(auth, async (user) => {
       let threadHTML = `<div class="thread-box" id="thread-${tDocId}">
         <div class="thread-title ${t.pinned?'pinned':''}">${t.title}</div>
         <div class="thread-meta">
-          <a class="username-link" href="Profile?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}
+          <a class="username-link" href="profile?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}
         </div>
         <div class="thread-body">${t.body}</div>`;
 
