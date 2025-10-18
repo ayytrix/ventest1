@@ -4,7 +4,41 @@
 <meta charset="UTF-8">
 <title>Venux - Profile</title>
 <style>
-/* ... (keep your existing CSS, same as before) ... */
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#d4d4d4;
+  color:#222;
+  font-size:13px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+#main-header {
+  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+#main-header img { height:52px; object-fit:contain; }
+.nav-links { display:flex; gap:10px; flex-wrap:wrap; }
+.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; padding:6px 10px; border-radius:4px; transition:0.3s; }
+.nav-links a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
+.button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; }
+.logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
+.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
+.edit-btn, .theme-btn, .friend-btn { margin-top:10px; padding:5px 10px; font-size:12px; cursor:pointer; }
+#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+#page-content { padding:20px; flex:1; }
+.profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
+.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
+.profile-username { font-weight:bold; font-size:20px; }
+#description { margin-bottom:20px; }
+#badges { margin-top:20px; }
+.badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
+.badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
+#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
 </style>
 </head>
 <body>
@@ -29,9 +63,9 @@
     <button class="theme-btn" id="editThemeBtn" style="display:none;">Edit Theme</button>
   </div>
 
-  <div id="friendRequestsContainer">
-    <h3>Friend Requests</h3>
-    <div id="friendRequestsList"></div>
+  <div id="friendRequestsSection" style="margin-top:20px;">
+    <strong>Friend Requests:</strong>
+    <ul id="friendRequestsList"></ul>
   </div>
 
   <div id="badges">
@@ -45,7 +79,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, deleteDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -81,25 +115,56 @@ async function getUserByNumericId(userId) {
   return null;
 }
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "Login.html"; return; }
+async function loadFriendRequests(uid) {
+  friendRequestsList.innerHTML = "";
+  const reqsRef = collection(db, `users/${uid}/friendRequests`);
+  const snapshot = await getDocs(reqsRef);
+  for (const reqDoc of snapshot.docs) {
+    const data = reqDoc.data();
+    const fromSnap = await getDoc(doc(db, "users", data.from));
+    const username = fromSnap.exists() ? fromSnap.data().username : data.from;
+    const li = document.createElement("li");
+    li.textContent = username + " ";
+    const acceptBtn = document.createElement("button");
+    acceptBtn.textContent = "Accept";
+    acceptBtn.addEventListener("click", async ()=>{
+      try {
+        // Add each other as friends
+        await updateDoc(doc(db, "users", uid), { friends: arrayUnion(data.from) });
+        await updateDoc(doc(db, "users", data.from), { friends: arrayUnion(uid) });
+        // Remove request
+        await deleteDoc(doc(db, `users/${uid}/friendRequests`, data.from));
+        li.remove();
+      } catch(e){ console.error(e); alert("Failed to accept request: " + e.message);}
+    });
+    li.appendChild(acceptBtn);
+    friendRequestsList.appendChild(li);
+  }
+}
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ window.location.href="Login.html"; return; }
   const currentUserId = user.uid;
 
-  // Navbar
   authNavLinks.innerHTML = `
     <a href="Home.html">Home</a>
     <a href="Games.html">Games</a>
     <a href="Catalog.html">Catalog</a>
     <a href="Users.html">Users</a>
+    <a href="Forums.html">Forum</a>
+    <a href="Clans.html">Clans</a>
+    <a href="Help.html">Help</a>
+    <a href="Downloads.html">Downloads</a>
+    <a href="Create.html">Create</a>
     <button class="button logout-btn" id="logoutBtn">Logout</button>
   `;
+
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
-  // Load profile
   let userDoc;
   if(viewingUserId){
     userDoc = await getUserByNumericId(viewingUserId);
-    if(!userDoc){ noticeBar.textContent = "User not found"; return; }
+    if(!userDoc){ noticeBar.textContent="User not found"; return; }
   } else {
     const usersRef = collection(db,"users");
     const q = query(usersRef, where("uid","==",currentUserId));
@@ -114,56 +179,26 @@ onAuthStateChanged(auth, async (user) => {
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
-  // Friend button
-  if(!isOwner){
+  if(isOwner){
+    editDescriptionBtn.style.display="inline-block";
+    editThemeBtn.style.display="inline-block";
+    loadFriendRequests(currentUserId);
+  } else {
+    // Friend button for others
     const friendBtn = document.createElement("button");
-    friendBtn.className = "friend-btn";
-    friendBtn.textContent = "Add Friend";
+    friendBtn.className="friend-btn";
+    friendBtn.textContent="Add Friend";
     descriptionDiv.appendChild(friendBtn);
-
-    // Check if already friends or request sent
-    const requestsSnapshot = await getDocs(collection(db, "users", userDoc.id, "friendRequests"));
-    const requestSent = requestsSnapshot.docs.some(docSnap => docSnap.data().from === currentUserId);
-    if((data.friends || []).includes(currentUserId) || requestSent){
-      friendBtn.disabled = true;
-      friendBtn.textContent = (data.friends || []).includes(currentUserId) ? "Friends" : "Request Sent";
-    }
-
+    if((data.friends||[]).includes(currentUserId)){ friendBtn.disabled=true; friendBtn.textContent="Friends"; }
     friendBtn.addEventListener("click", async ()=>{
-      try {
-        await setDoc(doc(db,"users",userDoc.id,"friendRequests", currentUserId), {from: currentUserId});
-        friendBtn.disabled = true;
-        friendBtn.textContent = "Request Sent";
-      } catch(err){ alert("Could not send friend request: " + err.message); }
+      try{
+        await setDoc(doc(db, `users/${userDoc.id}/friendRequests`, currentUserId), { from: currentUserId, timestamp:Date.now() });
+        friendBtn.disabled=true;
+        friendBtn.textContent="Request Sent";
+      } catch(e){ console.error(e); alert("Failed to send request: " + e.message);}
     });
   }
-
-  // Display incoming requests (for owner)
-  if(isOwner){
-    const requestsSnapshot = await getDocs(collection(db, "users", userDoc.id, "friendRequests"));
-    friendRequestsList.innerHTML = "";
-    for(const reqDoc of requestsSnapshot.docs){
-      const fromUid = reqDoc.data().from;
-      const fromUserDoc = await getDoc(doc(db,"users",fromUid));
-      const fromUsername = fromUserDoc.exists() ? fromUserDoc.data().username : "Unknown";
-      const div = document.createElement("div");
-      div.textContent = fromUsername + " ";
-      const acceptBtn = document.createElement("button");
-      acceptBtn.textContent = "Accept";
-      acceptBtn.addEventListener("click", async ()=>{
-        // Add to friends array
-        await updateDoc(doc(db,"users",currentUserId), {friends: arrayUnion(fromUid)});
-        // Delete request
-        await deleteDoc(doc(db,"users",currentUserId,"friendRequests",reqDoc.id));
-        div.remove();
-      });
-      div.appendChild(acceptBtn);
-      friendRequestsList.appendChild(div);
-    }
-  }
-
 });
 </script>
-
 </body>
 </html>
