@@ -307,7 +307,9 @@
           email: email || null,
           createdAt: new Date().toISOString(),
           userId: userId,
-          badges: []
+          badges: [],
+          friends: [],          // <-- initialize friends array
+          friendRequests: []    // <-- initialize friendRequests array
         });
 
         window.location.href = "Home.html";
