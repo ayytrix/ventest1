@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Venux - Help</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
 <style>
 body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
 #main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
@@ -41,7 +42,7 @@ ul { margin-left:20px; margin-bottom:12px; }
   <a href="Create.html">Create</a>
 </div>
 
-<div id="notice">Need help? You’ve come to the right place!</div>
+<div id="notice">Loading...</div>
 
 <div id="page-content">
   <h2>About Venux</h2>
@@ -63,7 +64,7 @@ ul { margin-left:20px; margin-bottom:12px; }
   <ul>
     <li>Use your username consistently across the site to identify yourself.</li>
     <li>All forum threads, replies, and content are moderated to keep the community safe.</li>
-    <li>Remember to be respectful  any violations can be reported.</li>
+    <li>Remember to be respectful — any violations can be reported.</li>
     <li>This page serves as a central hub for help, credits, and rules.</li>
   </ul>
 
@@ -73,8 +74,9 @@ ul { margin-left:20px; margin-bottom:12px; }
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script type="module">
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -88,13 +90,25 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const authButtons = document.getElementById("authButtons");
+const noticeBar = document.getElementById("notice");
+
+// Dynamic alert fetch
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : "Need help? You’ve come to the right place!")
+  .then(t => noticeBar.textContent = t)
+  .catch(() => noticeBar.textContent = "Need help? You’ve come to the right place!");
 
 onAuthStateChanged(auth, async (user) => {
   if(!user){ window.location.href="Login.html"; return; }
 
-  authButtons.innerHTML = `<span>Welcome, ${user.email}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+  // Fetch username from Firestore
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
+
+  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{ 
     await signOut(auth); 
     window.location.href="Login.html"; 
