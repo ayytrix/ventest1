@@ -20,25 +20,106 @@ body {
   display:flex;
   justify-content:space-between;
   align-items:center;
+  transition: all 0.3s ease;
 }
-#main-header img { height:52px; object-fit:contain; }
-.nav-links { display:flex; gap:10px; flex-wrap:wrap; }
-.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; padding:6px 10px; border-radius:4px; transition:0.3s; }
-.nav-links a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
-.button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; }
-.logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
-.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-.edit-btn, .theme-btn, .friend-btn { margin-top:10px; padding:5px 10px; font-size:12px; cursor:pointer; }
-#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-#page-content { padding:20px; flex:1; }
-.profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
-.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
-.profile-username { font-weight:bold; font-size:20px; }
+#main-header img {
+  height:52px;
+  object-fit:contain;
+}
+.nav-links {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.nav-links a {
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:13px;
+  padding:6px 10px;
+  border-radius:4px;
+  transition: all 0.3s ease;
+}
+.nav-links a:hover {
+  background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
+}
+.button {
+  padding:7px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:12px;
+  color:white;
+  transition: all 0.3s ease;
+}
+.logout-btn {
+  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
+}
+.logout-btn:hover {
+  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
+}
+.edit-btn, .theme-btn, .friend-btn {
+  margin-top:10px;
+  padding:5px 10px;
+  font-size:12px;
+  cursor:pointer;
+}
+#notice {
+  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
+  color:white;
+  padding:10px 20px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:2px solid #a85f00;
+}
+#page-content {
+  padding:20px;
+  flex:1;
+}
+.profile-header {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+.avatar-placeholder {
+  width:80px;
+  height:80px;
+  background:#ccc;
+  border:2px solid #999;
+}
+.profile-username {
+  font-weight:bold;
+  font-size:20px;
+}
 #description { margin-bottom:20px; }
 #badges { margin-top:20px; }
-.badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
-.badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
-#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
+.badge {
+  display:inline-flex;
+  align-items:center;
+  padding:4px 8px;
+  border-radius:4px;
+  margin-right:6px;
+  font-size:12px;
+  color:white;
+  font-weight:bold;
+}
+.badge img {
+  width:16px;
+  height:16px;
+  margin-right:4px;
+  vertical-align:middle;
+}
+#footer {
+  text-align:center;
+  font-size:12px;
+  color:#444;
+  padding:10px;
+  border-top:2px solid #999;
+  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
+}
 </style>
 </head>
 <body>
@@ -63,11 +144,6 @@ body {
     <button class="theme-btn" id="editThemeBtn" style="display:none;">Edit Theme</button>
   </div>
 
-  <div id="friendRequestsSection" style="margin-top:20px;">
-    <strong>Friend Requests:</strong>
-    <ul id="friendRequestsList"></ul>
-  </div>
-
   <div id="badges">
     <strong>Player Badges:</strong>
     <span id="badgeContainer"></span>
@@ -79,7 +155,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -102,7 +178,12 @@ const descriptionDiv = document.getElementById("description");
 const badgeContainer = document.getElementById("badgeContainer");
 const editDescriptionBtn = document.getElementById("editDescriptionBtn");
 const editThemeBtn = document.getElementById("editThemeBtn");
-const friendRequestsList = document.getElementById("friendRequestsList");
+
+let dynamicNotice = "Welcome to Venux!";
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : dynamicNotice)
+  .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
+  .catch(() => noticeBar.textContent = dynamicNotice);
 
 const urlParams = new URLSearchParams(window.location.search);
 const viewingUserId = parseInt(urlParams.get('userId'), 10);
@@ -115,37 +196,35 @@ async function getUserByNumericId(userId) {
   return null;
 }
 
-async function loadFriendRequests(uid) {
-  friendRequestsList.innerHTML = "";
-  const reqsRef = collection(db, `users/${uid}/friendRequests`);
-  const snapshot = await getDocs(reqsRef);
-  for (const reqDoc of snapshot.docs) {
-    const data = reqDoc.data();
-    const fromSnap = await getDoc(doc(db, "users", data.from));
-    const username = fromSnap.exists() ? fromSnap.data().username : data.from;
-    const li = document.createElement("li");
-    li.textContent = username + " ";
-    const acceptBtn = document.createElement("button");
-    acceptBtn.textContent = "Accept";
-    acceptBtn.addEventListener("click", async ()=>{
-      try {
-        // Add each other as friends
-        await updateDoc(doc(db, "users", uid), { friends: arrayUnion(data.from) });
-        await updateDoc(doc(db, "users", data.from), { friends: arrayUnion(uid) });
-        // Remove request
-        await deleteDoc(doc(db, `users/${uid}/friendRequests`, data.from));
-        li.remove();
-      } catch(e){ console.error(e); alert("Failed to accept request: " + e.message);}
-    });
-    li.appendChild(acceptBtn);
-    friendRequestsList.appendChild(li);
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "Login.html";
+    return;
   }
-}
 
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){ window.location.href="Login.html"; return; }
   const currentUserId = user.uid;
+  let userDoc;
+  if (viewingUserId) {
+    userDoc = await getUserByNumericId(viewingUserId);
+    if (!userDoc) { noticeBar.textContent = dynamicNotice; return; }
+  } else {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("uid", "==", currentUserId));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) { noticeBar.textContent = dynamicNotice; return; }
+    userDoc = snapshot.docs[0];
+  }
 
+  const data = userDoc.data();
+  const isOwner = currentUserId === userDoc.id;
+
+  // 🔹 Custom nav color for userId 2
+  const header = document.getElementById("main-header");
+  if (data.userId === 2) {
+    header.style.background = "linear-gradient(to right, #ff8c00, #ff0000)";
+  }
+
+  // Navbar setup
   authNavLinks.innerHTML = `
     <a href="Home.html">Home</a>
     <a href="Games.html">Games</a>
@@ -158,50 +237,83 @@ onAuthStateChanged(auth, async (user)=>{
     <a href="Create.html">Create</a>
     <button class="button logout-btn" id="logoutBtn">Logout</button>
   `;
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
 
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
-
-  let userDoc;
-  if(viewingUserId){
-    userDoc = await getUserByNumericId(viewingUserId);
-    if(!userDoc){ noticeBar.textContent="User not found"; return; }
-  } else {
-    const usersRef = collection(db,"users");
-    const q = query(usersRef, where("uid","==",currentUserId));
-    const snapshot = await getDocs(q);
-    if(snapshot.empty){ noticeBar.textContent="User not found"; return; }
-    userDoc = snapshot.docs[0];
-  }
-
-  const data = userDoc.data();
-  const isOwner = currentUserId === userDoc.id;
-
-  // 🎨 Custom navbar color for userId 2
-if (data.userId === 2) {
-  document.getElementById("main-header").style.background = "linear-gradient(to bottom, #6f6f6f 0%, #202020 100%)"; // greys
-}
-
-
+  // Basic profile info
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
-  if(isOwner){
-    editDescriptionBtn.style.display="inline-block";
-    editThemeBtn.style.display="inline-block";
-    loadFriendRequests(currentUserId);
+  // --- Edit description ---
+  if (isOwner) {
+    editDescriptionBtn.style.display = "inline-block";
+    editThemeBtn.style.display = "inline-block";
+
+    editDescriptionBtn.addEventListener("click", () => {
+      const currentText = data.description || "";
+      descriptionDiv.innerHTML = `
+        <textarea id="descTextarea">${currentText}</textarea>
+        <button class="edit-btn" id="saveDescription">Save</button>`;
+      document.getElementById("saveDescription").addEventListener("click", async () => {
+        const newDesc = document.getElementById("descTextarea").value;
+        await updateDoc(doc(db, "users", userDoc.id), { description: newDesc });
+        descriptionDiv.innerHTML = `<p>${newDesc}</p>`;
+      });
+    });
+
+    editThemeBtn.addEventListener("click", () => {
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = data.themeColor || "#d4d4d4";
+      const doneBtn = document.createElement("button");
+      doneBtn.textContent = "Done";
+      doneBtn.className = "edit-btn";
+      descriptionDiv.appendChild(document.createElement("br"));
+      descriptionDiv.appendChild(colorInput);
+      descriptionDiv.appendChild(doneBtn);
+
+      doneBtn.addEventListener("click", async () => {
+        const newColor = colorInput.value;
+        document.body.style.background = newColor;
+        await updateDoc(doc(db, "users", userDoc.id), { themeColor: newColor });
+        colorInput.remove();
+        doneBtn.remove();
+      });
+    });
+  }
+
+  if (data.themeColor) document.body.style.background = data.themeColor;
+
+  // --- Badges ---
+  const badges = [];
+  const badgeDefs = [
+    { userId: 1, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
+    { userId: 2, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
+    { userId: 7, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
+    { userId: 2, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"}
+    { userId: 2, name:"Omega Venux Club", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/omega.png", color:"#2563eb"},
+    { userId: 5, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"}
+  ];
+  badgeDefs.forEach(bd => { if (bd.userId === data.userId) badges.push(bd); });
+
+  badgeContainer.innerHTML = "";
+  if (badges.length === 0) {
+    badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
   } else {
-    // Friend button for others
-    const friendBtn = document.createElement("button");
-    friendBtn.className="friend-btn";
-    friendBtn.textContent="Add Friend";
-    descriptionDiv.appendChild(friendBtn);
-    if((data.friends||[]).includes(currentUserId)){ friendBtn.disabled=true; friendBtn.textContent="Friends"; }
-    friendBtn.addEventListener("click", async ()=>{
-      try{
-        await setDoc(doc(db, `users/${userDoc.id}/friendRequests`, currentUserId), { from: currentUserId, timestamp:Date.now() });
-        friendBtn.disabled=true;
-        friendBtn.textContent="Request Sent";
-      } catch(e){ console.error(e); alert("Failed to send request: " + e.message);}
+    badges.forEach(b => {
+      const badgeEl = document.createElement("span");
+      badgeEl.className = "badge";
+      badgeEl.style.background = b.color || "#1a4a84";
+      if (b.icon) {
+        const img = document.createElement("img");
+        img.src = b.icon;
+        img.alt = b.name;
+        badgeEl.appendChild(img);
+      }
+      badgeEl.appendChild(document.createTextNode(b.name));
+      badgeContainer.appendChild(badgeEl);
     });
   }
 });
