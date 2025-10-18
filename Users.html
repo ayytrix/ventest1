@@ -107,19 +107,19 @@ onAuthStateChanged(auth, async (user) => {
   // Set online initially
   await setStatus("online");
 
-  // Heartbeat for live presence
+  // Heartbeat every 30s
   setInterval(() => setStatus("online"), 30000);
 
-  // Idle detection
+  // Idle detection (3 mins)
   const resetIdleTimer = () => {
     clearTimeout(idleTimer);
     setStatus("online");
-    idleTimer = setTimeout(() => setStatus("idle"), 3 * 60 * 1000); // 3 minutes idle
+    idleTimer = setTimeout(() => setStatus("idle"), 3*60*1000);
   };
   ["mousemove","keydown","scroll","click"].forEach(e => window.addEventListener(e, resetIdleTimer));
   resetIdleTimer();
 
-  // Set offline on close tab
+  // Offline on close tab
   window.addEventListener("beforeunload", async () => { await setStatus("offline"); });
 
   // Live listener for all users
@@ -148,21 +148,22 @@ function renderUsers() {
   allUsers.forEach(u => {
     if(searchTerm && !u.username.toLowerCase().includes(searchTerm)) return;
 
-    let statusText = u.status === "idle" ? "🌙 Idle" : (u.status === "online" ? "Online" : "Offline");
-    const isAdmin = [1,2,5].includes(u.userId);
+    const status = u.status || "offline"; // default offline if undefined
+    let statusText = status === "idle" ? "🌙 Idle" : (status === "online" ? "Online" : "Offline");
+    let isOnlineSection = status === "online" || status === "idle";
 
+    const isAdmin = [1,2,5].includes(u.userId);
     const usernameHTML = isAdmin
       ? `<a href="Profile.html?userId=${u.userId}" style="color:red;">${u.username} <span style="color:red;font-weight:bold;">Admin</span></a>`
       : `<a href="Profile.html?userId=${u.userId}">${u.username}</a>`;
 
     const userHTML = `<div class="user-card">${usernameHTML}<span>${statusText}</span></div>`;
 
-    if(u.status === "offline") offlineUsersDiv.innerHTML += userHTML;
-    else onlineUsersDiv.innerHTML += userHTML;
+    if(isOnlineSection) onlineUsersDiv.innerHTML += userHTML;
+    else offlineUsersDiv.innerHTML += userHTML;
   });
 }
 
-// Search filter
 searchBar.addEventListener("input", renderUsers);
 </script>
 
