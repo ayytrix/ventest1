@@ -4,131 +4,26 @@
 <meta charset="UTF-8">
 <title>Venux - Profile</title>
 <style>
-body {
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#d4d4d4;
-  color:#222;
-  font-size:13px;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-/* Header */
-#main-header {
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:10px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-#main-header img {
-  height:52px;
-  object-fit:contain;
-}
-/* Nav bar */
-.nav-links {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-.nav-links a {
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-  font-size:13px;
-  padding:6px 10px;
-  border-radius:4px;
-  transition: all 0.3s ease;
-}
-.nav-links a:hover {
-  background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
-}
-/* Buttons */
-.button {
-  padding:7px 14px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-  font-size:12px;
-  color:white;
-  transition: all 0.3s ease;
-}
-.logout-btn {
-  background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);
-}
-.logout-btn:hover {
-  background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
-}
-.edit-btn, .theme-btn, .friend-btn {
-  margin-top:10px;
-  padding:5px 10px;
-  font-size:12px;
-  cursor:pointer;
-}
-/* Notice */
-#notice {
-  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
-  color:white;
-  padding:10px 20px;
-  font-weight:bold;
-  text-align:center;
-  border-bottom:2px solid #a85f00;
-}
-/* Page content */
-#page-content {
-  padding:20px;
-  flex:1;
-}
-.profile-header {
-  display:flex;
-  align-items:center;
-  gap:15px;
-  margin-bottom:20px;
-}
-.avatar-placeholder {
-  width:80px;
-  height:80px;
-  background:#ccc;
-  border:2px solid #999;
-}
-.profile-username {
-  font-weight:bold;
-  font-size:20px;
-}
-#description {
-  margin-bottom:20px;
-}
-#badges {
-  margin-top:20px;
-}
-.badge {
-  display:inline-flex;
-  align-items:center;
-  padding:4px 8px;
-  border-radius:4px;
-  margin-right:6px;
-  font-size:12px;
-  color:white;
-  font-weight:bold;
-}
-.badge img {
-  width:16px;
-  height:16px;
-  margin-right:4px;
-  vertical-align:middle;
-}
-/* Footer */
-#footer {
-  text-align:center;
-  font-size:12px;
-  color:#444;
-  padding:10px;
-  border-top:2px solid #999;
-  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
-}
+body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; min-height:100vh; display:flex; flex-direction:column;}
+#main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center;}
+#main-header img { height:52px; object-fit:contain;}
+.nav-links { display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; padding:6px 10px; border-radius:4px; transition: all 0.3s ease;}
+.nav-links a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);}
+.button { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px; color:white; transition: all 0.3s ease;}
+.logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%);}
+.logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);}
+.edit-btn, .theme-btn, .friend-btn { margin-top:10px; padding:5px 10px; font-size:12px; cursor:pointer;}
+#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00;}
+#page-content { padding:20px; flex:1;}
+.profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px;}
+.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999;}
+.profile-username { font-weight:bold; font-size:20px;}
+#description { margin-bottom:20px;}
+#badges { margin-top:20px;}
+.badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold;}
+.badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle;}
+#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);}
 </style>
 </head>
 <body>
@@ -164,7 +59,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -210,7 +105,6 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "Login.html";
     return;
   }
-
   const currentUserId = user.uid;
 
   authNavLinks.innerHTML = `
@@ -226,10 +120,7 @@ onAuthStateChanged(auth, async (user) => {
     <button class="button logout-btn" id="logoutBtn">Logout</button>
   `;
 
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-    await signOut(auth);
-    window.location.href="Login.html";
-  });
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
   let userDoc;
   if(viewingUserId){
@@ -255,22 +146,19 @@ onAuthStateChanged(auth, async (user) => {
     editThemeBtn.style.display = "inline-block";
   }
 
-  // Friend button
+  // Friend button using subcollection
   if(!isOwner){
     const friendBtn = document.createElement("button");
     friendBtn.className = "friend-btn";
     friendBtn.textContent = "Add Friend";
     descriptionDiv.appendChild(friendBtn);
 
-    if((data.friends || []).includes(currentUserId) || (data.friendRequests || []).includes(currentUserId)){
-      friendBtn.disabled = true;
-      friendBtn.textContent = (data.friends || []).includes(currentUserId) ? "Friends" : "Request Sent";
-    }
-
+    // Check if request already sent (optional: you can fetch subcollection)
     friendBtn.addEventListener("click", async ()=>{
       try {
-        await updateDoc(doc(db,"users",userDoc.id), {
-          friendRequests: arrayUnion(currentUserId)
+        await addDoc(collection(db,"users",userDoc.id,"friendRequests"), {
+          from: currentUserId,
+          timestamp: Date.now()
         });
         friendBtn.disabled = true;
         friendBtn.textContent = "Request Sent";
@@ -281,7 +169,7 @@ onAuthStateChanged(auth, async (user) => {
     });
   }
 
-  // Edit description
+  // Description and theme edits (same as before)...
   editDescriptionBtn.addEventListener("click", ()=>{
     const currentText = data.description || "";
     descriptionDiv.innerHTML = `<textarea id="descTextarea">${currentText}</textarea>
@@ -293,7 +181,6 @@ onAuthStateChanged(auth, async (user) => {
     });
   });
 
-  // Edit theme
   editThemeBtn.addEventListener("click", ()=>{
     const colorInput = document.createElement("input");
     colorInput.type = "color";
@@ -344,8 +231,8 @@ onAuthStateChanged(auth, async (user) => {
       badgeContainer.appendChild(badgeEl);
     });
   }
+
 });
 </script>
-
 </body>
 </html>
