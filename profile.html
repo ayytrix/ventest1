@@ -62,13 +62,7 @@ body {
 .logout-btn:hover {
   background:linear-gradient(to bottom,#da190b 0%,#f44336 100%);
 }
-.edit-btn {
-  margin-top:10px;
-  padding:5px 10px;
-  font-size:12px;
-  cursor:pointer;
-}
-.theme-btn {
+.edit-btn, .theme-btn, .friend-btn {
   margin-top:10px;
   padding:5px 10px;
   font-size:12px;
@@ -175,7 +169,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -224,6 +218,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  const currentUserId = user.uid;
+
   authNavLinks.innerHTML = `
     <a href="Home.html">Home</a>
     <a href="Games.html">Games</a>
@@ -258,7 +254,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const data = userDoc.data();
-  const isOwner = user.uid === userDoc.id;
+  const isOwner = currentUserId === userDoc.id;
 
   profileUsername.textContent = data.username || "User";
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
@@ -269,6 +265,28 @@ onAuthStateChanged(auth, async (user) => {
     editThemeBtn.style.display = "inline-block";
   }
 
+  // Add Friend button for other users
+  if(!isOwner){
+    const friendBtn = document.createElement("button");
+    friendBtn.className = "friend-btn";
+    friendBtn.textContent = "Add Friend";
+    descriptionDiv.appendChild(friendBtn);
+
+    // Disable if already friends or request sent
+    if((data.friends || []).includes(currentUserId) || (data.friendRequests || []).includes(currentUserId)){
+      friendBtn.disabled = true;
+      friendBtn.textContent = (data.friends || []).includes(currentUserId) ? "Friends" : "Request Sent";
+    }
+
+    friendBtn.addEventListener("click", async ()=>{
+      await updateDoc(doc(db,"users",userDoc.id), {
+        friendRequests: arrayUnion(currentUserId)
+      });
+      friendBtn.disabled = true;
+      friendBtn.textContent = "Request Sent";
+    });
+  }
+
   // Edit description
   editDescriptionBtn.addEventListener("click", ()=>{
     const currentText = data.description || "";
@@ -276,7 +294,7 @@ onAuthStateChanged(auth, async (user) => {
       <button class="edit-btn" id="saveDescription">Save</button>`;
     document.getElementById("saveDescription").addEventListener("click", async ()=>{
       const newDesc = document.getElementById("descTextarea").value;
-      await setDoc(doc(db,"users",user.uid), {...data, description:newDesc}, {merge:true});
+      await setDoc(doc(db,"users",currentUserId), {...data, description:newDesc}, {merge:true});
       descriptionDiv.innerHTML = `<p>${newDesc}</p>`;
     });
   });
@@ -296,18 +314,18 @@ onAuthStateChanged(auth, async (user) => {
     doneBtn.addEventListener("click", async ()=>{
       const newColor = colorInput.value;
       document.body.style.background = newColor;
-      await setDoc(doc(db,"users",user.uid), {...data, themeColor:newColor}, {merge:true});
+      await setDoc(doc(db,"users",currentUserId), {...data, themeColor:newColor}, {merge:true});
       colorInput.remove();
       doneBtn.remove();
     });
   });
 
-  // Apply saved theme for this profile only
+  // Apply saved theme
   if(data.themeColor){
     document.body.style.background = data.themeColor;
   }
 
-  // Badges (multiple)
+  // Badges
   const badges = [];
   const badgeDefs = [
     { userId: 1, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
