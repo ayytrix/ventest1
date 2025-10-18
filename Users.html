@@ -96,31 +96,36 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   authButtons.innerHTML = `<span>Welcome, ${user.displayName || "User"}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-
   const logoutBtn = document.getElementById("logoutBtn");
   logoutBtn.addEventListener("click", async () => {
-    await setStatus("offline");
+    await setOffline();
     await signOut(auth);
-    window.location.href="Login.html";
+    window.location.href = "Login.html";
   });
 
   // Set online initially
-  await setStatus("online");
+  await updateDoc(currentUserRef, { status: "online", online: true, lastActive: serverTimestamp() });
 
-  // Heartbeat every 30s
-  setInterval(() => setStatus("online"), 30000);
-
-  // Idle detection (3 mins)
+  // Idle detection
   const resetIdleTimer = () => {
     clearTimeout(idleTimer);
-    setStatus("online");
-    idleTimer = setTimeout(() => setStatus("idle"), 3*60*1000);
+    updateDoc(currentUserRef, { status: "online" });
+    idleTimer = setTimeout(() => updateDoc(currentUserRef, { status: "idle" }), 3*60*1000);
   };
   ["mousemove","keydown","scroll","click"].forEach(e => window.addEventListener(e, resetIdleTimer));
   resetIdleTimer();
 
-  // Offline on close tab
-  window.addEventListener("beforeunload", async () => { await setStatus("offline"); });
+  // Offline on close tab using sendBeacon
+  window.addEventListener("beforeunload", () => {
+    if(!currentUserRef) return;
+    const data = JSON.stringify({ fields: {
+      status: { stringValue: "offline" },
+      online: { booleanValue: false },
+      lastActive: { timestampValue: new Date().toISOString() }
+    }});
+    const url = `https://firestore.googleapis.com/v1/projects/venux1/databases/(default)/documents/users/${currentUserRef.id}?currentDocument.exists=true`;
+    navigator.sendBeacon(url, data);
+  });
 
   // Live listener for all users
   const usersRef = collection(db, "users");
@@ -131,13 +136,9 @@ onAuthStateChanged(auth, async (user) => {
   });
 });
 
-async function setStatus(status) {
+async function setOffline() {
   if(!currentUserRef) return;
-  await updateDoc(currentUserRef, {
-    status: status,
-    online: status !== "offline",
-    lastActive: serverTimestamp()
-  });
+  await updateDoc(currentUserRef, { status: "offline", online: false, lastActive: serverTimestamp() });
 }
 
 function renderUsers() {
@@ -148,7 +149,7 @@ function renderUsers() {
   allUsers.forEach(u => {
     if(searchTerm && !u.username.toLowerCase().includes(searchTerm)) return;
 
-    const status = u.status || "offline"; // default offline if undefined
+    const status = u.status || "offline";
     let statusText = status === "idle" ? "🌙 Idle" : (status === "online" ? "Online" : "Offline");
     let isOnlineSection = status === "online" || status === "idle";
 
@@ -158,7 +159,6 @@ function renderUsers() {
       : `<a href="Profile.html?userId=${u.userId}">${u.username}</a>`;
 
     const userHTML = `<div class="user-card">${usernameHTML}<span>${statusText}</span></div>`;
-
     if(isOnlineSection) onlineUsersDiv.innerHTML += userHTML;
     else offlineUsersDiv.innerHTML += userHTML;
   });
