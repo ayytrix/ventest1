@@ -74,6 +74,8 @@ body{
 }
 #page-content{
   padding:20px;
+  position: relative;
+  min-height:500px;
 }
 .news-box{
   background:linear-gradient(to bottom,#fff 0%,#e2e2e2 100%);
@@ -82,6 +84,8 @@ body{
   margin-bottom:15px;
   width:600px;
   box-shadow:2px 2px 0 #aaa;
+  position: relative;
+  z-index: 1;
 }
 .news-title{
   font-weight:bold;
@@ -96,59 +100,34 @@ body{
 .news-body{
   font-size:13px;
 }
-#avatar-frame{
-  width:200px;
-  height:200px;
-  background:#ccc;
-  border:4px solid #999;
-  margin:20px 0 10px 0;
+#profileOverlay{
+  position:absolute;
+  top:20px;
+  left:20px;
+  z-index:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
-#usernameDisplay{
+#avatarFrame{
+  width:150px;
+  height:150px;
+  background:#ccc;
+  border:2px solid #999;
+  margin-bottom:10px;
+}
+#profileUsernameOverlay{
   font-weight:bold;
   font-size:18px;
   margin-bottom:10px;
 }
-#friendRequestsBtn{
-  padding:6px 10px;
-  border:none;
+#incomingFRBtn{
+  padding:6px 12px;
   border-radius:4px;
-  background:#4caf50;
+  background:green;
   color:white;
   font-weight:bold;
   cursor:pointer;
-  margin-bottom:10px;
-}
-#friendRequestsPanel{
-  display:none;
-  margin-top:10px;
-  background:#fff;
-  border:2px solid #999;
-  padding:10px;
-  width:400px;
-}
-.friendRequestItem{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:6px;
-}
-.friendRequestItem button{
-  margin-left:5px;
-  padding:3px 8px;
-  font-size:12px;
-  cursor:pointer;
-}
-.acceptBtn{
-  background:#4caf50;
-  color:white;
-  border:none;
-  border-radius:4px;
-}
-.declineBtn{
-  background:#f44336;
-  color:white;
-  border:none;
-  border-radius:4px;
 }
 #footer{
   text-align:center;
@@ -165,174 +144,3 @@ body{
 
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  <div class="auth-buttons" id="authButtons"></div>
-</div>
-
-<div id="sub-header">
-  <a href="Home.html">Home</a><span class="nav-separator">|</span>
-  <a href="Games.html">Games</a><span class="nav-separator">|</span>
-  <a href="Catalog.html">Catalog</a><span class="nav-separator">|</span>
-  <a href="Users.html">Users</a><span class="nav-separator">|</span>
-  <a href="Forums.html">Forum</a><span class="nav-separator">|</span>
-  <a href="Clans.html">Clans</a><span class="nav-separator">|</span>
-  <a href="Help.html">Help</a><span class="nav-separator">|</span>
-  <a href="Downloads.html">Downloads</a><span class="nav-separator">|</span>
-  <a href="Create.html">Create</a>
-</div>
-
-<div id="notice">Loading...</div>
-<div id="page-content">
-  <div id="newsSection"></div>
-
-  <div id="avatar-frame"></div>
-  <div id="usernameDisplay"></div>
-  <button id="friendRequestsBtn">Incoming Friend Requests (0)</button>
-  <div id="friendRequestsPanel"></div>
-</div>
-
-<div id="footer">© 2025, Venux — All rights reserved</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
-  authDomain: "venux1.firebaseapp.com",
-  projectId: "venux1",
-  storageBucket: "venux1.appspot.com",
-  messagingSenderId: "231055963335",
-  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
-  measurementId: "G-N36RRV95SW"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const noticeBar = document.getElementById("notice");
-const authButtons = document.getElementById("authButtons");
-const newsSection = document.getElementById("newsSection");
-const usernameDisplay = document.getElementById("usernameDisplay");
-const friendRequestsBtn = document.getElementById("friendRequestsBtn");
-const friendRequestsPanel = document.getElementById("friendRequestsPanel");
-
-function loadStaticNews(){
-  newsSection.innerHTML = `
-    <h2>Latest News</h2>
-    <div class="news-box">
-      <div class="news-title">Welcome to Venux!</div>
-      <div class="news-date">Posted: 8th October, 2025</div>
-      <div class="news-body">This is for news happening in Venux!</div>
-    </div>
-    <div class="news-box">
-      <div class="news-title">Update Log</div>
-      <div class="news-date">Posted: 17th October, 2025</div>
-      <div class="news-body">- Fixed sign up, Login and home page problems!<br>- Added Incoming Friend Requests system.<br>- Added avatar frame below news.</div>
-    </div>
-  `;
-}
-
-loadStaticNews();
-
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){ window.location.href="Login.html"; return; }
-
-  const currentUserRef = doc(db,"users",user.uid);
-  const currentUserSnap = await getDoc(currentUserRef);
-  const currentUserData = currentUserSnap.exists() ? currentUserSnap.data() : {};
-  const username = currentUserData.username || "User";
-
-  noticeBar.textContent = `Welcome, ${username}`;
-  usernameDisplay.textContent = username;
-  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-    await signOut(auth);
-    window.location.href="Login.html";
-  });
-
-  // Load dynamic news from Firestore
-  try{
-    const newsRef = collection(db,"news");
-    const newsSnap = await getDocs(newsRef);
-    if(!newsSnap.empty){
-      let newsHTML = "<h2>Latest News</h2>";
-      newsSnap.forEach(doc=>{
-        const data = doc.data();
-        newsHTML += `
-          <div class="news-box">
-            <div class="news-title">${data.title}</div>
-            <div class="news-date">Posted: ${data.date}</div>
-            <div class="news-body">${data.body}</div>
-          </div>
-        `;
-      });
-      newsSection.innerHTML = newsHTML;
-    }
-  }catch(err){
-    console.error(err);
-  }
-
-  // --- Friend Requests System ---
-  async function loadFriendRequests(){
-    const currentSnap = await getDoc(currentUserRef);
-    const currentData = currentSnap.data();
-    const frArray = Array.isArray(currentData.friendRequests) ? currentData.friendRequests : [];
-    friendRequestsBtn.textContent = `Incoming Friend Requests (${frArray.length})`;
-    friendRequestsPanel.innerHTML = "";
-    frArray.forEach(requesterId => {
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "friendRequestItem";
-      const requesterRef = doc(db,"users",requesterId);
-      getDoc(requesterRef).then(requesterSnap=>{
-        const requesterName = requesterSnap.exists() ? requesterSnap.data().username : "Unknown";
-        itemDiv.innerHTML = `
-          <span>${requesterName}</span>
-          <span>
-            <button class="acceptBtn">Accept</button>
-            <button class="declineBtn">Decline</button>
-          </span>
-        `;
-        const acceptBtn = itemDiv.querySelector(".acceptBtn");
-        const declineBtn = itemDiv.querySelector(".declineBtn");
-
-        acceptBtn.addEventListener("click", async ()=>{
-          // Add each other to friends
-          const requesterSnapLatest = await getDoc(requesterRef);
-          const requesterData = requesterSnapLatest.data();
-          const requesterFriends = Array.isArray(requesterData.friends) ? requesterData.friends : [];
-          const updatedRequesterFriends = [...new Set([...requesterFriends, user.uid])];
-          await updateDoc(requesterRef,{ friends: updatedRequesterFriends });
-
-          const currentFriends = Array.isArray(currentData.friends) ? currentData.friends : [];
-          const updatedCurrentFriends = [...new Set([...currentFriends, requesterId])];
-          await updateDoc(currentUserRef,{
-            friends: updatedCurrentFriends,
-            friendRequests: frArray.filter(id => id!==requesterId)
-          });
-
-          loadFriendRequests();
-        });
-
-        declineBtn.addEventListener("click", async ()=>{
-          await updateDoc(currentUserRef,{ friendRequests: frArray.filter(id => id!==requesterId) });
-          loadFriendRequests();
-        });
-
-        friendRequestsPanel.appendChild(itemDiv);
-      });
-    });
-  }
-
-  friendRequestsBtn.addEventListener("click", ()=>{
-    friendRequestsPanel.style.display = friendRequestsPanel.style.display==="none" ? "block":"none";
-  });
-
-  loadFriendRequests();
-});
-</script>
-
-</body>
-</html>
