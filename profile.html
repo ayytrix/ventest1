@@ -33,7 +33,15 @@ body {
 #notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
 #page-content { padding:20px; flex:1; }
 .profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
-.avatar-placeholder { width:80px; height:80px; background:#ccc; border:2px solid #999; }
+.avatar-placeholder {
+  width:80px;
+  height:80px;
+  background:#ccc;
+  border:2px solid #999;
+  border-radius:8px;
+  background-size:cover;
+  background-position:center;
+}
 .profile-username { font-weight:bold; font-size:20px; }
 #description { margin-bottom:20px; }
 #profileButtons { margin-bottom:20px; }
@@ -54,7 +62,7 @@ body {
 
 <div id="page-content">
   <div class="profile-header">
-    <div class="avatar-placeholder"></div>
+    <div class="avatar-placeholder" id="avatarFrame"></div>
     <div class="profile-username" id="profileUsername"></div>
   </div>
 
@@ -72,7 +80,7 @@ body {
   </div>
 </div>
 
-<div id="footer">© 2025, Venux All rights reserved</div>
+<div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -101,6 +109,7 @@ const badgeContainer = document.getElementById("badgeContainer");
 const editDescriptionBtn = document.getElementById("editDescriptionBtn");
 const editThemeBtn = document.getElementById("editThemeBtn");
 const friendBtn = document.getElementById("friendBtn");
+const avatarFrame = document.getElementById("avatarFrame");
 
 let dynamicNotice = "Welcome to Venux!";
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
@@ -126,15 +135,15 @@ onAuthStateChanged(auth, async (user) => {
 
   // Navbar
   authNavLinks.innerHTML = `
-    <a href="Home.html">Home</a>
-    <a href="Games.html">Games</a>
-    <a href="Catalog.html">Catalog</a>
-    <a href="Users.html">Users</a>
-    <a href="Forums.html">Forum</a>
-    <a href="Clans.html">Clans</a>
-    <a href="Help.html">Help</a>
-    <a href="Downloads.html">Downloads</a>
-    <a href="Create.html">Create</a>
+    <a href="Home">Home</a>
+    <a href="Games">Games</a>
+    <a href="Catalog">Catalog</a>
+    <a href="Users">Users</a>
+    <a href="Forums">Forum</a>
+    <a href="Clans">Clans</a>
+    <a href="Help">Help</a>
+    <a href="Downloads">Downloads</a>
+    <a href="Create">Create</a>
     <button class="button logout-btn" id="logoutBtn">Logout</button>
   `;
   document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -153,13 +162,20 @@ onAuthStateChanged(auth, async (user) => {
   const data = userDoc.data();
   const isOwner = user.uid === userDoc.id;
 
-  // Nav bar color for userId 2
-if (data.userId === 2) {
-  document.getElementById("main-header").style.background = 
-    "linear-gradient(to right, #ff8c00 0%, #ff0000 100%)";
-}
+  // Gradient navbar for userId 2
+  if (data.userId === 2) {
+    document.getElementById("main-header").style.background =
+      "linear-gradient(to right, #ff8c00 0%, #ff0000 100%)";
+  }
 
-  // Theme
+  // Custom profile picture for userId 4
+  if (data.userId === 4) {
+    avatarFrame.style.backgroundImage = "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/id4pfp.png')";
+  } else {
+    avatarFrame.style.backgroundImage = "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/defaultpfp.png')";
+  }
+
+  // Theme color
   if (data.themeColor) document.body.style.background = data.themeColor;
 
   profileUsername.textContent = data.username || "User";
@@ -220,10 +236,9 @@ if (data.userId === 2) {
     { userId: 1, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
     { userId: 2, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
     { userId: 2, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
+    { userId: 4, name:"Cool Profile", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/star.png", color:"#2196f3"},
     { userId: 5, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
     { userId: 6, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
-    { userId: 2, name:"Omega Venux Club", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/omega.png", color:"#190000"},
-    { userId: 7, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
   ];
   badgeDefs.forEach(b=>{if(b.userId===data.userId) badges.push(b);});
 
