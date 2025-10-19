@@ -150,34 +150,33 @@ fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
   .catch(() => noticeBar.textContent = dynamicNotice);
 
-async function getUserByUid(uid) {
-  const usersRef = collection(db, "users");
-  const q = query(usersRef, where("authEmail", "==", uid));
-  const snapshot = await getDocs(q);
-  return snapshot.empty ? null : snapshot.docs[0];
-}
-
 onAuthStateChanged(auth, async (user) => {
   if (!user) return window.location.href = "Login.html";
 
-  // Get user doc
   const usersRef = collection(db, "users");
-  const allUsers = await getDocs(usersRef);
-  let adminData = null;
-  allUsers.forEach(docSnap => {
+  const snapshot = await getDocs(usersRef);
+
+  let currentUserData = null;
+  snapshot.forEach(docSnap => {
     const data = docSnap.data();
-    if (data.email === user.email) adminData = data;
+    if (data.authEmail && user.email && data.authEmail === user.email) currentUserData = data;
   });
 
-  // 🔒 Redirect if not admin
-  if (!adminData || ![1, 2, 5].includes(adminData.userId)) {
-    window.location.href = "https://venux.fun/unfinished";
+  if (!currentUserData) {
+    console.warn("User data not found, redirecting...");
+    window.location.href = "/error";
     return;
   }
 
-  // ✅ Show all users
+  // 🔒 Restrict access to only userId 1, 2, or 5
+  if (![1, 2, 5].includes(currentUserData.userId)) {
+    window.location.href = "/error";
+    return;
+  }
+
+  // ✅ Authorized admin continues
   usersBody.innerHTML = "";
-  allUsers.forEach((docSnap) => {
+  snapshot.forEach((docSnap) => {
     const u = docSnap.data();
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -189,18 +188,18 @@ onAuthStateChanged(auth, async (user) => {
       <td>${u.lastActive ? new Date(u.lastActive.seconds * 1000).toLocaleString() : "Never"}</td>
       <td>
         <button class="action-btn view-btn" onclick="window.location='Profile.html?userId=${u.userId}'">View</button>
-        <button class="action-btn toggle-btn" data-uid="${docSnap.id}">Toggle Online</button>
+        <button class="action-btn toggle-btn" data-uid="${docSnap.id}">Toggle</button>
         <button class="action-btn delete-btn" data-uid="${docSnap.id}">Delete</button>
       </td>
     `;
     usersBody.appendChild(tr);
   });
 
-  // Toggle Online / Offline
+  // Toggle Online/Offline
   document.querySelectorAll(".toggle-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const userRef = doc(db, "users", btn.dataset.uid);
-      const snap = allUsers.docs.find(d => d.id === btn.dataset.uid);
+      const snap = snapshot.docs.find(d => d.id === btn.dataset.uid);
       const current = snap.data().online;
       await updateDoc(userRef, { online: !current, lastOnline: serverTimestamp() });
       location.reload();
