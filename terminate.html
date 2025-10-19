@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Venux - Account Terminated</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #e2e3e5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #terminate-container {
+    background: #fff;
+    border: 2px solid #6c757d;
+    padding: 30px 40px;
+    border-radius: 8px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+  }
+  #terminate-container h2 {
+    color: #6c757d;
+    margin-bottom: 15px;
+  }
+  #terminate-container p {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #6c757d;
+  }
+  .btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  #logoutBtn {
+    background: linear-gradient(to right, #6c757d, #495057);
+  }
+  #logoutBtn:hover {
+    background: linear-gradient(to right, #495057, #343a40);
+  }
+</style>
+</head>
+<body>
+
+<div id="terminate-container">
+  <h2>⚠ Account Terminated</h2>
+  <p id="terminateMessage">Loading account status...</p>
+  <p id="moderatorNote"></p>
+  <button class="btn" id="logoutBtn">Logout</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const terminateMessage = document.getElementById("terminateMessage");
+const moderatorNote = document.getElementById("moderatorNote");
+const logoutBtn = document.getElementById("logoutBtn");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "Login.html";
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists() || !userSnap.data().terminated) {
+    // Not terminated, redirect to home
+    window.location.href = "Home";
+    return;
+  }
+
+  const termData = userSnap.data().terminated;
+
+  terminateMessage.textContent = termData.message || "Your account has been terminated by a moderator.";
+  moderatorNote.textContent = termData.note ? `Moderator Note: ${termData.note}` : "";
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+});
+</script>
+
+</body>
+</html>
