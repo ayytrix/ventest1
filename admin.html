@@ -4,89 +4,56 @@
 <meta charset="UTF-8">
 <title>Venux - Admin Panel</title>
 <style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#d4d4d4;
-  color:#222;
-  font-size:13px;
-}
-#main-header{
-  background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding:10px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-#main-header img{ height:52px; object-fit:contain; }
-.nav-links{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.nav-links a{
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-  padding:6px 10px;
-  border-radius:4px;
-}
-.nav-links a:hover{
-  background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
-}
-.nav-separator{
-  color:white;
-}
-#notice{
-  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
-  color:white;
-  padding:10px 20px;
-  font-weight:bold;
-  text-align:center;
-  border-bottom:2px solid #a85f00;
-}
-#page-content{
-  padding:20px;
-}
-.user-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background:#fff;
-  border:2px solid #999;
-  padding:10px;
-  margin-bottom:8px;
-}
-.user-row button{
-  padding:5px 10px;
-  border:none;
-  border-radius:4px;
-  cursor:pointer;
-  font-weight:bold;
-  color:white;
-}
-.edit-btn{ background:#4caf50; margin-right:5px; }
-.delete-btn{ background:#f44336; }
+body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; min-height:100vh; display:flex; flex-direction:column; }
+#main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; transition: all 0.3s ease; }
+#main-header img { height:52px; object-fit:contain; }
+.nav-links { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; padding:6px 10px; border-radius:4px; transition: all 0.3s ease; }
+.nav-links a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
+.user-table { width:100%; border-collapse:collapse; margin-top:20px; }
+.user-table th, .user-table td { border:1px solid #999; padding:8px; text-align:left; }
+.user-table th { background:#ccc; }
+.edit-btn { padding:5px 10px; cursor:pointer; background:#1a4a84; color:white; border:none; border-radius:4px; font-weight:bold; }
+.modal-backdrop { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:9999; }
+.modal-content { background:white; padding:15px; border-radius:6px; width:400px; max-width:90%; }
+.modal-content h3 { margin-top:0; }
+.modal-content input, .modal-content button { margin-top:5px; width:100%; padding:5px; }
+#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:auto; }
 </style>
 </head>
 <body>
 
 <div id="main-header">
-  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  <div class="nav-links" id="navLinks"></div>
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux Logo">
+  <div class="nav-links" id="adminNav">
+    <a href="Home">Home</a> | <a href="Admin">Admin</a>
+  </div>
 </div>
 
-<div id="notice">Loading...</div>
+<div id="notice">Loading admin panel...</div>
 
 <div id="page-content">
-  <h2>Admin Panel</h2>
-  <div id="usersContainer"></div>
+  <table class="user-table" id="usersTable">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- User rows will be dynamically loaded here -->
+    </tbody>
+  </table>
 </div>
+
+<div id="footer">© 2025 Venux All rights reserved</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -102,66 +69,120 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const navLinks = document.getElementById("navLinks");
 const noticeBar = document.getElementById("notice");
-const usersContainer = document.getElementById("usersContainer");
+const usersTableBody = document.querySelector("#usersTable tbody");
 
-// Admin IDs
-const adminIds = [1,2,5];
-
-onAuthStateChanged(auth, async (user)=>{
-  if(!user) return window.location.href="/Login.html";
-
-  const currentUserRef = doc(db,"users",user.uid);
-  const currentUserSnap = await getDoc(currentUserRef);
-  if(!currentUserSnap.exists()){
-    return window.location.href="/error";
-  }
-  const currentUserData = currentUserSnap.data();
-  if(!adminIds.includes(currentUserData.userId)){
-    return window.location.href="/error";
-  }
-
-  // Navbar
-  navLinks.innerHTML = `
-    <a href="Home">Home</a><span class="nav-separator">|</span>
-    <a href="Games">Games</a><span class="nav-separator">|</span>
-    <a href="Catalog">Catalog</a><span class="nav-separator">|</span>
-    <a href="Users">Users</a><span class="nav-separator">|</span>
-    <a href="Forums">Forum</a><span class="nav-separator">|</span>
-    <a href="Clans">Clans</a><span class="nav-separator">|</span>
-    <a href="Help">Help</a><span class="nav-separator">|</span>
-    <a href="Downloads">Downloads</a><span class="nav-separator">|</span>
-    <a href="Create">Create</a>
-    <button style="background:#f44336;" id="logoutBtn">Logout</button>
-  `;
-  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-    await updateDoc(currentUserRef,{online:false,lastOnline:serverTimestamp()});
-    await signOut(auth);
-    window.location.href="/Login.html";
-  });
-
-  // Fetch all users
-  const usersSnap = await getDocs(collection(db,"users"));
-  usersContainer.innerHTML = "";
-  usersSnap.forEach(uDoc=>{
-    const u = uDoc.data();
-    const row = document.createElement("div");
-    row.className = "user-row";
-    row.innerHTML = `
-      <span>${u.username} (ID: ${u.userId})</span>
-      <div>
-        <button class="edit-btn">Edit</button>
-        <button class="delete-btn">Terminate</button>
-      </div>
+async function loadUsers() {
+  const usersRef = collection(db, "users");
+  const snapshot = await getDocs(usersRef);
+  usersTableBody.innerHTML = "";
+  snapshot.forEach(docSnap => {
+    const user = docSnap.data();
+    const tr = document.createElement("tr");
+    tr.className = "user-row";
+    tr.dataset.userid = docSnap.id;
+    tr.innerHTML = `
+      <td>${user.userId}</td>
+      <td class="username">${user.username}</td>
+      <td>${user.email || ""}</td>
+      <td><button class="edit-btn">Edit</button></td>
     `;
-    // Placeholder: attach actual functions for Edit/Delete
-    row.querySelector(".edit-btn").addEventListener("click", ()=>alert("Open edit modal for "+u.username));
-    row.querySelector(".delete-btn").addEventListener("click", ()=>alert("Terminate "+u.username));
-    usersContainer.appendChild(row);
+    usersTableBody.appendChild(tr);
   });
+}
+
+// --- ADMIN LOGIC ---
+async function setupAdminButtons() {
+  const userRows = document.querySelectorAll(".user-row");
+  userRows.forEach(row => {
+    const editBtn = row.querySelector(".edit-btn");
+    const userId = row.dataset.userid;
+    const usernameCell = row.querySelector(".username");
+
+    editBtn.addEventListener("click", async () => {
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) return alert("User not found");
+      const userData = userSnap.data();
+
+      const modalWrapper = document.createElement("div");
+      modalWrapper.className = "modal-backdrop";
+
+      const modalContent = document.createElement("div");
+      modalContent.className = "modal-content";
+      modalContent.innerHTML = `
+        <h3>Edit ${userData.username}</h3>
+        <div><label>Username:</label><input id="changeUsername" value="${userData.username}" /></div>
+        <div><label>User ID:</label><input id="changeUserId" type="number" value="${userData.userId}" /></div>
+        <div><button id="banBtn">${userData.banned ? "Unban" : "Ban"}</button>
+        <input id="banNote" placeholder="Ban note" value="${userData.banNote||''}" />
+        <input id="banDuration" placeholder="Ban duration" value="${userData.banDuration||''}" /></div>
+        <div><button id="terminateBtn">${userData.terminated ? "Unterminate" : "Terminate"}</button></div>
+        <div><button id="warnBtn">${userData.warned ? "Remove Warning" : "Warn"}</button>
+        <input id="warnNote" placeholder="Warning note" value="${userData.warnNote||''}" /></div>
+        <button id="saveChangesBtn">Save Changes</button>
+        <button id="closeModalBtn">Close</button>
+      `;
+
+      modalWrapper.appendChild(modalContent);
+      document.body.appendChild(modalWrapper);
+
+      const banBtnEl = modalContent.querySelector("#banBtn");
+      const terminateBtnEl = modalContent.querySelector("#terminateBtn");
+      const warnBtnEl = modalContent.querySelector("#warnBtn");
+      const saveBtnEl = modalContent.querySelector("#saveChangesBtn");
+      const closeBtnEl = modalContent.querySelector("#closeModalBtn");
+
+      banBtnEl.addEventListener("click", () => {
+        if (userData.banned) { userData.banned = false; banBtnEl.textContent = "Ban"; }
+        else { userData.banned = true; userData.banNote = modalContent.querySelector("#banNote").value; userData.banDuration = modalContent.querySelector("#banDuration").value; banBtnEl.textContent = "Unban"; }
+      });
+
+      terminateBtnEl.addEventListener("click", () => {
+        if (userData.terminated) { userData.terminated = false; terminateBtnEl.textContent = "Terminate"; }
+        else { userData.terminated = true; terminateBtnEl.textContent = "Unterminate"; }
+      });
+
+      warnBtnEl.addEventListener("click", () => {
+        if (userData.warned) { userData.warned = false; userData.warnNote = ""; warnBtnEl.textContent = "Warn"; }
+        else { userData.warned = true; userData.warnNote = modalContent.querySelector("#warnNote").value; warnBtnEl.textContent = "Remove Warning"; }
+      });
+
+      saveBtnEl.addEventListener("click", async () => {
+        userData.username = modalContent.querySelector("#changeUsername").value;
+        userData.userId = parseInt(modalContent.querySelector("#changeUserId").value,10);
+        await updateDoc(userRef, {
+          username: userData.username,
+          userId: userData.userId,
+          banned: userData.banned || false,
+          banNote: userData.banNote || "",
+          banDuration: userData.banDuration || "",
+          terminated: userData.terminated || false,
+          warned: userData.warned || false,
+          warnNote: userData.warnNote || ""
+        });
+        alert("Changes saved!");
+        modalWrapper.remove();
+        usernameCell.textContent = userData.username;
+      });
+
+      closeBtnEl.addEventListener("click", () => { modalWrapper.remove(); });
+    });
+  });
+}
+
+// --- AUTH CHECK ---
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "/error";
+  const usersRef = collection(db, "users");
+  const userDoc = await getDocs(usersRef);
+  let currentUser = null;
+  userDoc.forEach(docSnap => { if(docSnap.data().userId && [1,2,5].includes(docSnap.data().userId) && docSnap.id===user.uid) currentUser = docSnap.data(); });
+  if (!currentUser) return window.location.href = "/error";
+  noticeBar.textContent = "Admin Panel Loaded";
+  await loadUsers();
+  setupAdminButtons();
 });
 </script>
-
 </body>
 </html>
