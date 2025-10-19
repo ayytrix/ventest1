@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Venux - Account Banned</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8d7da;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #ban-container {
+    background: #fff3f3;
+    border: 2px solid #f5c6cb;
+    padding: 30px 40px;
+    border-radius: 8px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+  }
+  #ban-container h2 {
+    color: #721c24;
+    margin-bottom: 15px;
+  }
+  #ban-container p {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #721c24;
+  }
+  .btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  #logoutBtn {
+    background: linear-gradient(to right, #dc3545, #c82333);
+  }
+  #logoutBtn:hover {
+    background: linear-gradient(to right, #c82333, #bd2130);
+  }
+</style>
+</head>
+<body>
+
+<div id="ban-container">
+  <h2>⛔ Account Banned</h2>
+  <p id="banMessage">Loading ban details...</p>
+  <p id="banDuration"></p>
+  <p id="moderatorNote"></p>
+  <button class="btn" id="logoutBtn">Logout</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const banMessage = document.getElementById("banMessage");
+const banDuration = document.getElementById("banDuration");
+const moderatorNote = document.getElementById("moderatorNote");
+const logoutBtn = document.getElementById("logoutBtn");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "Login.html";
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists() || !userSnap.data().ban?.active) {
+    // Not banned, redirect to home
+    window.location.href = "Home";
+    return;
+  }
+
+  const banData = userSnap.data().ban;
+
+  banMessage.textContent = banData.message || "Your account has been banned by a moderator.";
+  
+  // Display duration
+  if (banData.until) {
+    const untilDate = banData.until.toDate ? banData.until.toDate() : new Date(banData.until);
+    const now = new Date();
+    const diffMs = untilDate - now;
+    if (diffMs > 0) {
+      const days = Math.floor(diffMs / (1000*60*60*24));
+      const hours = Math.floor((diffMs / (1000*60*60)) % 24);
+      const minutes = Math.floor((diffMs / (1000*60)) % 60);
+      banDuration.textContent = `Duration remaining: ${days}d ${hours}h ${minutes}m`;
+    } else {
+      banDuration.textContent = `Ban duration has ended.`;
+    }
+  }
+
+  moderatorNote.textContent = banData.note ? `Moderator Note: ${banData.note}` : "";
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+});
+</script>
+
+</body>
+</html>
