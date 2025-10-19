@@ -154,7 +154,7 @@ onAuthStateChanged(auth, async user => {
 
   // Go to profile button
   goProfileBtn.addEventListener("click", () => {
-    window.location.href = `Profile?userId=${userSnap.data().userId}`;
+    window.location.href = `profile?userId=${userSnap.data().userId}`;
   });
 
   // Incoming friend requests
