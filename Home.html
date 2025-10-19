@@ -11,6 +11,8 @@ body {
   color: #222;
   font-size: 13px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 #main-header {
   background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
@@ -35,8 +37,6 @@ body {
 .profile-username { font-weight:bold; font-size:20px; margin-bottom:10px; }
 .profile-buttons { display:flex; gap:10px; margin-bottom:10px; }
 .button { padding:5px 10px; font-size:12px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; color:white; }
-.add-friend { background: #007bff; }
-.friend-sent { background: #6c757d; cursor: not-allowed; }
 .profile-btn { background: #28a745; }
 .incoming-btn { background: #ffc107; }
 #friendRequestsFrame { display:none; flex-direction:column; gap:10px; margin-bottom:20px; width:300px; border:2px solid #999; padding:10px; background:#fff; border-radius:6px; }
@@ -78,7 +78,6 @@ body {
     <div class="profile-username" id="profileUsername">Username</div>
     <div class="profile-buttons">
       <button class="button profile-btn" id="goProfileBtn">Go to Profile</button>
-      <button class="button add-friend" id="friendBtn">Add Friend</button>
       <button class="button incoming-btn" id="incomingBtn">Incoming Friend Requests (0)</button>
     </div>
     <div id="friendRequestsFrame"></div>
@@ -110,7 +109,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -129,7 +128,6 @@ const db = getFirestore(app);
 const noticeBar = document.getElementById("notice");
 const authButtons = document.getElementById("authButtons");
 const profileUsername = document.getElementById("profileUsername");
-const friendBtn = document.getElementById("friendBtn");
 const incomingBtn = document.getElementById("incomingBtn");
 const friendRequestsFrame = document.getElementById("friendRequestsFrame");
 const goProfileBtn = document.getElementById("goProfileBtn");
@@ -155,32 +153,26 @@ onAuthStateChanged(auth, async user => {
   });
 
   // Go to profile button
-  goProfileBtn.addEventListener("click", () => window.location.href = `Profile.html?userId=${userSnap.data().userId}`);
+  goProfileBtn.addEventListener("click", () => {
+    window.location.href = `Profile?userId=${userSnap.data().userId}`;
+  });
 
-  // --- Friends system ---
-  async function updateFriendButtons() {
-    const frArray = userSnap.data().friendRequests || [];
-    const friendsArray = userSnap.data().friends || [];
-    incomingBtn.textContent = `Incoming Friend Requests (${frArray.length})`;
-
-    if(friendsArray.includes("SOME_OTHER_USER_ID")) { 
-      friendBtn.textContent = "Friend"; friendBtn.disabled = true; 
-    } else {
-      friendBtn.textContent = "Add Friend"; friendBtn.disabled = false;
-      friendBtn.onclick = async () => {
-        const targetUserRef = doc(db,"users","SOME_OTHER_USER_ID"); // Replace with actual user id viewing
-        await updateDoc(targetUserRef,{ friendRequests: [...(targetUserRef.friendRequests || []), user.uid] });
-        friendBtn.textContent = "Friend Request Sent"; friendBtn.disabled = true;
-      };
-    }
+  // Incoming friend requests
+  function updateIncomingButton() {
+    const frCount = (userSnap.data().friendRequests || []).length;
+    incomingBtn.textContent = `Incoming Friend Requests (${frCount})`;
   }
+  updateIncomingButton();
 
-  // Incoming requests frame
   incomingBtn.addEventListener("click", async () => {
     friendRequestsFrame.innerHTML = "";
     const frArray = userSnap.data().friendRequests || [];
-    if(frArray.length === 0) { friendRequestsFrame.innerHTML = "<span>No incoming requests</span>"; friendRequestsFrame.style.display = "flex"; return; }
-    for(const uid of frArray) {
+    if(frArray.length === 0) { 
+      friendRequestsFrame.innerHTML = "<span>No incoming requests</span>"; 
+      friendRequestsFrame.style.display = "flex"; 
+      return; 
+    }
+    for(const uid of frArray){
       const frSnap = await getDoc(doc(db,"users",uid));
       const frUsername = frSnap.exists() ? frSnap.data().username : "User";
       const frDiv = document.createElement("div");
@@ -192,28 +184,29 @@ onAuthStateChanged(auth, async user => {
           <button class="decline-btn">Decline</button>
         </div>
       `;
-      // Click username to go to profile
       frDiv.querySelector(".fr-user").addEventListener("click", () => {
-        window.location.href = `Profile.html?userId=${frSnap.data().userId}`;
+        window.location.href = `Profile?userId=${frSnap.data().userId}`;
       });
-      // Accept
       frDiv.querySelector(".accept-btn").addEventListener("click", async () => {
-        // Add each other as friends
-        await updateDoc(userRef,{ friends: [...(userSnap.data().friends||[]), uid], friendRequests: frArray.filter(f => f !== uid) });
-        await updateDoc(doc(db,"users",uid), { friends: [...(frSnap.data().friends||[]), user.uid] });
-        updateFriendButtons();
+        await updateDoc(userRef, { 
+          friends: [...(userSnap.data().friends || []), uid], 
+          friendRequests: frArray.filter(f => f !== uid)
+        });
+        await updateDoc(doc(db,"users",uid), { 
+          friends: [...(frSnap.data().friends || []), user.uid]
+        });
+        updateIncomingButton();
+        frDiv.remove();
       });
-      // Decline
       frDiv.querySelector(".decline-btn").addEventListener("click", async () => {
-        await updateDoc(userRef,{ friendRequests: frArray.filter(f => f !== uid) });
-        updateFriendButtons();
+        await updateDoc(userRef, { friendRequests: frArray.filter(f => f !== uid) });
+        updateIncomingButton();
+        frDiv.remove();
       });
-
       friendRequestsFrame.appendChild(frDiv);
     }
     friendRequestsFrame.style.display = "flex";
   });
-
 });
 </script>
 </body>
