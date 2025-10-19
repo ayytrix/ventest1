@@ -97,7 +97,6 @@
     .turnstile-wrapper { text-align: center; margin: 15px 0; }
   </style>
 
-  <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
@@ -107,15 +106,15 @@
   </div>
 
   <div id="sub-header">
-    <a href="Home.html">Home</a>
-    <a href="unfinished.html">Games</a>
-    <a href="unfinished.html">Catalog</a>
-    <a href="unfinished.html">Users</a>
-    <a href="unfinished.html">Forum</a>
-    <a href="unfinished.html">Clans</a>
-    <a href="unfinished.html">Help</a>
-    <a href="unfinished.html">Downloads</a>
-    <a href="Create.html">Create</a>
+    <a href="Home">Home</a>
+    <a href="Games">Games</a>
+    <a href="Catalog">Catalog</a>
+    <a href="Users">Users</a>
+    <a href="Forums">Forum</a>
+    <a href="Clans">Clans</a>
+    <a href="Help">Help</a>
+    <a href="Downloads">Downloads</a>
+    <a href="Create">Create</a>
   </div>
 
   <div id="notice">Loading...</div>
@@ -148,7 +147,7 @@
           <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ"></div>
         </div>
 
-        <button type="disabled" id="signupBtn" disabled>Registration Disabled.</button>
+        <button type="submit" id="signupBtn" disabled>Create Account</button>
       </form>
 
       <div class="signup-links">
@@ -157,9 +156,7 @@
     </div>
   </div>
 
-  <div id="footer">
-    © 2025, Venux All rights reserved
-  </div>
+  <div id="footer">© 2025, Venux — All rights reserved</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -192,20 +189,18 @@
     let isUsernameValid = false;
     let isPasswordValid = false;
 
-    // --- NOTICE BAR ---
     fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
       .then(r => r.ok ? r.text() : "Welcome to Venux!")
       .then(data => document.getElementById("notice").textContent = data)
-      .catch(()=>document.getElementById("notice").textContent = "Welcome to Venux!");
+      .catch(() => document.getElementById("notice").textContent = "Welcome to Venux!");
 
-    // --- PASSWORD CHECK ---
     function checkPasswords() {
-      if(passwordInput.value.length < 6){
+      if (passwordInput.value.length < 6) {
         passwordSuccess.style.display = "none";
         passwordError.style.display = "block";
         passwordError.textContent = "Password must be at least 6 characters long.";
         isPasswordValid = false;
-      } else if(passwordInput.value !== confirmPassword.value){
+      } else if (passwordInput.value !== confirmPassword.value) {
         passwordSuccess.style.display = "none";
         passwordError.style.display = "block";
         passwordError.textContent = "Passwords do not match.";
@@ -220,30 +215,29 @@
     passwordInput.addEventListener("input", checkPasswords);
     confirmPassword.addEventListener("input", checkPasswords);
 
-    // --- CHECK USERNAME AVAILABILITY ---
     async function checkUsername() {
       const username = usernameInput.value.trim();
       isUsernameValid = false;
 
-      if(username.length < 3 || username.length > 20){
+      if (username.length < 3 || username.length > 20) {
         usernameError.textContent = "Username must be 3-20 characters.";
         usernameError.style.display = "block";
       } else {
         const forbiddenWords = ["nigga","nigger","niga","niger","nigeria","fuck","shit","bitch","hoe"];
-        if(forbiddenWords.includes(username.toLowerCase())){
-          usernameError.textContent = "Invalid username";
+        if (forbiddenWords.includes(username.toLowerCase())) {
+          usernameError.textContent = "Invalid username.";
           usernameError.style.display = "block";
         } else {
           const regex = /^[a-zA-Z0-9_ ]+$/;
-          if(!regex.test(username)){
-            usernameError.textContent = "Invalid characters";
+          if (!regex.test(username)) {
+            usernameError.textContent = "Invalid characters.";
             usernameError.style.display = "block";
           } else {
-            const usersRef = collection(db,"users");
-            const q = query(usersRef, where("username","==",username));
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("username", "==", username));
             const snapshot = await getDocs(q);
-            if(!snapshot.empty){
-              usernameError.textContent = "Username taken";
+            if (!snapshot.empty) {
+              usernameError.textContent = "Username taken.";
               usernameError.style.display = "block";
             } else {
               usernameError.style.display = "none";
@@ -256,34 +250,30 @@
     }
     usernameInput.addEventListener("input", checkUsername);
 
-    // --- ENABLE/DISABLE BUTTON ---
-    function updateSignupBtn(){
+    function updateSignupBtn() {
       signupBtn.disabled = !(isUsernameValid && isPasswordValid);
     }
 
-    // --- GET NEXT USER ID ---
-    async function getNextUserId(){
-      const usersRef = collection(db,"users");
-      const q = query(usersRef, orderBy("userId","desc"), limit(1));
+    async function getNextUserId() {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, orderBy("userId", "desc"), limit(1));
       const snapshot = await getDocs(q);
-      if(!snapshot.empty){
+      if (!snapshot.empty) {
         return snapshot.docs[0].data().userId + 1;
       }
       return 1;
     }
 
-    // --- SIGNUP FORM SUBMIT ---
-    document.getElementById("signupForm").addEventListener("submit", async (e)=>{
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if(!isUsernameValid || !isPasswordValid) return;
+      if (!isUsernameValid || !isPasswordValid) return;
 
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
-      // CAPTCHA
       const captchaToken = document.querySelector('input[name="cf-turnstile-response"]');
-      if(!captchaToken || !captchaToken.value){
+      if (!captchaToken || !captchaToken.value) {
         alert("Please complete the CAPTCHA");
         return;
       }
@@ -291,8 +281,8 @@
       signupBtn.disabled = true;
       signupBtn.textContent = "Creating Account...";
 
-      try{
-        const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g,"");
+      try {
+        const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, "");
         const timestamp = Date.now();
         const uniqueEmail = `${cleanUsername}_${timestamp}@venux.local`;
 
@@ -301,20 +291,28 @@
 
         const userId = await getNextUserId();
 
-        await setDoc(doc(db,"users",user.uid),{
-          username: username,
+        await setDoc(doc(db, "users", user.uid), {
+          username,
           authEmail: uniqueEmail,
           email: email || null,
           createdAt: new Date().toISOString(),
-          userId: userId,
+          userId,
           badges: [],
-          friends: [],          // <-- initialize friends array
-          friendRequests: []    // <-- initialize friendRequests array
+          friends: [],
+          friendRequests: [],
+          sentRequests: [],
+          description: "",
+          themeColor: "#dc4105",
+          avatar: "default.png",
+          status: "offline",
+          online: false,
+          lastActive: new Date().toISOString(),
+          lastOnline: new Date().toISOString()
         });
 
-        window.location.href = "Home.html";
+        window.location.href = "Home";
 
-      } catch(err){
+      } catch (err) {
         console.error(err);
         alert("Error: " + (err.message || JSON.stringify(err)));
         signupBtn.disabled = false;
