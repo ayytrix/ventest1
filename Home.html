@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <title>Venux - Home</title>
 <style>
-html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; background:#d4d4d4; color:#222; min-height:100vh; display:flex; flex-direction:column; }
+html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; background:#d4d4d4; color:#222; min-height:100vh; }
+
 #main-header { background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
 #main-header img { height:52px; object-fit:contain; }
 .auth-buttons { display:flex; align-items:center; gap:10px; color:white; }
@@ -20,15 +21,27 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
 
 #page-content { flex:1 0 auto; padding:20px; display:flex; flex-direction:column; align-items:flex-start; position:relative; }
 
+/* News Section Front */
+#newsSection { position: relative; z-index: 2; }
 .news-box { background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; width:600px; box-shadow:2px 2px 0 #aaa; }
 .news-title { font-weight:bold; font-size:14px; margin-bottom:6px; }
 .news-date { font-size:11px; color:#666; margin-bottom:10px; }
 .news-body { font-size:13px; }
 
-#profileOverlay { display:flex; flex-direction:column; align-items:center; margin-top:20px; z-index:1; }
+/* Profile Overlay Behind */
+#profileOverlay { 
+    position:absolute; 
+    top:20px; 
+    left:20px; 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    z-index:1; /* behind news */
+    pointer-events:none; /* allow clicks to pass through to news if needed */
+}
 #avatarFrame { width:150px; height:150px; background:#ccc; border:2px solid #999; margin-bottom:10px; }
-#profileUsernameOverlay { font-weight:bold; font-size:18px; margin-bottom:10px; }
-#incomingFRBtn, #goProfileBtn { padding:6px 12px; border-radius:4px; background:green; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px; }
+#profileUsernameOverlay { font-weight:bold; font-size:18px; margin-bottom:10px; color:#000; }
+#incomingFRBtn, #goProfileBtn { padding:6px 12px; border-radius:4px; background:green; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px; pointer-events:auto; } 
 
 #footer { flex-shrink:0; text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
 
@@ -50,21 +63,29 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
 </div>
 
 <div id="sub-header">
-  <a href="Home.html">Home</a><span class="nav-separator">|</span>
-  <a href="Games.html">Games</a><span class="nav-separator">|</span>
-  <a href="Catalog.html">Catalog</a><span class="nav-separator">|</span>
-  <a href="Users.html">Users</a><span class="nav-separator">|</span>
-  <a href="Forums.html">Forum</a><span class="nav-separator">|</span>
-  <a href="Clans.html">Clans</a><span class="nav-separator">|</span>
-  <a href="Help.html">Help</a><span class="nav-separator">|</span>
-  <a href="Downloads.html">Downloads</a><span class="nav-separator">|</span>
-  <a href="Create.html">Create</a>
+  <a href="Home">Home</a><span class="nav-separator">|</span>
+  <a href="Games">Games</a><span class="nav-separator">|</span>
+  <a href="Catalog">Catalog</a><span class="nav-separator">|</span>
+  <a href="Users">Users</a><span class="nav-separator">|</span>
+  <a href="Forums">Forum</a><span class="nav-separator">|</span>
+  <a href="Clans">Clans</a><span class="nav-separator">|</span>
+  <a href="Help">Help</a><span class="nav-separator">|</span>
+  <a href="Downloads">Downloads</a><span class="nav-separator">|</span>
+  <a href="Create">Create</a>
 </div>
 
 <div id="notice">Loading...</div>
 
 <div id="page-content">
-  <!-- News Section First -->
+  <!-- Profile Overlay Behind News -->
+  <div id="profileOverlay">
+    <div id="avatarFrame"></div>
+    <div id="profileUsernameOverlay">Username</div>
+    <button id="incomingFRBtn">Incoming Friend Requests (0)</button>
+    <button id="goProfileBtn">Go to Your Profile</button>
+  </div>
+
+  <!-- News Section Front -->
   <div id="newsSection">
     <h2>Latest News</h2>
     <div class="news-box">
@@ -79,18 +100,10 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
       <div class="news-date">Posted: 8th October, 2025</div>
       <div class="news-body">
         - Added more pages<br>
-        - Greatblox is also great! <a href="https://greatblox.com/" target="_blank">greatblox.com</a><br>
+        - Checkout our new status site, at <a href="https://status.venux.fun" target="_blank">status.venux.fun</a><br>
         - Our website is live!
       </div>
     </div>
-  </div>
-
-  <!-- Profile Overlay Below News -->
-  <div id="profileOverlay">
-    <div id="avatarFrame"></div>
-    <div id="profileUsernameOverlay">Username</div>
-    <button id="incomingFRBtn">Incoming Friend Requests (0)</button>
-    <button id="goProfileBtn">View your profile</button>
   </div>
 </div>
 
@@ -140,23 +153,19 @@ onAuthStateChanged(auth, async (user)=>{
   const userSnap = await getDoc(userRef);
   const data = userSnap.data();
 
-  // Display username & theme color
   usernameOverlay.textContent = data.username || "User";
   avatarFrame.style.background = data.themeColor || "#ccc";
 
   noticeBar.textContent = `Welcome, ${data.username || "User"}`;
 
-  // Logout button
   authButtons.innerHTML = `<span>Welcome, ${data.username || "User"}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{
     await signOut(auth);
     window.location.href="Login.html";
   });
 
-  // Go to Profile button
   goProfileBtn.onclick = () => { window.location.href = `profile?userId=${data.userId}`; };
 
-  // Incoming friend requests
   const fr = data.friendRequests || [];
   incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length})`;
   incomingFRBtn.onclick = async ()=>{
@@ -176,19 +185,15 @@ onAuthStateChanged(auth, async (user)=>{
         </div>`;
       frList.appendChild(frItem);
 
-      // Username click goes to their profile
       frItem.querySelector(".frUser").onclick = () => { window.location.href = `profile?userId=${frUserSnap.data().userId}`; };
 
-      // Accept
       frItem.querySelector(".frAccept").onclick = async ()=>{
-        // Add to friends for both users
         await updateDoc(userRef, { friends: arrayUnion(frUid), friendRequests: arrayRemove(frUid) });
         await updateDoc(frUserRef, { friends: arrayUnion(user.uid) });
         frItem.remove();
         incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length-1})`;
       };
 
-      // Decline
       frItem.querySelector(".frDecline").onclick = async ()=>{
         await updateDoc(userRef, { friendRequests: arrayRemove(frUid) });
         frItem.remove();
