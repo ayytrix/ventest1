@@ -6,11 +6,12 @@
 <style>
 html, body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
   background: #d4d4d4;
   color: #222;
   font-size: 13px;
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -63,34 +64,21 @@ html, body {
 }
 
 #page-content {
-  position: relative;
-  flex: 1;
+  flex: 1 0 auto;
   padding: 20px;
-}
-
-.news-box {
-  background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%);
-  border: 2px solid #999;
-  padding: 12px;
-  margin-bottom: 15px;
-  width: 600px;
-  box-shadow: 2px 2px 0 #aaa;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   position: relative;
-  z-index: 1;
 }
-.news-title { font-weight: bold; font-size: 14px; margin-bottom: 6px; }
-.news-date { font-size: 11px; color: #666; margin-bottom: 10px; }
-.news-body { font-size: 13px; }
 
-/* Avatar overlay behind news */
+/* Avatar overlay */
 #profileOverlay {
-  position: absolute;
-  top: 0;
-  left: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 0;
+  margin-bottom: 20px;
+  z-index: 1;
 }
 #avatarFrame {
   width: 150px;
@@ -113,7 +101,22 @@ html, body {
   cursor: pointer;
 }
 
+/* News */
+.news-box {
+  background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%);
+  border: 2px solid #999;
+  padding: 12px;
+  margin-bottom: 15px;
+  width: 600px;
+  box-shadow: 2px 2px 0 #aaa;
+}
+.news-title { font-weight: bold; font-size: 14px; margin-bottom: 6px; }
+.news-date { font-size: 11px; color: #666; margin-bottom: 10px; }
+.news-body { font-size: 13px; }
+
+/* Footer pinned at bottom */
 #footer {
+  flex-shrink: 0;
   text-align: center;
   font-size: 12px;
   color: #444;
@@ -145,14 +148,14 @@ html, body {
 <div id="notice">Loading...</div>
 
 <div id="page-content">
-  <!-- Avatar overlay behind news -->
+  <!-- Avatar + username + friend requests -->
   <div id="profileOverlay">
     <div id="avatarFrame"></div>
     <div id="profileUsernameOverlay">Username</div>
     <button id="incomingFRBtn">Incoming Friend Requests (0)</button>
   </div>
 
-  <!-- News section -->
+  <!-- News -->
   <div id="newsSection"></div>
 </div>
 
@@ -161,7 +164,7 @@ html, body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -172,6 +175,7 @@ const firebaseConfig = {
   appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
   measurementId: "G-N36RRV95SW"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -198,23 +202,15 @@ async function loadNews() {
         </div>`;
       });
     } else {
-      // Static fallback news
       newsHTML = `
       <div class="news-box">
         <div class="news-title">Welcome to Venux!</div>
         <div class="news-date">Posted: 8th October, 2025</div>
         <div class="news-body">This is for news happening in Venux!</div>
-      </div>
-      <div class="news-box">
-        <div class="news-title">Update Log</div>
-        <div class="news-date">Posted: 17th October, 2025</div>
-        <div class="news-body">- Fixed sign up, Login and home page problems! <br>- We now have a status page <a href="https://status.venux.fun/" target="_blank">status.venux.fun</a><br>- Changed buttons and added gradient to log out <br>- Added "|" next to buttons on nav bar.</div>
       </div>`;
     }
     newsSection.innerHTML = newsHTML;
-  } catch(err) {
-    console.error(err);
-  }
+  } catch(err) { console.error(err); }
 }
 
 async function loadUserData(user) {
@@ -224,13 +220,11 @@ async function loadUserData(user) {
   usernameOverlay.textContent = data.username || "User";
   avatarFrame.style.background = data.themeColor || "#ccc";
 
-  // Dynamic orange notice
+  // Dynamic notice
   try {
     const response = await fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc");
     noticeBar.textContent = response.ok ? await response.text() : `Welcome, ${data.username || "User"}`;
-  } catch(e) {
-    noticeBar.textContent = `Welcome, ${data.username || "User"}`;
-  }
+  } catch(e) { noticeBar.textContent = `Welcome, ${data.username || "User"}`; }
 
   // Auth buttons
   authButtons.innerHTML = `<span>Welcome, ${data.username || "User"}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
@@ -239,7 +233,6 @@ async function loadUserData(user) {
     window.location.href = "Login.html";
   });
 
-  // Friend Requests count
   const fr = data.friendRequests || [];
   incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length})`;
 }
