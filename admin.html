@@ -177,7 +177,7 @@ onAuthStateChanged(auth, async (user) => {
   const usersRef = collection(db, "users");
   const userDoc = await getDocs(usersRef);
   let currentUser = null;
-  userDoc.forEach(docSnap => { if(docSnap.data().userId && [1,2,5].includes(docSnap.data().userId) && docSnap.id===user.uid) currentUser = docSnap.data(); });
+  userDoc.forEach(docSnap => { if(docSnap.data().userId && [1,2].includes(docSnap.data().userId) && docSnap.id===user.uid) currentUser = docSnap.data(); });
   if (!currentUser) return window.location.href = "/error";
   noticeBar.textContent = "Admin Panel Loaded";
   await loadUsers();
