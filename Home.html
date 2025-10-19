@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <title>Venux - Home</title>
 <style>
-html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; background:#d4d4d4; color:#222; min-height:100vh; }
+body, html {
+  margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; background:#d4d4d4; color:#222;
+  min-height:100vh; display:flex; flex-direction:column;
+}
 
 #main-header { background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
 #main-header img { height:52px; object-fit:contain; }
@@ -19,29 +22,22 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
 
 #notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
 
-#page-content { flex:1 0 auto; padding:20px; display:flex; flex-direction:column; align-items:flex-start; position:relative; }
+#page-content { flex:1 0 auto; padding:20px; display:flex; flex-direction:column; align-items:flex-start; }
 
-/* News Section Front */
-#newsSection { position: relative; z-index: 2; }
-.news-box { background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; width:600px; box-shadow:2px 2px 0 #aaa; }
+/* Profile section first */
+#profileContainer {
+  display:flex; flex-direction:column; align-items:center; margin-bottom:20px;
+}
+#avatarFrame { width:150px; height:150px; background:#ccc; border:2px solid #999; margin-bottom:10px; }
+#profileUsernameOverlay { font-weight:bold; font-size:18px; margin-bottom:10px; }
+#incomingFRBtn, #goProfileBtn { padding:6px 12px; border-radius:4px; background:green; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px; }
+
+/* News Section */
+#newsSection { width:100%; max-width:600px; }
+.news-box { background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; box-shadow:2px 2px 0 #aaa; }
 .news-title { font-weight:bold; font-size:14px; margin-bottom:6px; }
 .news-date { font-size:11px; color:#666; margin-bottom:10px; }
 .news-body { font-size:13px; }
-
-/* Profile Overlay Behind */
-#profileOverlay { 
-    position:absolute; 
-    top:20px; 
-    left:20px; 
-    display:flex; 
-    flex-direction:column; 
-    align-items:center; 
-    z-index:1; /* behind news */
-    pointer-events:none; /* allow clicks to pass through to news if needed */
-}
-#avatarFrame { width:150px; height:150px; background:#ccc; border:2px solid #999; margin-bottom:10px; }
-#profileUsernameOverlay { font-weight:bold; font-size:18px; margin-bottom:10px; color:#000; }
-#incomingFRBtn, #goProfileBtn { padding:6px 12px; border-radius:4px; background:green; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px; pointer-events:auto; } 
 
 #footer { flex-shrink:0; text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
 
@@ -63,29 +59,29 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
 </div>
 
 <div id="sub-header">
-  <a href="Home">Home</a><span class="nav-separator">|</span>
-  <a href="Games">Games</a><span class="nav-separator">|</span>
-  <a href="Catalog">Catalog</a><span class="nav-separator">|</span>
-  <a href="Users">Users</a><span class="nav-separator">|</span>
-  <a href="Forums">Forum</a><span class="nav-separator">|</span>
-  <a href="Clans">Clans</a><span class="nav-separator">|</span>
-  <a href="Help">Help</a><span class="nav-separator">|</span>
-  <a href="Downloads">Downloads</a><span class="nav-separator">|</span>
-  <a href="Create">Create</a>
+  <a href="Home.html">Home</a><span class="nav-separator">|</span>
+  <a href="Games.html">Games</a><span class="nav-separator">|</span>
+  <a href="Catalog.html">Catalog</a><span class="nav-separator">|</span>
+  <a href="Users.html">Users</a><span class="nav-separator">|</span>
+  <a href="Forums.html">Forum</a><span class="nav-separator">|</span>
+  <a href="Clans.html">Clans</a><span class="nav-separator">|</span>
+  <a href="Help.html">Help</a><span class="nav-separator">|</span>
+  <a href="Downloads.html">Downloads</a><span class="nav-separator">|</span>
+  <a href="Create.html">Create</a>
 </div>
 
 <div id="notice">Loading...</div>
 
 <div id="page-content">
-  <!-- Profile Overlay Behind News -->
-  <div id="profileOverlay">
+  <!-- Profile section first -->
+  <div id="profileContainer">
     <div id="avatarFrame"></div>
     <div id="profileUsernameOverlay">Username</div>
     <button id="incomingFRBtn">Incoming Friend Requests (0)</button>
     <button id="goProfileBtn">Go to Your Profile</button>
   </div>
 
-  <!-- News Section Front -->
+  <!-- News Section -->
   <div id="newsSection">
     <h2>Latest News</h2>
     <div class="news-box">
@@ -97,11 +93,11 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
     </div>
     <div class="news-box">
       <div class="news-title">Update Log</div>
-      <div class="news-date">Posted: 8th October, 2025</div>
+      <div class="news-date">Posted: 19th October, 2025</div>
       <div class="news-body">
-        - Added more pages<br>
-        - Checkout our new status site, at <a href="https://status.venux.fun" target="_blank">status.venux.fun</a><br>
-        - Our website is live!
+        - Added users page<br>
+        - Check out our status site, at <a href="https://status.venux.fun/" target="_blank">status.venux.fun</a><br>
+        - Still working on friends system
       </div>
     </div>
   </div>
@@ -164,20 +160,22 @@ onAuthStateChanged(auth, async (user)=>{
     window.location.href="Login.html";
   });
 
-  goProfileBtn.onclick = () => { window.location.href = `profile?userId=${data.userId}`; };
+  goProfileBtn.onclick = () => { window.location.href = `Profile.html?userId=${data.userId}`; };
 
+  // Friend Requests
   const fr = data.friendRequests || [];
   incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length})`;
+
   incomingFRBtn.onclick = async ()=>{
-    frList.innerHTML = "";
-    for(const frUid of fr){
+    frList.innerHTML="";
+    for(let frUid of fr){
       const frUserRef = doc(db,"users",frUid);
       const frUserSnap = await getDoc(frUserRef);
       if(!frUserSnap.exists()) continue;
-      const frUsername = frUserSnap.data().username || "Unknown";
+      const frUsername = frUserSnap.data().username;
 
       const frItem = document.createElement("div");
-      frItem.className = "frRequest";
+      frItem.className="frRequest";
       frItem.innerHTML = `<span class="frUser">${frUsername}</span>
         <div>
           <button class="frAccept">Accept</button>
@@ -185,7 +183,7 @@ onAuthStateChanged(auth, async (user)=>{
         </div>`;
       frList.appendChild(frItem);
 
-      frItem.querySelector(".frUser").onclick = () => { window.location.href = `profile?userId=${frUserSnap.data().userId}`; };
+      frItem.querySelector(".frUser").onclick = () => { window.location.href = `Profile.html?userId=${frUserSnap.data().userId}`; };
 
       frItem.querySelector(".frAccept").onclick = async ()=>{
         await updateDoc(userRef, { friends: arrayUnion(frUid), friendRequests: arrayRemove(frUid) });
@@ -193,7 +191,6 @@ onAuthStateChanged(auth, async (user)=>{
         frItem.remove();
         incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length-1})`;
       };
-
       frItem.querySelector(".frDecline").onclick = async ()=>{
         await updateDoc(userRef, { friendRequests: arrayRemove(frUid) });
         frItem.remove();
@@ -202,7 +199,6 @@ onAuthStateChanged(auth, async (user)=>{
     }
     frModal.style.display="block";
   };
-
   frCloseBtn.onclick = ()=>{ frModal.style.display="none"; };
 });
 </script>
