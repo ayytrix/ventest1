@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Venux - Warning</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #warn-container {
+    background: #fff3cd;
+    border: 2px solid #ffeeba;
+    padding: 30px 40px;
+    border-radius: 8px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+  }
+  #warn-container h2 {
+    color: #856404;
+    margin-bottom: 15px;
+  }
+  #warn-container p {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #856404;
+  }
+  .btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  #acknowledgeBtn {
+    background: linear-gradient(to right, #28a745, #218838);
+  }
+  #acknowledgeBtn:hover {
+    background: linear-gradient(to right, #218838, #1e7e34);
+  }
+  #logoutBtn {
+    background: linear-gradient(to right, #dc3545, #c82333);
+  }
+  #logoutBtn:hover {
+    background: linear-gradient(to right, #c82333, #bd2130);
+  }
+</style>
+</head>
+<body>
+
+<div id="warn-container">
+  <h2>⚠ Warning</h2>
+  <p id="warnMessage">Loading warning...</p>
+  <button class="btn" id="acknowledgeBtn">Acknowledge</button>
+  <button class="btn" id="logoutBtn">Logout</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const warnMessage = document.getElementById("warnMessage");
+const acknowledgeBtn = document.getElementById("acknowledgeBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "Login.html";
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists() || !userSnap.data().warning?.active) {
+    // No active warning, redirect to home
+    window.location.href = "Home";
+    return;
+  }
+
+  const warningData = userSnap.data().warning;
+  warnMessage.textContent = warningData.message || "You have been warned by a moderator.";
+
+  acknowledgeBtn.addEventListener("click", async () => {
+    // Deactivate the warning
+    await updateDoc(userRef, { "warning.active": false });
+    window.location.href = "Home";
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+});
+</script>
+
+</body>
+</html>
