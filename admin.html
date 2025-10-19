@@ -4,54 +4,21 @@
 <meta charset="UTF-8">
 <title>Venux - Admin Panel</title>
 <style>
-  body {
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#d4d4d4;
-    font-size:13px;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-  }
-
-  #main-header {
-    background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-    padding:10px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  #main-header img { height:52px; object-fit:contain; }
-
-  #sub-header {
-    background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-    padding: 8px 15px;
-    border-bottom:1px solid #000;
-  }
-  #sub-header a {
-    color:white;
-    text-decoration:none;
-    margin-right:10px;
-    font-weight:bold;
-    padding:6px 10px;
-    border-radius:4px;
-    transition:all 0.3s ease;
-  }
-  #sub-header a:hover {
-    background: linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%);
-  }
-  .nav-separator{ color:white; margin:0 10px 0 0; }
-
-  #page-content { padding:20px; flex:1; }
-  .admin-section { background:#fff; padding:20px; margin-bottom:15px; border-radius:6px; box-shadow:2px 2px 5px rgba(0,0,0,0.2); }
-
-  label { display:block; margin-top:10px; font-weight:bold; }
-  input, select, textarea { width:100%; padding:8px; margin-top:5px; border-radius:4px; border:1px solid #999; }
-  button { margin-top:10px; padding:8px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; }
-  .warn-btn { background: #ffa200; color:white; }
-  .reactivate-btn { background:#22c55e; color:white; }
-
-  #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background: linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);}
+  body {margin:0; font-family:Arial,sans-serif; background:#d4d4d4; font-size:13px; display:flex; flex-direction:column;}
+  #main-header {background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center;}
+  #main-header img {height:52px;}
+  #sub-header {background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000;}
+  #sub-header a {color:white; text-decoration:none; margin-right:10px; font-weight:bold;}
+  #sub-header a:hover {text-decoration:underline;}
+  table {width:100%; border-collapse:collapse; margin-top:20px;}
+  th, td {border:1px solid #999; padding:8px; text-align:center;}
+  button {padding:5px 10px; margin:2px; cursor:pointer;}
+  .warn-btn {background:#ffa200;color:white;}
+  .ban-btn {background:#f44336;color:white;}
+  .terminate-btn {background:#000;color:white;}
+  .unban-btn {background:#22c55e;color:white;}
+  .unterminate-btn {background:#22c55e;color:white;}
+  #footer {text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);}
 </style>
 </head>
 <body>
@@ -61,37 +28,25 @@
 </div>
 
 <div id="sub-header">
-  <a href="Home">Home</a><span class="nav-separator">|</span>
-  <a href="Games">Games</a><span class="nav-separator">|</span>
-  <a href="Catalog">Catalog</a><span class="nav-separator">|</span>
-  <a href="Users">Users</a><span class="nav-separator">|</span>
-  <a href="Forums">Forum</a><span class="nav-separator">|</span>
-  <a href="Clans">Clans</a><span class="nav-separator">|</span>
-  <a href="Help">Help</a><span class="nav-separator">|</span>
-  <a href="Downloads">Downloads</a><span class="nav-separator">|</span>
-  <a href="Create">Create</a>
-  <button id="logoutBtn" style="margin-left:10px;background:#f44336;color:white;">Logout</button>
+  <a href="Home">Home</a>
+  <a href="Users">Users</a>
+  <a href="Forums">Forums</a>
+  <button id="logoutBtn" style="float:right;">Logout</button>
 </div>
 
 <div id="page-content">
-  <div class="admin-section">
-    <h2>Warn User</h2>
-    <label for="warnUserId">User ID</label>
-    <input type="number" id="warnUserId" placeholder="Enter User ID to warn">
-
-    <label for="warnNote">Warning Note</label>
-    <textarea id="warnNote" placeholder="Enter moderator note"></textarea>
-
-    <button class="warn-btn" id="warnUserBtn">Warn User</button>
-  </div>
-
-  <div class="admin-section">
-    <h2>Manage Warnings</h2>
-    <label for="warnedUserId">User ID</label>
-    <input type="number" id="warnedUserId" placeholder="Enter User ID">
-
-    <button class="reactivate-btn" id="reactivateUserBtn">Remove Warning / Reactivate</button>
-  </div>
+  <h2>Admin Panel - User Management</h2>
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Username</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </div>
 
 <div id="footer">© 2025, Venux All rights reserved</div>
@@ -99,7 +54,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -115,68 +70,108 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const warnUserBtn = document.getElementById('warnUserBtn');
-const reactivateUserBtn = document.getElementById('reactivateUserBtn');
-const logoutBtn = document.getElementById('logoutBtn');
+const logoutBtn = document.getElementById("logoutBtn");
+const usersTableBody = document.querySelector("#usersTable tbody");
 
+// ADMIN AUTH
 onAuthStateChanged(auth, async (user)=>{
   if(!user) return window.location.href="/error";
 
-  const userRef = doc(db,"users",user.uid);
-  const userSnap = await getDoc(userRef);
-  if(!userSnap.exists()) return window.location.href="/error";
-  const data = userSnap.data();
+  const currentUserRef = doc(db,"users",user.uid);
+  const currentUserSnap = await getDocs(collection(db,"users"));
+  const currentUserData = (await currentUserRef.get()).data?.() || {}; 
 
   // Only allow admin IDs 1,2,5
-  if(![1,2,5].includes(data.userId)) return window.location.href="/error";
+  const adminIds = [1,2,5];
+  const currentUserDocSnap = await getDocs(collection(db,"users"));
+  let isAdmin=false;
+  currentUserDocSnap.forEach(u=>{
+    if(u.id===user.uid && adminIds.includes(u.data().userId)) isAdmin=true;
+  });
+  if(!isAdmin) return window.location.href="/error";
 
-  // LOGOUT
   logoutBtn.addEventListener("click", async ()=>{
-    await updateDoc(userRef,{ online:false, lastOnline:serverTimestamp() });
+    await updateDoc(currentUserRef,{ online:false, lastOnline:serverTimestamp() });
     await signOut(auth);
     window.location.href="/Login";
   });
-});
 
-// WARN USER
-warnUserBtn.addEventListener("click", async ()=>{
-  const uidQuery = parseInt(document.getElementById("warnUserId").value,10);
-  const note = document.getElementById("warnNote").value;
-  if(!uidQuery || !note) return alert("Fill both fields");
+  // LOAD USERS
+  const usersSnap = await getDocs(collection(db,"users"));
+  usersTableBody.innerHTML="";
+  usersSnap.forEach(u=>{
+    const d = u.data();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${d.userId}</td>
+      <td>${d.username}</td>
+      <td>
+        ${d.warned?"Warned":""} ${d.banned?"Banned":""} ${d.terminated?"Terminated":""}
+      </td>
+      <td>
+        <button class="warn-btn">Warn</button>
+        <button class="ban-btn">Ban</button>
+        <button class="terminate-btn">Terminate</button>
+        <button class="unban-btn">Unban</button>
+        <button class="unterminate-btn">Unterminate</button>
+      </td>
+    `;
+    usersTableBody.appendChild(tr);
 
-  // Find user by numeric ID
-  const usersRef = collection(db,"users");
-  const q = query(usersRef, where("userId","==",uidQuery));
-  const snap = await getDocs(q);
-  if(snap.empty) return alert("User not found");
-  const userDoc = snap.docs[0];
+    // BUTTON HOOKS
+    const warnBtn = tr.querySelector(".warn-btn");
+    const banBtn = tr.querySelector(".ban-btn");
+    const terminateBtn = tr.querySelector(".terminate-btn");
+    const unbanBtn = tr.querySelector(".unban-btn");
+    const unterminateBtn = tr.querySelector(".unterminate-btn");
 
-  await updateDoc(userDoc.ref,{
-    warned: true,
-    warnNote: note,
-    warnTimestamp: serverTimestamp()
+    // WARN
+    warnBtn.addEventListener("click", async ()=>{
+      const note = prompt("Enter moderator warning note:");
+      if(!note) return;
+      await updateDoc(u.ref,{ warned:true, warnNote:note, warnTimestamp:serverTimestamp() });
+      alert(`${d.username} has been warned`);
+      location.reload();
+    });
+
+    // BAN
+    banBtn.addEventListener("click", async ()=>{
+      const note = prompt("Enter moderator ban note:");
+      if(!note) return;
+      const days = parseInt(prompt("Days of ban:"),10) || 0;
+      const hours = parseInt(prompt("Hours of ban:"),10) || 0;
+      const until = new Date();
+      until.setDate(until.getDate()+days);
+      until.setHours(until.getHours()+hours);
+      await updateDoc(u.ref,{ banned:true, banNote:note, banUntil:until, banTimestamp:serverTimestamp() });
+      alert(`${d.username} has been banned`);
+      location.reload();
+    });
+
+    // TERMINATE
+    terminateBtn.addEventListener("click", async ()=>{
+      const note = prompt("Enter moderator terminate note:");
+      if(!note) return;
+      await updateDoc(u.ref,{ terminated:true, terminateNote:note, username:"Account Terminated", description:"" });
+      alert(`${d.username} account terminated`);
+      location.reload();
+    });
+
+    // UNBAN
+    unbanBtn.addEventListener("click", async ()=>{
+      await updateDoc(u.ref,{ banned:false, banNote:"", banUntil:null });
+      alert(`${d.username} unbanned`);
+      location.reload();
+    });
+
+    // UNTERMINATE
+    unterminateBtn.addEventListener("click", async ()=>{
+      await updateDoc(u.ref,{ terminated:false });
+      alert(`${d.username} unterminated`);
+      location.reload();
+    });
   });
-  alert(`User ${uidQuery} has been warned.`);
-});
-
-// REACTIVATE USER
-reactivateUserBtn.addEventListener("click", async ()=>{
-  const uidQuery = parseInt(document.getElementById("warnedUserId").value,10);
-  if(!uidQuery) return alert("Enter user ID");
-
-  const usersRef = collection(db,"users");
-  const q = query(usersRef, where("userId","==",uidQuery));
-  const snap = await getDocs(q);
-  if(snap.empty) return alert("User not found");
-  const userDoc = snap.docs[0];
-
-  await updateDoc(userDoc.ref,{
-    warned: false,
-    warnNote: ""
-  });
-  alert(`User ${uidQuery} warning removed.`);
 });
 </script>
-
 </body>
 </html>
