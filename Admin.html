@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Venux - Administration Panel</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e8e8e8;
+  color: #222;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+#main-header {
+  background: linear-gradient(to right, #8b0000 0%, #ff0000 100%);
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#main-header img {
+  height: 50px;
+}
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 10px;
+  font-size: 13px;
+}
+.nav-links a:hover {
+  text-decoration: underline;
+}
+#notice {
+  background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+#admin-panel {
+  padding: 20px;
+  flex: 1;
+}
+#users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+#users-table th, #users-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+#users-table th {
+  background: #f5f5f5;
+}
+.action-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.view-btn { background: #2196f3; color: white; }
+.toggle-btn { background: #ff9800; color: white; }
+.delete-btn { background: #f44336; color: white; }
+#footer {
+  text-align: center;
+  font-size: 12px;
+  color: #444;
+  padding: 10px;
+  border-top: 2px solid #999;
+  background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
+  margin-top: auto;
+}
+</style>
+</head>
+<body>
+
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux Logo">
+  <div class="nav-links">
+    <a href="Home">Home</a>
+    <a href="Users">Users</a>
+    <a href="Catalog">Catalog</a>
+    <a href="Downloads">Downloads</a>
+    <a href="Admin">Admin Panel</a>
+    <a href="Help">Help</a>
+  </div>
+</div>
+
+<div id="notice">Loading Administration Panel...</div>
+
+<div id="admin-panel">
+  <h2>👑 Venux Administration Panel</h2>
+  <p>Welcome, Admin! Here you can manage users, monitor activity, and handle moderation tasks.</p>
+  
+  <table id="users-table">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Online</th>
+        <th>Last Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="users-body">
+      <tr><td colspan="7" style="text-align:center;">Loading users...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="footer">© 2025, Venux Administration | All rights reserved</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const noticeBar = document.getElementById("notice");
+const usersBody = document.getElementById("users-body");
+
+// Dynamic notice banner
+let dynamicNotice = "Welcome to the Venux Admin Panel!";
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : dynamicNotice)
+  .then(t => { dynamicNotice = t; noticeBar.textContent = t; })
+  .catch(() => noticeBar.textContent = dynamicNotice);
+
+async function getUserByUid(uid) {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("authEmail", "==", uid));
+  const snapshot = await getDocs(q);
+  return snapshot.empty ? null : snapshot.docs[0];
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "Login.html";
+
+  // Get user doc
+  const usersRef = collection(db, "users");
+  const allUsers = await getDocs(usersRef);
+  let adminData = null;
+  allUsers.forEach(docSnap => {
+    const data = docSnap.data();
+    if (data.email === user.email) adminData = data;
+  });
+
+  // 🔒 Redirect if not admin
+  if (!adminData || ![1, 2, 5].includes(adminData.userId)) {
+    window.location.href = "https://venux.fun/unfinished";
+    return;
+  }
+
+  // ✅ Show all users
+  usersBody.innerHTML = "";
+  allUsers.forEach((docSnap) => {
+    const u = docSnap.data();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${u.userId ?? "?"}</td>
+      <td>${u.username ?? "Unknown"}</td>
+      <td>${u.email ?? "N/A"}</td>
+      <td>${u.status ?? "offline"}</td>
+      <td>${u.online ? "🟢" : "🔴"}</td>
+      <td>${u.lastActive ? new Date(u.lastActive.seconds * 1000).toLocaleString() : "Never"}</td>
+      <td>
+        <button class="action-btn view-btn" onclick="window.location='Profile.html?userId=${u.userId}'">View</button>
+        <button class="action-btn toggle-btn" data-uid="${docSnap.id}">Toggle Online</button>
+        <button class="action-btn delete-btn" data-uid="${docSnap.id}">Delete</button>
+      </td>
+    `;
+    usersBody.appendChild(tr);
+  });
+
+  // Toggle Online / Offline
+  document.querySelectorAll(".toggle-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const userRef = doc(db, "users", btn.dataset.uid);
+      const snap = allUsers.docs.find(d => d.id === btn.dataset.uid);
+      const current = snap.data().online;
+      await updateDoc(userRef, { online: !current, lastOnline: serverTimestamp() });
+      location.reload();
+    });
+  });
+
+  // Delete user
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to delete this user?")) return;
+      await deleteDoc(doc(db, "users", btn.dataset.uid));
+      alert("User deleted successfully.");
+      location.reload();
+    });
+  });
+});
+</script>
+</body>
+</html>
