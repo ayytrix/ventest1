@@ -63,7 +63,7 @@ body {
   <div id="profileButtons">
     <button class="edit-btn" id="editDescriptionBtn" style="display:none;">Edit Description</button>
     <button class="theme-btn" id="editThemeBtn" style="display:none;">Edit Theme</button>
-    <button class="friend-btn" id="friendBtn" style="display:none;"></button>
+    <button class="friend-btn" id="friendBtn" style="display:none;">Add Friend</button>
   </div>
 
   <div id="badges">
@@ -153,7 +153,10 @@ onAuthStateChanged(auth, async (user) => {
   const data = userDoc.data();
   const isOwner = user.uid === userDoc.id;
 
-  // Apply theme
+  // Nav bar color for userId 2
+  if (data.userId === 2) document.getElementById("main-header").style.background = "#8b0000";
+
+  // Theme
   if (data.themeColor) document.body.style.background = data.themeColor;
 
   profileUsername.textContent = data.username || "User";
@@ -194,41 +197,19 @@ onAuthStateChanged(auth, async (user) => {
     });
   }
 
-  // --- Friends ---
-  friendBtn.style.display = "inline-block";
+  // --- Add Friend Button ---
+  if (!isOwner) {
+    friendBtn.style.display = "inline-block";
+    friendBtn.textContent = "Add Friend";
+    friendBtn.disabled = false;
 
-  async function updateFriendButton() {
-    const friendsRef = collection(userDoc.ref, "friends");
-    const frRef = collection(userDoc.ref, "friendRequests");
-    const friendsSnap = await getDocs(friendsRef);
-    const frSnap = await getDocs(frRef);
-
-    const isFriend = friendsSnap.docs.some(d=>d.id===user.uid);
-    const requestSent = frSnap.docs.some(d=>d.id===user.uid);
-
-    if (isOwner) friendBtn.style.display="none";
-    else if (isFriend) { 
-      friendBtn.textContent = "Unfriend";
-      friendBtn.disabled = false;
-      friendBtn.onclick = async () => {
-        await updateDoc(doc(userDoc.ref,"friends",user.uid),{removed:true});
-        await updateDoc(doc(currentUserRef,"friends",data.uid),{removed:true});
-        await updateFriendButton();
-      };
-    } else if (requestSent) {
+    friendBtn.onclick = async () => {
+      const frRef = collection(userDoc.ref,"friendRequests");
+      await setDoc(doc(frRef,user.uid), { from:user.uid, timestamp:serverTimestamp() });
       friendBtn.textContent = "Friend Request Sent";
       friendBtn.disabled = true;
-    } else {
-      friendBtn.textContent = "Add Friend";
-      friendBtn.disabled = false;
-      friendBtn.onclick = async () => {
-        await setDoc(doc(frRef,user.uid),{from:user.uid,timestamp:serverTimestamp()});
-        friendBtn.textContent = "Friend Request Sent";
-        friendBtn.disabled = true;
-      };
-    }
-  }
-  await updateFriendButton();
+    };
+  } else friendBtn.style.display="none";
 
   // --- Badges ---
   const badges = [];
@@ -246,12 +227,7 @@ onAuthStateChanged(auth, async (user) => {
     const el=document.createElement("span");
     el.className="badge";
     el.style.background=b.color||"#1a4a84";
-    if(b.icon){
-      const img=document.createElement("img");
-      img.src=b.icon;
-      img.alt=b.name;
-      el.appendChild(img);
-    }
+    if(b.icon){ const img=document.createElement("img"); img.src=b.icon; img.alt=b.name; el.appendChild(img);}
     el.appendChild(document.createTextNode(b.name));
     badgeContainer.appendChild(el);
   });
