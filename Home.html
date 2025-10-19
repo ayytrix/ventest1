@@ -20,15 +20,15 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
 
 #page-content { flex:1 0 auto; padding:20px; display:flex; flex-direction:column; align-items:flex-start; position:relative; }
 
-#profileOverlay { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; z-index:1; }
-#avatarFrame { width:150px; height:150px; background:#ccc; border:2px solid #999; margin-bottom:10px; }
-#profileUsernameOverlay { font-weight:bold; font-size:18px; margin-bottom:10px; }
-#incomingFRBtn, #goProfileBtn { padding:6px 12px; border-radius:4px; background:green; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px; }
-
 .news-box { background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; width:600px; box-shadow:2px 2px 0 #aaa; }
 .news-title { font-weight:bold; font-size:14px; margin-bottom:6px; }
 .news-date { font-size:11px; color:#666; margin-bottom:10px; }
 .news-body { font-size:13px; }
+
+#profileOverlay { display:flex; flex-direction:column; align-items:center; margin-top:20px; z-index:1; }
+#avatarFrame { width:150px; height:150px; background:#ccc; border:2px solid #999; margin-bottom:10px; }
+#profileUsernameOverlay { font-weight:bold; font-size:18px; margin-bottom:10px; }
+#incomingFRBtn, #goProfileBtn { padding:6px 12px; border-radius:4px; background:green; color:white; font-weight:bold; cursor:pointer; margin-bottom:10px; }
 
 #footer { flex-shrink:0; text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
 
@@ -64,14 +64,7 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
 <div id="notice">Loading...</div>
 
 <div id="page-content">
-  <!-- Profile Overlay -->
-  <div id="profileOverlay">
-    <div id="avatarFrame"></div>
-    <div id="profileUsernameOverlay">Username</div>
-    <button id="incomingFRBtn">Incoming Friend Requests (0)</button>
-  </div>
-
-  <!-- News Section -->
+  <!-- News Section First -->
   <div id="newsSection">
     <h2>Latest News</h2>
     <div class="news-box">
@@ -92,8 +85,13 @@ html, body { margin:0; padding:0; font-family:Arial,sans-serif; font-size:13px; 
     </div>
   </div>
 
-  <!-- Go to Profile Button -->
-  <button id="goProfileBtn">Go to Your Profile</button>
+  <!-- Profile Overlay Below News -->
+  <div id="profileOverlay">
+    <div id="avatarFrame"></div>
+    <div id="profileUsernameOverlay">Username</div>
+    <button id="incomingFRBtn">Incoming Friend Requests (0)</button>
+    <button id="goProfileBtn">View your profile</button>
+  </div>
 </div>
 
 <div id="footer">© 2025, Venux — All rights reserved</div>
@@ -135,27 +133,35 @@ const frModal = document.getElementById("frModal");
 const frList = document.getElementById("frList");
 const frCloseBtn = document.getElementById("frCloseBtn");
 
-async function loadUserData(user) {
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ window.location.href="Login.html"; return; }
+
   const userRef = doc(db,"users",user.uid);
   const userSnap = await getDoc(userRef);
   const data = userSnap.data();
 
+  // Display username & theme color
   usernameOverlay.textContent = data.username || "User";
   avatarFrame.style.background = data.themeColor || "#ccc";
 
   noticeBar.textContent = `Welcome, ${data.username || "User"}`;
 
+  // Logout button
   authButtons.innerHTML = `<span>Welcome, ${data.username || "User"}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
     await signOut(auth);
     window.location.href="Login.html";
   });
 
+  // Go to Profile button
+  goProfileBtn.onclick = () => { window.location.href = `profile?userId=${data.userId}`; };
+
+  // Incoming friend requests
   const fr = data.friendRequests || [];
   incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length})`;
-  incomingFRBtn.onclick = async () => {
+  incomingFRBtn.onclick = async ()=>{
     frList.innerHTML = "";
-    for (const frUid of fr) {
+    for(const frUid of fr){
       const frUserRef = doc(db,"users",frUid);
       const frUserSnap = await getDoc(frUserRef);
       if(!frUserSnap.exists()) continue;
@@ -170,4 +176,30 @@ async function loadUserData(user) {
         </div>`;
       frList.appendChild(frItem);
 
-      frItem.querySelector(".frUser").onclick = () =>
+      // Username click goes to their profile
+      frItem.querySelector(".frUser").onclick = () => { window.location.href = `profile?userId=${frUserSnap.data().userId}`; };
+
+      // Accept
+      frItem.querySelector(".frAccept").onclick = async ()=>{
+        // Add to friends for both users
+        await updateDoc(userRef, { friends: arrayUnion(frUid), friendRequests: arrayRemove(frUid) });
+        await updateDoc(frUserRef, { friends: arrayUnion(user.uid) });
+        frItem.remove();
+        incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length-1})`;
+      };
+
+      // Decline
+      frItem.querySelector(".frDecline").onclick = async ()=>{
+        await updateDoc(userRef, { friendRequests: arrayRemove(frUid) });
+        frItem.remove();
+        incomingFRBtn.textContent = `Incoming Friend Requests (${fr.length-1})`;
+      };
+    }
+    frModal.style.display="block";
+  };
+
+  frCloseBtn.onclick = ()=>{ frModal.style.display="none"; };
+});
+</script>
+</body>
+</html>
