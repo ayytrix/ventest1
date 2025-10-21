@@ -10,7 +10,7 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 .auth-buttons { display:flex; align-items:center; gap:10px; color:white; }
 .logout-btn { padding:8px 15px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); color:white; transition: all 0.3s ease; }
 .logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-#sub-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000; }
+#sub-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000000; }
 #sub-header a { color:white; text-decoration:none; margin:0 10px 0 0; font-weight:bold; padding:6px 10px; border-radius:4px; transition: all 0.3s ease; }
 #sub-header a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); text-decoration:none; }
 .nav-separator { color:white; margin:0 10px 0 0; }
@@ -36,7 +36,6 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 .like-btn { background:green; color:white; }
 .dislike-btn { background:red; color:white; }
 .replies-container { display:none; margin-top:6px; margin-left:12px; border-left:2px solid #aaa; padding-left:6px; }
-.reply-likes { font-size:11px; color:#333; margin-left:6px; }
 </style>
 </head>
 <body>
@@ -131,15 +130,9 @@ onAuthStateChanged(auth, async (user) => {
       const tDocId = tObj.id;
       const t = tObj.data;
 
-      let authorName = "User";
-      let authorUserId = 0;
-      if(t.uid){
-        const authorSnap = await getDoc(doc(db,"users",t.uid));
-        if(authorSnap.exists()){
-          authorName = authorSnap.data().username || "User"; // <-- display username
-          authorUserId = authorSnap.data().userId || 0;      // for profile link
-        }
-      }
+      const authorSnap = await getDoc(doc(db,"users",t.uid));
+      const authorName = authorSnap.exists()?authorSnap.data().username:"User";
+      const authorUserId = authorSnap.exists()?authorSnap.data().userId:t.uid;
 
       const likes = t.likes?.length || 0;
       const dislikes = t.dislikes?.length || 0;
@@ -153,6 +146,7 @@ onAuthStateChanged(auth, async (user) => {
         <button class="like-btn" data-threadid="${tDocId}">👍 ${likes}</button>
         <button class="dislike-btn" data-threadid="${tDocId}">👎 ${dislikes}</button>`;
 
+      // Delete button: IDs 1,2,5 or owner
       if([1,2,5].includes(numericUserId) || currentUser.uid === t.uid){
         threadHTML += `<button class="delete-btn" data-threadid="${tDocId}">Delete</button>`;
       }
@@ -161,16 +155,10 @@ onAuthStateChanged(auth, async (user) => {
       threadHTML += `<button class="view-replies-btn" data-threadid="${tDocId}">View Replies (${replyCount})</button>
         <div class="replies-container" id="replies-${tDocId}">`;
 
-      t.replies?.forEach((r, idx)=>{
-        const rLikes = r.likes?.length || 0;
+      t.replies?.forEach(r=>{
         threadHTML += `<div class="reply-box">
           <a class="username-link" href="profile?userId=${r.userId}" style="color:${([1,2,5].includes(r.userId)?'darkred':'black')}">${r.username}</a>: ${r.text}
-          <span class="reply-likes">👍 ${rLikes}</span>`;
-
-        if([1,2,5].includes(numericUserId) || r.userId === numericUserId){
-          threadHTML += `<button class="delete-btn" data-threadid="${tDocId}" data-replyidx="${idx}">Delete</button>`;
-        }
-        threadHTML += `</div>`;
+        </div>`;
       });
 
       threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDocId}" class="reply-input"></textarea>
@@ -179,16 +167,72 @@ onAuthStateChanged(auth, async (user) => {
       threadsContainer.innerHTML += threadHTML;
     }
 
-    // Add listeners for likes, dislikes, replies, delete, etc. (same as before)
+    // Like/Dislike functionality
+    document.querySelectorAll(".like-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const ref = doc(db,"threads",btn.dataset.threadid);
+        const tSnap = await getDoc(ref);
+        if(tSnap.exists()){
+          const currentLikes = tSnap.data().likes || [];
+          if(!currentLikes.includes(numericUserId)){
+            await updateDoc(ref,{ likes: arrayUnion(numericUserId) });
+          }
+          loadThreads();
+        }
+      });
+    });
+
+    document.querySelectorAll(".dislike-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const ref = doc(db,"threads",btn.dataset.threadid);
+        const tSnap = await getDoc(ref);
+        if(tSnap.exists()){
+          const currentDislikes = tSnap.data().dislikes || [];
+          if(!currentDislikes.includes(numericUserId)){
+            await updateDoc(ref,{ dislikes: arrayUnion(numericUserId) });
+          }
+          loadThreads();
+        }
+      });
+    });
+
+    // Original listeners for pin, delete, replies
+    document.querySelectorAll(".pin-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const ref = doc(db,"threads",btn.dataset.threadid);
+        const tSnap = await getDoc(ref);
+        if(tSnap.exists()){
+          await updateDoc(ref,{ pinned: !(tSnap.data().pinned||false) });
+          loadThreads();
+        }
+      });
+    });
+
+    document.querySelectorAll(".delete-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        if(confirm("Delete this thread?")){
+          await deleteDoc(doc(db,"threads",btn.dataset.threadid));
+          loadThreads();
+        }
+      });
+    });
+
     document.querySelectorAll(".reply-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         const threadId = btn.dataset.threadid;
         const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
         const text = input.value.trim();
         if(!text) return;
-        await updateDoc(doc(db,"threads",threadId), { replies: arrayUnion({ userId:numericUserId, username, text, likes:[] }) });
+        await updateDoc(doc(db,"threads",threadId), { replies: arrayUnion({ userId:numericUserId, username, text }) });
         input.value="";
         loadThreads();
+      });
+    });
+
+    document.querySelectorAll(".view-replies-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const container = document.getElementById(`replies-${btn.dataset.threadid}`);
+        container.style.display = container.style.display==="none"?"block":"none";
       });
     });
 
