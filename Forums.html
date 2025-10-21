@@ -124,9 +124,21 @@ onAuthStateChanged(auth, async (user) => {
     for (const tObj of threadsArray) {
       const tDocId = tObj.id;
       const t = tObj.data;
-      const authorSnap = await getDoc(doc(db, "users", t.uid));
-      const authorName = authorSnap.exists() ? authorSnap.data().username : "User";
-      const authorUserId = authorSnap.exists() ? authorSnap.data().userId : 0;
+let authorName = "User";
+let authorUserId = 0;
+
+if (t.uid) {
+  try {
+    const authorSnap = await getDoc(doc(db, "users", t.uid));
+    if (authorSnap.exists()) {
+      authorName = authorSnap.data().username || "User";
+      authorUserId = authorSnap.data().userId || 0;
+    }
+  } catch (err) {
+    console.warn("Error loading author for thread:", t.uid, err);
+  }
+}
+
       const usernameColor = [1, 2, 5].includes(authorUserId) ? "darkred" : "black";
       const adminBadge = [1, 2, 5].includes(authorUserId) ? " <span style='color:#8b0000;font-weight:bold'>(Admin)</span>" : "";
 
