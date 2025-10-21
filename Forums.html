@@ -33,6 +33,10 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 .reply-btn { background:#1a4a84; color:white; margin-top:4px; }
 .view-replies-btn { background:#555; color:white; margin-top:4px; margin-left:5px; }
 .replies-container { display:none; margin-top:6px; margin-left:12px; border-left:2px solid #aaa; padding-left:6px; }
+.like-btn, .dislike-btn { background:#eee; border:1px solid #999; padding:4px 10px; font-size:12px; margin-top:6px; border-radius:4px; }
+.like-btn:hover { background:#c8ffc8; }
+.dislike-btn:hover { background:#ffc8c8; }
+.like-count, .dislike-count { font-size:12px; margin-left:4px; }
 </style>
 </head>
 <body>
@@ -61,7 +65,7 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -96,6 +100,8 @@ onAuthStateChanged(auth, async (user) => {
   const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
   const numericUserId = userSnap.exists() && userSnap.data().userId ? userSnap.data().userId : 0;
 
+  const isAdmin = [1,2,5].includes(numericUserId);
+
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
   document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
@@ -117,7 +123,6 @@ onAuthStateChanged(auth, async (user) => {
     let threadsArray = [];
     threadsSnap.forEach(docSnap => threadsArray.push({ id: docSnap.id, data: docSnap.data() }));
 
-    // Sort pinned on top
     threadsArray.sort((a,b) => (b.data.pinned?1:0) - (a.data.pinned?1:0));
 
     for(const tObj of threadsArray){
@@ -129,6 +134,11 @@ onAuthStateChanged(auth, async (user) => {
       const usernameColor = (authorUserId===1||authorUserId===2)?"darkred":"black";
       const adminBadge = (authorUserId===1||authorUserId===2||authorUserId===5)?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
 
+      const likes = t.likes?.length || 0;
+      const dislikes = t.dislikes?.length || 0;
+      const userLiked = t.likes?.includes(user.uid);
+      const userDisliked = t.dislikes?.includes(user.uid);
+
       let threadHTML = `<div class="thread-box" id="thread-${tDocId}">
         <div class="thread-title ${t.pinned?'pinned':''}">${t.title}</div>
         <div class="thread-meta">
@@ -136,12 +146,20 @@ onAuthStateChanged(auth, async (user) => {
         </div>
         <div class="thread-body">${t.body}</div>`;
 
-      if(numericUserId===1||numericUserId===2){
-        threadHTML += `<button class="pin-btn" data-threadid="${tDocId}">${t.pinned?"Unpin":"Pin"}</button>`;
-      }
-      if(user.uid===t.uid){
+      // Admins OR post owner can delete
+      if(isAdmin || user.uid===t.uid){
         threadHTML += `<button class="delete-btn" data-threadid="${tDocId}">Delete</button>`;
       }
+      if(isAdmin){
+        threadHTML += `<button class="pin-btn" data-threadid="${tDocId}">${t.pinned?"Unpin":"Pin"}</button>`;
+      }
+
+      threadHTML += `
+        <button class="like-btn" data-threadid="${tDocId}">${userLiked?"👍 Liked":"👍 Like"}</button>
+        <span class="like-count">${likes}</span>
+        <button class="dislike-btn" data-threadid="${tDocId}">${userDisliked?"👎 Disliked":"👎 Dislike"}</button>
+        <span class="dislike-count">${dislikes}</span>
+      `;
 
       const replyCount = t.replies?.length || 0;
       threadHTML += `<button class="view-replies-btn" data-threadid="${tDocId}">View Replies (${replyCount})</button>
@@ -159,7 +177,7 @@ onAuthStateChanged(auth, async (user) => {
       threadsContainer.innerHTML += threadHTML;
     }
 
-    // Listeners
+    // Event Listeners
     document.querySelectorAll(".pin-btn").forEach(btn=>{
       btn.addEventListener("click", async ()=>{
         const ref = doc(db,"threads",btn.dataset.threadid);
@@ -177,6 +195,38 @@ onAuthStateChanged(auth, async (user) => {
           await deleteDoc(doc(db,"threads",btn.dataset.threadid));
           loadThreads();
         }
+      });
+    });
+
+    document.querySelectorAll(".like-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const threadId = btn.dataset.threadid;
+        const ref = doc(db,"threads",threadId);
+        const tSnap = await getDoc(ref);
+        if(!tSnap.exists()) return;
+        const tData = tSnap.data();
+        if(tData.likes?.includes(user.uid)){
+          await updateDoc(ref, { likes: arrayRemove(user.uid) });
+        } else {
+          await updateDoc(ref, { likes: arrayUnion(user.uid), dislikes: arrayRemove(user.uid) });
+        }
+        loadThreads();
+      });
+    });
+
+    document.querySelectorAll(".dislike-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const threadId = btn.dataset.threadid;
+        const ref = doc(db,"threads",threadId);
+        const tSnap = await getDoc(ref);
+        if(!tSnap.exists()) return;
+        const tData = tSnap.data();
+        if(tData.dislikes?.includes(user.uid)){
+          await updateDoc(ref, { dislikes: arrayRemove(user.uid) });
+        } else {
+          await updateDoc(ref, { dislikes: arrayUnion(user.uid), likes: arrayRemove(user.uid) });
+        }
+        loadThreads();
       });
     });
 
@@ -206,7 +256,7 @@ onAuthStateChanged(auth, async (user) => {
     const title = document.getElementById("threadTitle").value.trim();
     const body = document.getElementById("threadBody").value.trim();
     if(!title || !body) return alert("Enter title and body");
-    await addDoc(collection(db,"threads"),{ uid:user.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false });
+    await addDoc(collection(db,"threads"),{ uid:user.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false, likes:[], dislikes:[] });
     document.getElementById("threadTitle").value="";
     document.getElementById("threadBody").value="";
     loadThreads();
