@@ -21,7 +21,7 @@ body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; f
 .thread-title.pinned { color:gold; }
 .thread-meta { font-size:11px; color:#666; margin-bottom:6px; }
 .thread-body { font-size:13px; margin-bottom:10px; }
-.reply-box { background:#f0f0f0; border:1px solid #bbb; padding:6px; margin-bottom:6px; }
+.reply-box { background:#f0f0f0; border:1px solid #bbb; padding:6px; margin-bottom:6px; border-radius:4px; }
 .username-link { font-weight:bold; text-decoration:none; }
 #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
 input, textarea { width:100%; padding:6px; margin-bottom:6px; font-size:13px; border-radius:4px; border:1px solid #999; }
@@ -32,9 +32,11 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 .delete-btn { background:red; color:white; margin-left:5px; }
 .reply-btn { background:#1a4a84; color:white; margin-top:4px; }
 .view-replies-btn { background:#555; color:white; margin-top:4px; margin-left:5px; }
-.like-btn, .dislike-btn { background:#eee; color:#333; margin-right:5px; }
-.like-btn.active { background:green; color:white; }
-.dislike-btn.active { background:#b00; color:white; }
+.like-btn, .dislike-btn, .reply-like-btn, .reply-dislike-btn {
+  background:#ddd; border:1px solid #999; border-radius:3px; font-size:12px; margin-right:5px;
+}
+.like-btn:hover, .reply-like-btn:hover { background:#aaffaa; }
+.dislike-btn:hover, .reply-dislike-btn:hover { background:#ffaaaa; }
 .replies-container { display:none; margin-top:6px; margin-left:12px; border-left:2px solid #aaa; padding-left:6px; }
 </style>
 </head>
@@ -64,7 +66,7 @@ button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cur
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -84,23 +86,27 @@ const noticeBar = document.getElementById("notice");
 const authButtons = document.getElementById("authButtons");
 const pageContent = document.getElementById("page-content");
 
+let currentUser = null;
+let username = "User";
+let numericUserId = 0;
+
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : "Welcome to Venux Forums!")
   .then(t => noticeBar.textContent = t)
   .catch(() => noticeBar.textContent = "Welcome to Venux Forums!");
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "Login.html"; return; }
+  if(!user){ window.location.href="Login.html"; return; }
+  currentUser = user;
 
-  const userSnap = await getDoc(doc(db, "users", user.uid));
-  const username = userSnap.exists() ? userSnap.data().username : "User";
-  const numericUserId = userSnap.exists() ? userSnap.data().userId : 0;
+  const userSnap = await getDoc(doc(db,"users",user.uid));
+  if(userSnap.exists()){
+    username = userSnap.data().username || "User";
+    numericUserId = userSnap.data().userId || 0;
+  }
 
   authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await signOut(auth);
-    window.location.href = "Login.html";
-  });
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
 
   pageContent.innerHTML = `
     <h2>Forums</h2>
@@ -114,177 +120,203 @@ onAuthStateChanged(auth, async (user) => {
 
   const threadsContainer = document.getElementById("threadsContainer");
 
-  async function loadThreads() {
+  async function loadThreads(){
     threadsContainer.innerHTML = "";
-    const threadsSnap = await getDocs(query(collection(db, "threads"), orderBy("date", "desc")));
+    const threadsSnap = await getDocs(query(collection(db,"threads"), orderBy("date","desc")));
     let threadsArray = [];
     threadsSnap.forEach(docSnap => threadsArray.push({ id: docSnap.id, data: docSnap.data() }));
-    threadsArray.sort((a, b) => (b.data.pinned ? 1 : 0) - (a.data.pinned ? 1 : 0));
 
-    for (const tObj of threadsArray) {
+    // pinned first
+    threadsArray.sort((a,b)=>(b.data.pinned?1:0)-(a.data.pinned?1:0));
+
+    for(const tObj of threadsArray){
       const tDocId = tObj.id;
       const t = tObj.data;
-let authorName = "User";
-let authorUserId = 0;
 
-if (t.uid) {
-  try {
-    const authorSnap = await getDoc(doc(db, "users", t.uid));
-    if (authorSnap.exists()) {
-      authorName = authorSnap.data().username || "User";
-      authorUserId = authorSnap.data().userId || 0;
-    }
-  } catch (err) {
-    console.warn("Error loading author for thread:", t.uid, err);
-  }
-}
+      let authorName = "User";
+      let authorUserId = 0;
+      if(t.uid){
+        try{
+          const authorRef = doc(db,"users",t.uid);
+          const authorSnap = await getDoc(authorRef);
+          if(authorSnap.exists()){
+            const aData = authorSnap.data();
+            authorName = aData.username || "User";
+            authorUserId = aData.userId || 0;
+          }
+        }catch(err){ console.warn("User fetch error:", err); }
+      }
 
-      const usernameColor = [1, 2, 5].includes(authorUserId) ? "darkred" : "black";
-      const adminBadge = [1, 2, 5].includes(authorUserId) ? " <span style='color:#8b0000;font-weight:bold'>(Admin)</span>" : "";
+      const usernameColor = (authorUserId===1||authorUserId===2)?"darkred":"black";
+      const adminBadge = (authorUserId===1||authorUserId===2||authorUserId===5)?" <span style='color:#8b0000;font-weight:bold'>(Admin)</span>":"";
 
-      const threadLikes = t.likes || [];
-      const threadDislikes = t.dislikes || [];
+      const likes = t.likes || [];
+      const dislikes = t.dislikes || [];
+      const likeCount = likes.length;
+      const dislikeCount = dislikes.length;
+      const userLiked = likes.includes(numericUserId);
+      const userDisliked = dislikes.includes(numericUserId);
 
       let threadHTML = `<div class="thread-box" id="thread-${tDocId}">
-        <div class="thread-title ${t.pinned ? 'pinned' : ''}">${t.title}</div>
+        <div class="thread-title ${t.pinned?'pinned':''}">${t.title}</div>
         <div class="thread-meta">
           <a class="username-link" href="profile?userId=${authorUserId}" style="color:${usernameColor}">${authorName}</a>${adminBadge} - ${t.date}
         </div>
         <div class="thread-body">${t.body}</div>
-        <button class="like-btn ${threadLikes.includes(numericUserId) ? 'active' : ''}" data-threadid="${tDocId}">👍 ${threadLikes.length}</button>
-        <button class="dislike-btn ${threadDislikes.includes(numericUserId) ? 'active' : ''}" data-threadid="${tDocId}">👎 ${threadDislikes.length}</button>`;
+        <button class="like-btn" data-id="${tDocId}">👍 ${likeCount}</button>
+        <button class="dislike-btn" data-id="${tDocId}">👎 ${dislikeCount}</button>`;
 
-      if ([1, 2, 5].includes(numericUserId) || user.uid === t.uid) {
-        threadHTML += `<button class="delete-btn" data-threadid="${tDocId}">Delete</button>`;
+      if(numericUserId===1||numericUserId===2||numericUserId===5||user.uid===t.uid){
+        threadHTML += `<button class="delete-btn" data-id="${tDocId}">Delete</button>`;
       }
-      if ([1, 2, 5].includes(numericUserId)) {
-        threadHTML += `<button class="pin-btn" data-threadid="${tDocId}">${t.pinned ? "Unpin" : "Pin"}</button>`;
-      }
-
-      const replyCount = t.replies?.length || 0;
-      threadHTML += `<button class="view-replies-btn" data-threadid="${tDocId}">View Replies (${replyCount})</button>
-        <div class="replies-container" id="replies-${tDocId}">`;
-
-      if (t.replies) {
-        for (const r of t.replies) {
-          const rAuthorSnap = await getDoc(doc(db, "users", r.uid));
-          const rName = rAuthorSnap.exists() ? rAuthorSnap.data().username : "User";
-          const rUserId = rAuthorSnap.exists() ? rAuthorSnap.data().userId : 0;
-          const rLikes = r.likes || [];
-          const rDislikes = r.dislikes || [];
-          threadHTML += `<div class="reply-box">
-            <a class="username-link" href="profile?userId=${rUserId}" style="color:${[1,2,5].includes(rUserId)?'darkred':'black'}">${rName}</a>: ${r.text}
-            <div>
-              <button class="like-btn ${rLikes.includes(numericUserId)?'active':''}" data-threadid="${tDocId}" data-replyid="${rUserId}">👍 ${rLikes.length}</button>
-              <button class="dislike-btn ${rDislikes.includes(numericUserId)?'active':''}" data-threadid="${tDocId}" data-replyid="${rUserId}">👎 ${rDislikes.length}</button>
-              ${([1,2,5].includes(numericUserId)||r.uid===user.uid)?`<button class="delete-btn" data-threadid="${tDocId}" data-replyid="${rUserId}">Delete</button>`:""}
-            </div>
-          </div>`;
-        }
+      if(numericUserId===1||numericUserId===2||numericUserId===5){
+        threadHTML += `<button class="pin-btn" data-id="${tDocId}">${t.pinned?"Unpin":"Pin"}</button>`;
       }
 
-      threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDocId}" class="reply-input"></textarea>
-        <button class="reply-btn" data-threadid="${tDocId}">Reply</button>
+      const replies = t.replies || [];
+      threadHTML += `<button class="view-replies-btn" data-id="${tDocId}">View Replies (${replies.length})</button>
+      <div class="replies-container" id="replies-${tDocId}">`;
+
+      replies.forEach((r, idx)=>{
+        const replyUserId = r.userId || 0;
+        const replyName = r.username || "User";
+        const replyColor = (replyUserId===1||replyUserId===2)?"darkred":"black";
+        const rLikes = r.likes || [];
+        const rDislikes = r.dislikes || [];
+        threadHTML += `<div class="reply-box">
+          <a class="username-link" href="profile?userId=${replyUserId}" style="color:${replyColor}">${replyName}</a>: ${r.text}
+          <br>
+          <button class="reply-like-btn" data-thread="${tDocId}" data-index="${idx}">👍 ${rLikes.length}</button>
+          <button class="reply-dislike-btn" data-thread="${tDocId}" data-index="${idx}">👎 ${rDislikes.length}</button>
+        </div>`;
+      });
+
+      threadHTML += `<textarea placeholder="Reply..." data-id="${tDocId}" class="reply-input"></textarea>
+        <button class="reply-btn" data-id="${tDocId}">Reply</button>
       </div></div>`;
 
       threadsContainer.innerHTML += threadHTML;
     }
 
-    // Buttons
-    document.querySelectorAll(".like-btn").forEach(btn => btn.addEventListener("click", () => toggleReaction(btn, true)));
-    document.querySelectorAll(".dislike-btn").forEach(btn => btn.addEventListener("click", () => toggleReaction(btn, false)));
-    document.querySelectorAll(".delete-btn").forEach(btn => btn.addEventListener("click", () => deleteContent(btn)));
-    document.querySelectorAll(".reply-btn").forEach(btn => btn.addEventListener("click", () => postReply(btn)));
-    document.querySelectorAll(".pin-btn").forEach(btn => btn.addEventListener("click", () => togglePin(btn)));
-    document.querySelectorAll(".view-replies-btn").forEach(btn => btn.addEventListener("click", () => toggleReplies(btn)));
-  }
-
-  async function toggleReaction(btn, isLike) {
-    const threadId = btn.dataset.threadid;
-    const ref = doc(db, "threads", threadId);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-
-    const data = snap.data();
-    const likes = data.likes || [];
-    const dislikes = data.dislikes || [];
-
-    let updateData = {};
-    if (isLike) {
-      if (likes.includes(numericUserId)) {
-        updateData.likes = arrayRemove(numericUserId);
-      } else {
-        updateData.likes = arrayUnion(numericUserId);
-        updateData.dislikes = arrayRemove(numericUserId);
-      }
-    } else {
-      if (dislikes.includes(numericUserId)) {
-        updateData.dislikes = arrayRemove(numericUserId);
-      } else {
-        updateData.dislikes = arrayUnion(numericUserId);
-        updateData.likes = arrayRemove(numericUserId);
-      }
-    }
-    await updateDoc(ref, updateData);
-    loadThreads();
-  }
-
-  async function deleteContent(btn) {
-    const threadId = btn.dataset.threadid;
-    const replyId = btn.dataset.replyid;
-    if (!replyId) {
-      if (confirm("Delete this thread?")) {
-        await deleteDoc(doc(db, "threads", threadId));
+    // like/dislike
+    document.querySelectorAll(".like-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const ref = doc(db,"threads",btn.dataset.id);
+        const snap = await getDoc(ref);
+        if(!snap.exists())return;
+        const d = snap.data();
+        const likes = d.likes || [];
+        const dislikes = d.dislikes || [];
+        let newLikes = likes.includes(numericUserId)?likes.filter(i=>i!==numericUserId):[...likes,numericUserId];
+        let newDislikes = dislikes.filter(i=>i!==numericUserId);
+        await updateDoc(ref,{likes:newLikes,dislikes:newDislikes});
         loadThreads();
-      }
-    } else {
-      const ref = doc(db, "threads", threadId);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        let replies = snap.data().replies || [];
-        replies = replies.filter(r => r.userId !== parseInt(replyId));
-        await updateDoc(ref, { replies });
+      };
+    });
+    document.querySelectorAll(".dislike-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const ref = doc(db,"threads",btn.dataset.id);
+        const snap = await getDoc(ref);
+        if(!snap.exists())return;
+        const d = snap.data();
+        const likes = d.likes || [];
+        const dislikes = d.dislikes || [];
+        let newDislikes = dislikes.includes(numericUserId)?dislikes.filter(i=>i!==numericUserId):[...dislikes,numericUserId];
+        let newLikes = likes.filter(i=>i!==numericUserId);
+        await updateDoc(ref,{likes:newLikes,dislikes:newDislikes});
         loadThreads();
-      }
-    }
-  }
-
-  async function postReply(btn) {
-    const threadId = btn.dataset.threadid;
-    const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
-    const text = input.value.trim();
-    if (!text) return;
-    await updateDoc(doc(db, "threads", threadId), {
-      replies: arrayUnion({ uid: user.uid, text, likes: [], dislikes: [] })
+      };
     });
-    input.value = "";
-    loadThreads();
-  }
 
-  async function togglePin(btn) {
-    const ref = doc(db, "threads", btn.dataset.threadid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) await updateDoc(ref, { pinned: !(snap.data().pinned || false) });
-    loadThreads();
-  }
-
-  function toggleReplies(btn) {
-    const el = document.getElementById(`replies-${btn.dataset.threadid}`);
-    el.style.display = el.style.display === "none" ? "block" : "none";
-  }
-
-  document.getElementById("postThread").addEventListener("click", async () => {
-    const title = document.getElementById("threadTitle").value.trim();
-    const body = document.getElementById("threadBody").value.trim();
-    if (!title || !body) return alert("Enter title and body");
-    await addDoc(collection(db, "threads"), {
-      uid: user.uid, title, body, date: new Date().toLocaleString(),
-      replies: [], pinned: false, likes: [], dislikes: []
+    // reply like/dislike
+    document.querySelectorAll(".reply-like-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const ref = doc(db,"threads",btn.dataset.thread);
+        const snap = await getDoc(ref);
+        if(!snap.exists())return;
+        const d = snap.data();
+        const replies = d.replies || [];
+        const idx = parseInt(btn.dataset.index);
+        if(!replies[idx])return;
+        const r = replies[idx];
+        const likes = r.likes || [];
+        const dislikes = r.dislikes || [];
+        r.likes = likes.includes(numericUserId)?likes.filter(i=>i!==numericUserId):[...likes,numericUserId];
+        r.dislikes = dislikes.filter(i=>i!==numericUserId);
+        replies[idx]=r;
+        await updateDoc(ref,{replies});
+        loadThreads();
+      };
     });
-    loadThreads();
-  });
+    document.querySelectorAll(".reply-dislike-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const ref = doc(db,"threads",btn.dataset.thread);
+        const snap = await getDoc(ref);
+        if(!snap.exists())return;
+        const d = snap.data();
+        const replies = d.replies || [];
+        const idx = parseInt(btn.dataset.index);
+        if(!replies[idx])return;
+        const r = replies[idx];
+        const likes = r.likes || [];
+        const dislikes = r.dislikes || [];
+        r.dislikes = dislikes.includes(numericUserId)?dislikes.filter(i=>i!==numericUserId):[...dislikes,numericUserId];
+        r.likes = likes.filter(i=>i!==numericUserId);
+        replies[idx]=r;
+        await updateDoc(ref,{replies});
+        loadThreads();
+      };
+    });
+
+    // delete/pin/reply toggle
+    document.querySelectorAll(".delete-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(confirm("Delete this thread?")){
+          await deleteDoc(doc(db,"threads",btn.dataset.id));
+          loadThreads();
+        }
+      };
+    });
+    document.querySelectorAll(".pin-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const ref = doc(db,"threads",btn.dataset.id);
+        const snap = await getDoc(ref);
+        if(!snap.exists())return;
+        await updateDoc(ref,{pinned:!(snap.data().pinned||false)});
+        loadThreads();
+      };
+    });
+    document.querySelectorAll(".view-replies-btn").forEach(btn=>{
+      btn.onclick = ()=>{
+        const cont = document.getElementById(`replies-${btn.dataset.id}`);
+        cont.style.display = cont.style.display==="none"?"block":"none";
+      };
+    });
+    document.querySelectorAll(".reply-btn").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const id = btn.dataset.id;
+        const input = document.querySelector(`.reply-input[data-id='${id}']`);
+        const text = input.value.trim();
+        if(!text)return;
+        const ref = doc(db,"threads",id);
+        await updateDoc(ref,{replies:arrayUnion({userId:numericUserId,username,text,likes:[],dislikes:[]})});
+        input.value="";
+        loadThreads();
+      };
+    });
+  }
 
   await loadThreads();
+
+  document.getElementById("postThread").addEventListener("click", async ()=>{
+    const title = document.getElementById("threadTitle").value.trim();
+    const body = document.getElementById("threadBody").value.trim();
+    if(!title || !body) return alert("Enter title and body");
+    await addDoc(collection(db,"threads"),{ uid:user.uid, title, body, date:new Date().toLocaleString(), replies:[], pinned:false, likes:[], dislikes:[] });
+    document.getElementById("threadTitle").value="";
+    document.getElementById("threadBody").value="";
+    loadThreads();
+  });
 });
 </script>
 </body>
