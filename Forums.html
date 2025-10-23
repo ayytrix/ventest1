@@ -28,12 +28,229 @@ input, textarea { width:100%; padding:6px; margin-bottom:6px; font-size:13px; bo
 button { padding:6px 12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-right:5px; }
 .submit-btn { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); color:white; }
 .submit-btn:hover { background:linear-gradient(to bottom,#255da3 0%,#0d3268 100%); }
-.pin-btn { background:orange; color:white; margin-left:5px; }
 .delete-btn { background:red; color:white; margin-left:5px; }
 .reply-btn { background:#1a4a84; color:white; margin-top:4px; }
 .view-replies-btn { background:#555; color:white; margin-top:4px; margin-left:5px; }
-.like-btn, .dislike-btn { margin-left:5px; padding:4px 8px; font-size:11px; border-radius:3px; }
-.like-btn { background:green; color:white; }
+.like-btn, .dislike-btn { background:#ccc; color:black; margin-top:4px; margin-right:5px; }
+.replies-container { display:none; margin-top:6px; margin-left:12px; border-left:2px solid #aaa; padding-left:6px; }
+</style>
+</head>
+<body>
+
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+  <div class="auth-buttons" id="authButtons"></div>
+</div>
+
+<div id="sub-header">
+  <a href="Home.html">Home</a><span class="nav-separator">|</span>
+  <a href="Games.html">Games</a><span class="nav-separator">|</span>
+  <a href="Catalog.html">Catalog</a><span class="nav-separator">|</span>
+  <a href="Users.html">Users</a><span class="nav-separator">|</span>
+  <a href="Forums.html">Forum</a><span class="nav-separator">|</span>
+  <a href="Clans.html">Clans</a><span class="nav-separator">|</span>
+  <a href="Help.html">Help</a><span class="nav-separator">|</span>
+  <a href="Downloads.html">Downloads</a><span class="nav-separator">|</span>
+  <a href="Create.html">Create</a>
+</div>
+
+<div id="notice">Loading...</div>
+<div id="page-content"></div>
+<div id="footer">© 2025, Venux — All rights reserved</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const noticeBar = document.getElementById("notice");
+const authButtons = document.getElementById("authButtons");
+const pageContent = document.getElementById("page-content");
+
+let currentUser = null;
+
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : "Welcome to Venux Forums!")
+  .then(t => noticeBar.textContent = t)
+  .catch(() => noticeBar.textContent = "Welcome to Venux Forums!");
+
+onAuthStateChanged(auth, async (user) => {
+  if(!user){ window.location.href="Login.html"; return; }
+  currentUser = user;
+
+  const userSnap = await getDoc(doc(db,"users",user.uid));
+  const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
+
+  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{ await signOut(auth); window.location.href="Login.html"; });
+
+  pageContent.innerHTML = `
+    <h2>Forums</h2>
+    <div>
+      <input type="text" id="threadTitle" placeholder="Thread title">
+      <textarea id="threadBody" placeholder="Thread content"></textarea>
+      <button id="postThread" class="submit-btn">Post Thread</button>
+    </div>
+    <div id="threadsContainer"></div>
+  `;
+
+  const threadsContainer = document.getElementById("threadsContainer");
+
+  async function loadThreads(){
+    threadsContainer.innerHTML = "";
+    const threadsSnap = await getDocs(query(collection(db,"threads"), orderBy("date","desc")));
+    let threadsArray = [];
+    threadsSnap.forEach(docSnap => threadsArray.push({ id: docSnap.id, data: docSnap.data() }));
+
+    for(const tObj of threadsArray){
+      const tDocId = tObj.id;
+      const t = tObj.data;
+      const authorName = t.username || "User";
+      const likes = t.likes?.length || 0;
+      const dislikes = t.dislikes?.length || 0;
+      const userLiked = t.likes?.includes(currentUser.uid);
+      const userDisliked = t.dislikes?.includes(currentUser.uid);
+
+      let threadHTML = `
+      <div class="thread-box" id="thread-${tDocId}">
+        <div class="thread-title">${t.title}</div>
+        <div class="thread-meta">
+          <a class="username-link" style="color:black">${authorName}</a> - ${t.date}
+        </div>
+        <div class="thread-body">${t.body}</div>
+        <button class="like-btn" data-threadid="${tDocId}">👍 ${likes}</button>
+        <button class="dislike-btn" data-threadid="${tDocId}">👎 ${dislikes}</button>
+      `;
+
+      if(currentUser.uid === t.uid){
+        threadHTML += `<button class="delete-btn" data-threadid="${tDocId}">Delete</button>`;
+      }
+
+      const replyCount = t.replies?.length || 0;
+      threadHTML += `<button class="view-replies-btn" data-threadid="${tDocId}">View Replies (${replyCount})</button>
+        <div class="replies-container" id="replies-${tDocId}">`;
+
+      t.replies?.forEach(r=>{
+        threadHTML += `<div class="reply-box">
+          <a class="username-link" style="color:black">${r.username}</a>: ${r.text}
+        </div>`;
+      });
+
+      threadHTML += `<textarea placeholder="Reply..." data-threadid="${tDocId}" class="reply-input"></textarea>
+        <button class="reply-btn" data-threadid="${tDocId}">Reply</button></div></div>`;
+
+      threadsContainer.innerHTML += threadHTML;
+    }
+
+    // Likes/dislikes
+    document.querySelectorAll(".like-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const ref = doc(db,"threads",btn.dataset.threadid);
+        const tSnap = await getDoc(ref);
+        if(!tSnap.exists()) return;
+        const data = tSnap.data();
+        const likes = data.likes || [];
+        const dislikes = data.dislikes || [];
+        if(likes.includes(currentUser.uid)){
+          await updateDoc(ref, { likes: arrayRemove(currentUser.uid) });
+        } else {
+          await updateDoc(ref, { likes: arrayUnion(currentUser.uid), dislikes: arrayRemove(currentUser.uid) });
+        }
+        loadThreads();
+      });
+    });
+
+    document.querySelectorAll(".dislike-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const ref = doc(db,"threads",btn.dataset.threadid);
+        const tSnap = await getDoc(ref);
+        if(!tSnap.exists()) return;
+        const data = tSnap.data();
+        const likes = data.likes || [];
+        const dislikes = data.dislikes || [];
+        if(dislikes.includes(currentUser.uid)){
+          await updateDoc(ref, { dislikes: arrayRemove(currentUser.uid) });
+        } else {
+          await updateDoc(ref, { dislikes: arrayUnion(currentUser.uid), likes: arrayRemove(currentUser.uid) });
+        }
+        loadThreads();
+      });
+    });
+
+    // Delete
+    document.querySelectorAll(".delete-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        if(confirm("Delete this thread?")){
+          await deleteDoc(doc(db,"threads",btn.dataset.threadid));
+          loadThreads();
+        }
+      });
+    });
+
+    // Replies
+    document.querySelectorAll(".reply-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const threadId = btn.dataset.threadid;
+        const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
+        const text = input.value.trim();
+        if(!text) return;
+        await updateDoc(doc(db,"threads",threadId), {
+          replies: arrayUnion({ userId: currentUser.uid, username, text })
+        });
+        input.value="";
+        loadThreads();
+      });
+    });
+
+    // Toggle replies
+    document.querySelectorAll(".view-replies-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const container = document.getElementById(`replies-${btn.dataset.threadid}`);
+        container.style.display = container.style.display==="none"?"block":"none";
+      });
+    });
+  }
+
+  await loadThreads();
+
+  document.getElementById("postThread").addEventListener("click", async ()=>{
+    const title = document.getElementById("threadTitle").value.trim();
+    const body = document.getElementById("threadBody").value.trim();
+    if(!title || !body) return alert("Enter title and body");
+    await addDoc(collection(db,"threads"),{
+      uid:user.uid,
+      username: username,
+      title,
+      body,
+      date:new Date().toLocaleString(),
+      replies:[],
+      pinned:false,
+      likes:[],
+      dislikes:[]
+    });
+    document.getElementById("threadTitle").value="";
+    document.getElementById("threadBody").value="";
+    loadThreads();
+  });
+
+});
+</script>
+</body>
+</html>
 .dislike-btn { background:red; color:white; }
 .replies-container { display:none; margin-top:6px; margin-left:12px; border-left:2px solid #aaa; padding-left:6px; }
 </style>
