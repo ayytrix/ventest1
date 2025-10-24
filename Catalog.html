@@ -1,175 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Venux - Catalog</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #d4d4d4;
-      font-family: Arial, sans-serif;
-      font-size: 13px;
-      color: #222;
-    }
-
-   
-    #main-header {
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      padding: 10px 20px;
-      border-bottom: 2px solid #071b36;
-      display: flex;
-      align-items: center;
-    }
-
-    #main-header img {
-      height: 52px;
-      object-fit: contain;
-    }
-
-   
-    #sub-header {
-      background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-      padding: 8px 15px;
-      border-bottom: 1px solid #000000;
-    }
-
-    #sub-header a {
-      color: white;
-      text-decoration: none;
-      margin-right: 20px;
-      font-weight: bold;
-    }
-
-    #sub-header a:hover {
-      text-decoration: underline;
-    }
-
-    
-    #notice {
-      background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 2px solid #a85f00;
-    }
-
-    
-    #page-content {
-      padding: 20px;
-    }
-
-    h2 {
-      font-size: 15px;
-      margin-bottom: 15px;
-      color: #1a1a1a;
-      border-bottom: 1px solid #aaa;
-      padding-bottom: 5px;
-    }
-
-    .news-box {
-      background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
-      border: 2px solid #999;
-      padding: 12px;
-      margin-bottom: 15px;
-      width: 600px;
-      box-shadow: 2px 2px 0px #aaa;
-    }
-
-    .news-title {
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .news-date {
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 10px;
-    }
-
-    .news-body {
-      font-size: 13px;
-    }
-
-    /* Footer with Version */
-    #footer {
-      text-align: center;
-      font-size: 12px;
-      color: #444;
-      padding: 10px;
-      border-top: 2px solid #999;
-      background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
-      margin-top: 40px;
-    }
-
-  </style>
+<meta charset="UTF-8">
+<title>Venux - Catalog</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
+<style>
+  body { margin: 0; font-family: Arial, sans-serif; background-color: #f2f2f2; color: #222; }
+  #main-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 10px 20px; display: flex; align-items: center; border-bottom: 2px solid #071b36; }
+  #main-header img { height: 52px; }
+  #sub-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 8px 15px; border-bottom: 1px solid #000; }
+  #sub-header a { color: white; text-decoration: none; margin-right: 20px; font-weight: bold; }
+  #sub-header a:hover { text-decoration: underline; }
+  #notice { background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%); color: white; padding: 10px 20px; font-weight: bold; text-align: center; border-bottom: 2px solid #a85f00; }
+  #page-content { padding: 20px; }
+  .category { margin-bottom: 30px; }
+  .category h2 { border-bottom: 2px solid #999; padding-bottom: 5px; }
+  .items-container { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+  .item-card { width: 120px; background: #fff; border: 2px solid #999; border-radius: 6px; padding: 10px; text-align: center; box-shadow: 2px 2px 0px #aaa; cursor: pointer; transition: transform 0.2s; }
+  .item-card:hover { transform: translateY(-3px); box-shadow: 4px 4px 0px #888; }
+  .item-card img { width: 64px; height: 64px; image-rendering: pixelated; }
+  .item-card span { display: block; font-size: 12px; margin-top: 5px; font-weight: bold; }
+  #footer { text-align: center; font-size: 12px; color: #444; padding: 10px; border-top: 2px solid #999; background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%); margin-top: 40px; }
+</style>
 </head>
 <body>
 
-  
-  <div id="main-header">
-    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-  </div>
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+</div>
 
-  <div id="sub-header">
-    <a href="Home.html">Home</a>
-    <a href="Games.html">Games</a>
-    <a href="Catalog.html">Catalog</a>
-    <a href="unfinished.html">Users</a>
-    <a href="Forums.html">Forum</a>
-    <a href="Clans.html">Clans</a>
-    <a href="Help.html">Help</a>
-    <a href="Download.html">Downloads</a>
-    <a href="Create.html">Create</a>
-  </div>
+<div id="sub-header">
+  <a href="Home.html">Home</a>
+  <a href="Games.html">Games</a>
+  <a href="Catalog.html">Catalog</a>
+  <a href="Users.html">Users</a>
+  <a href="Forums.html">Forum</a>
+  <a href="Clans.html">Clans</a>
+  <a href="Help.html">Help</a>
+  <a href="Downloads.html">Downloads</a>
+  <a href="Create.html">Create</a>
+</div>
 
-  <!-- Notification -->
-<div id="notice">Loading...</div>
+<div id="notice">Loading catalog...</div>
 
-<script>
-  // The link to fetch text from
-  const textLink = "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc"; // replace with your actual URL
+<div id="page-content">
+  <!-- Categories will be injected here -->
+</div>
 
-  // Get the notice div
-  const notice = document.getElementById("notice");
+<div id="footer">© 2025, Venux — All rights reserved</div>
 
-  // Fetch the text from the link
-  fetch(textLink)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.text();
-    })
-    .then(data => {
-      // Set the text of the notice div
-      notice.textContent = data;
-    })
-    .catch(error => {
-      // Handle errors
-      notice.textContent = "Failed to load message.";
-      console.error("Error fetching message:", error);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const pageContent = document.getElementById("page-content");
+const notice = document.getElementById("notice");
+
+async function loadCatalog() {
+  try {
+    const categoriesSnapshot = await getDocs(collection(db, "catalog"));
+    const categories = [];
+    categoriesSnapshot.forEach(doc => {
+      categories.push({ id: doc.id, ...doc.data() });
     });
+
+    if (categories.length === 0) {
+      notice.textContent = "No items in catalog yet.";
+      return;
+    }
+
+    notice.textContent = "Browse items in the catalog";
+
+    categories.forEach(cat => {
+      const catDiv = document.createElement("div");
+      catDiv.className = "category";
+      catDiv.innerHTML = `<h2>${cat.name}</h2><div class="items-container" id="cat-${cat.id}"></div>`;
+      pageContent.appendChild(catDiv);
+
+      const container = catDiv.querySelector(".items-container");
+      if (cat.items && cat.items.length) {
+        cat.items.forEach(item => {
+          const itemCard = document.createElement("div");
+          itemCard.className = "item-card";
+          itemCard.innerHTML = `<img src="${item.img}" alt="${item.name}"><span>${item.name}</span>`;
+          container.appendChild(itemCard);
+        });
+      } else {
+        container.innerHTML = "<em>No items in this category yet.</em>";
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    notice.textContent = "Failed to load catalog.";
+  }
+}
+
+loadCatalog();
 </script>
-
-
-
-  <!-- Content -->
-  <div id="page-content">
-    <h2>Error!</h2>
-
-    <div class="Information">
-      <div class="Information-title">This page is a work in progress!</div>
-      </div>
-    </div>
-
-  <!-- Footer -->
-  <div id="footer">
-    © 2025, Venux All rights reserved
-  </div>
 
 </body>
 </html>
-
-
