@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>if youre reading this hi</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
+<style>
+  body { margin:0; font-family: Arial, sans-serif; background:#f2f2f2; color:#222; }
+  #main-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding:10px 20px; display:flex; align-items:center; border-bottom:2px solid #071b36; }
+  #main-header img { height:52px; }
+  #sub-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000; }
+  #sub-header a { color:white; text-decoration:none; margin-right:20px; font-weight:bold; }
+  #sub-header a:hover { text-decoration:underline; }
+  #notice { background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+  #page-content { padding:20px; }
+  .item-container { display:flex; gap:20px; flex-wrap:wrap; }
+  .item-image { max-width:300px; max-height:300px; object-fit:contain; }
+  .item-info { max-width:600px; }
+  .item-info h2 { font-size:24px; margin-bottom:10px; }
+  .item-info p { margin:5px 0; }
+  .item-info button { margin-top:10px; padding:10px 20px; background:#1a4a84; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:4px; }
+  .item-info button:hover { background:#255da3; }
+  .recommended { margin-top:40px; }
+  .recommended h3 { border-bottom:2px solid #999; padding-bottom:5px; }
+  .recommended-items { display:flex; flex-wrap:wrap; gap:15px; margin-top:10px; }
+  .recommended-card { width:120px; background:#fff; border:2px solid #999; border-radius:6px; padding:10px; text-align:center; box-shadow:2px 2px 0px #aaa; cursor:pointer; }
+  .recommended-card img { width:64px; height:64px; image-rendering:pixelated; }
+  .recommended-card span { display:block; font-size:12px; margin-top:5px; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+</div>
+
+<div id="sub-header">
+  <a href="Home.html">Home</a>
+  <a href="Games.html">Games</a>
+  <a href="Catalog.html">Catalog</a>
+  <a href="Users.html">Users</a>
+  <a href="Forums.html">Forum</a>
+</div>
+
+<div id="notice">Loading item...</div>
+
+<div id="page-content">
+  <div class="item-container">
+    <img id="itemImage" class="item-image" src="" alt="Item">
+    <div class="item-info">
+      <h2 id="itemName">Item Name</h2>
+      <p id="itemPrice">Price: </p>
+      <p id="itemDesc">Description: </p>
+      <button id="buyBtn">Buy</button>
+    </div>
+  </div>
+
+  <div class="recommended">
+    <h3>Recommended Items</h3>
+    <div class="recommended-items" id="recommended"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getFirestore, collection, doc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const params = new URLSearchParams(window.location.search);
+const itemId = params.get("id"); // get item id from URL
+
+const itemImage = document.getElementById("itemImage");
+const itemName = document.getElementById("itemName");
+const itemPrice = document.getElementById("itemPrice");
+const itemDesc = document.getElementById("itemDesc");
+const notice = document.getElementById("notice");
+const recommendedDiv = document.getElementById("recommended");
+const buyBtn = document.getElementById("buyBtn");
+
+async function loadItem() {
+  if (!itemId) {
+    notice.textContent = "No item selected.";
+    return;
+  }
+
+  try {
+    const itemRef = doc(db, "catalog", itemId);
+    const snap = await getDoc(itemRef);
+    if (!snap.exists()) {
+      notice.textContent = "Item not found.";
+      return;
+    }
+
+    const item = snap.data();
+    itemImage.src = item.image;
+    itemName.textContent = item.name;
+    itemPrice.textContent = `Price: ${item.price} Dosh`;
+    itemDesc.textContent = item.description;
+    notice.textContent = "";
+
+    buyBtn.onclick = async () => {
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return alert("Log in to buy this item.");
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        const userData = userSnap.data();
+        if ((userData.dosh || 0) < item.price) return alert("Not enough Dosh!");
+        const inventory = userData.inventory || { hats: [], shirts: [], pants: [], accessorys: [] };
+        const typeKey = item.type + "s";
+        inventory[typeKey].push(itemId);
+        await updateDoc(userRef, { dosh: userData.dosh - item.price, inventory });
+        alert(`You bought ${item.name}!`);
+      });
+    };
+
+    // Load recommended
+    const catalogSnap = await getDocs(collection(db, "catalog"));
+    catalogSnap.forEach(docSnap => {
+      const rec = docSnap.data();
+      if (docSnap.id !== itemId) {
+        const recCard = document.createElement("div");
+        recCard.className = "recommended-card";
+        recCard.innerHTML = `<img src="${rec.image}" alt="${rec.name}"><span>${rec.name}</span>`;
+        recCard.onclick = () => window.location.href = `item.html?id=${docSnap.id}`;
+        recommendedDiv.appendChild(recCard);
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    notice.textContent = "Failed to load item.";
+  }
+}
+
+loadItem();
+</script>
+
+</body>
+</html>
