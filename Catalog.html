@@ -5,45 +5,35 @@
 <title>Venux - Catalog</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
 <style>
-  body { margin: 0; font-family: Arial, sans-serif; background-color: #f2f2f2; color: #222; }
-  #main-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 10px 20px; display: flex; align-items: center; border-bottom: 2px solid #071b36; }
-  #main-header img { height: 52px; }
-  #sub-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 8px 15px; border-bottom: 1px solid #000; }
-  #sub-header a { color: white; text-decoration: none; margin-right: 20px; font-weight: bold; }
-  #sub-header a:hover { text-decoration: underline; }
-  #notice { background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%); color: white; padding: 10px 20px; font-weight: bold; text-align: center; border-bottom: 2px solid #a85f00; }
-  #page-content { padding: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: flex-start; }
-  .item-card { width: 120px; background: #fff; border: 2px solid #999; border-radius: 6px; padding: 10px; text-align: center; box-shadow: 2px 2px 0px #aaa; cursor: pointer; transition: transform 0.2s; }
-  .item-card:hover { transform: translateY(-3px); box-shadow: 4px 4px 0px #888; }
-  .item-card img { width: 64px; height: 64px; image-rendering: pixelated; }
-  .item-card span { display: block; font-size: 12px; margin-top: 5px; font-weight: bold; }
-  #footer { text-align: center; font-size: 12px; color: #444; padding: 10px; border-top: 2px solid #999; background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%); margin-top: 40px; }
+body { margin:0; font-family:Arial,sans-serif; background:#f2f2f2; color:#222;}
+#main-header, #sub-header { padding:10px 20px; background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);}
+#main-header img{height:52px;}
+#sub-header a{color:white;text-decoration:none;margin-right:20px;font-weight:bold;}
+#sub-header a:hover{text-decoration:underline;}
+#notice{background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);color:white;padding:10px 20px;font-weight:bold;text-align:center;}
+#page-content{padding:20px;}
+.category{margin-bottom:30px;}
+.category h2{border-bottom:2px solid #999;padding-bottom:5px;}
+.items-container{display:flex;flex-wrap:wrap;gap:15px;margin-top:10px;}
+.item-card{width:120px;background:#fff;border:2px solid #999;border-radius:6px;padding:10px;text-align:center;box-shadow:2px 2px 0px #aaa;cursor:pointer;transition:0.2s;}
+.item-card:hover{transform:translateY(-3px);box-shadow:4px 4px 0px #888;}
+.item-card img{width:64px;height:64px;image-rendering:pixelated;}
+.item-card span{display:block;font-size:12px;margin-top:5px;font-weight:bold;}
+#footer{text-align:center;font-size:12px;color:#444;padding:10px;border-top:2px solid #999;background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);margin-top:40px;}
 </style>
 </head>
 <body>
 
-<div id="main-header">
-  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-</div>
-
+<div id="main-header"><img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux"></div>
 <div id="sub-header">
-  <a href="Home.html">Home</a>
-  <a href="Games.html">Games</a>
-  <a href="Catalog.html">Catalog</a>
-  <a href="Users.html">Users</a>
-  <a href="Forums.html">Forum</a>
-  <a href="Clans.html">Clans</a>
-  <a href="Help.html">Help</a>
-  <a href="Downloads.html">Downloads</a>
-  <a href="Create.html">Create</a>
+<a href="Home.html">Home</a>
+<a href="Games.html">Games</a>
+<a href="Catalog.html">Catalog</a>
+<a href="Users.html">Users</a>
+<a href="Forums.html">Forum</a>
 </div>
-
 <div id="notice">Loading catalog...</div>
-
-<div id="page-content">
-  <!-- Items will be injected here -->
-</div>
-
+<div id="page-content"></div>
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script type="module">
@@ -51,53 +41,35 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebas
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
-  authDomain: "venux1.firebaseapp.com",
-  projectId: "venux1",
-  storageBucket: "venux1.appspot.com",
-  messagingSenderId: "231055963335",
-  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2"
+apiKey:"AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+authDomain:"venux1.firebaseapp.com",
+projectId:"venux1",
+storageBucket:"venux1.appspot.com",
+messagingSenderId:"231055963335",
+appId:"1:231055963335:web:34c2f52fca2191b3d0bae2"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 const pageContent = document.getElementById("page-content");
 const notice = document.getElementById("notice");
 
-async function loadCatalog() {
-  try {
-    const snapshot = await getDocs(collection(db, "catalog"));
-    if (snapshot.empty) {
-      notice.textContent = "No items in catalog yet.";
-      return;
-    }
-
-    notice.textContent = "Browse items in the catalog";
-
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-
-      const itemCard = document.createElement("div");
-      itemCard.className = "item-card";
-      itemCard.innerHTML = `
-        <img src="${data.image || 'https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux-default-avatar.png'}" alt="${data.name || 'Unknown'}">
-        <span>${data.name || 'Unknown'}</span>
-        <span>${data.price || 0} dosh</span>
-      `;
-      itemCard.addEventListener("click", () => {
-        // redirect to item view page with doc id
-        window.location.href = `item.html?id=${docSnap.id}`;
-      });
-      pageContent.appendChild(itemCard);
+async function loadCatalog(){
+  try{
+    const snapshot = await getDocs(collection(db,"catalog"));
+    if(snapshot.empty){ notice.textContent="No items in catalog yet."; return; }
+    notice.textContent="Browse items in the catalog";
+    snapshot.forEach(doc=>{
+      const data = doc.data();
+      const card = document.createElement("div");
+      card.className="item-card";
+      card.innerHTML=`<img src="${data.image}" alt="${data.name}"><span>${data.name}</span>`;
+      card.onclick=()=>window.location.href=`item.html?id=${doc.id}`;
+      pageContent.appendChild(card);
     });
-  } catch (err) {
-    console.error(err);
-    notice.textContent = "Failed to load catalog.";
-  }
+  }catch(err){console.error(err); notice.textContent="Failed to load catalog.";}
 }
-
 loadCatalog();
 </script>
-
 </body>
 </html>
