@@ -50,7 +50,7 @@
       <h2 id="itemName">Item Name</h2>
       <p id="itemPrice">Price: 0 dosh</p>
       <p id="itemDesc">Description</p>
-      <button class="buy-btn" id="buyBtn">Buy</button>
+      <button class="buy-btn" id="buyBtn" disabled>Buy</button>
     </div>
   </div>
 
@@ -64,7 +64,8 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -77,6 +78,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 const notice = document.getElementById("notice");
 const itemImage = document.getElementById("itemImage");
@@ -90,7 +92,13 @@ function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-async function loadItem() {
+// Load dynamic notice
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : "Welcome to Venux!")
+  .then(data => notice.textContent = data)
+  .catch(() => notice.textContent = "Welcome to Venux!");
+
+async function loadItem(user) {
   const itemId = getQueryParam("id");
   if (!itemId) {
     notice.textContent = "No item specified!";
@@ -111,9 +119,30 @@ async function loadItem() {
     itemDesc.textContent = data.description || "No description available";
     itemImage.src = data.image || "";
 
-    notice.textContent = "Enjoy browsing this item!";
+    // Enable Buy button if logged in
+    if (user) buyBtn.disabled = false;
 
-    // Load recommended items
+    // Buy item
+    buyBtn.onclick = async () => {
+      if (!user) return alert("You must be logged in to buy!");
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) return alert("User not found!");
+
+      const inv = userSnap.data().inventory || { hats: [], shirts: [], pants: [], accessorys: [] };
+      const typeKey = data.type + "s"; // e.g., hat -> hats
+      if (!inv[typeKey]) inv[typeKey] = [];
+
+      if (!inv[typeKey].includes(itemId)) {
+        inv[typeKey].push(itemId);
+        await updateDoc(userRef, { inventory: inv });
+        alert(`${data.name} added to your inventory!`);
+      } else {
+        alert("You already own this item.");
+      }
+    };
+
+    // Recommended items
     const catSnapshot = await getDocs(collection(db, "catalogItems"));
     catSnapshot.forEach(docSnap => {
       const rec = docSnap.data();
@@ -134,11 +163,9 @@ async function loadItem() {
   }
 }
 
-buyBtn.addEventListener("click", () => {
-  alert("Buying not implemented yet!");
+onAuthStateChanged(auth, (user) => {
+  loadItem(user);
 });
-
-loadItem();
 </script>
 </body>
 </html>
