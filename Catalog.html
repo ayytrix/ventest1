@@ -41,9 +41,11 @@
   <a href="Create.html">Create</a>
 </div>
 
-<div id="notice">Loading...</div>
+<div id="notice">Loading catalog...</div>
 
-<div id="page-content"></div>
+<div id="page-content">
+  <!-- Categories will be injected here -->
+</div>
 
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
@@ -51,7 +53,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
   authDomain: "venux1.firebaseapp.com",
@@ -63,53 +64,45 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const pageContent = document.getElementById("page-content");
 const notice = document.getElementById("notice");
 
-// Load dynamic notice
-fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r => r.ok ? r.text() : "Welcome to Venux!")
-  .then(data => notice.textContent = data)
-  .catch(() => notice.textContent = "Welcome to Venux!");
-
 async function loadCatalog() {
   try {
-    const snapshot = await getDocs(collection(db, "catalog"));
-    if (snapshot.empty) {
+    const categoriesSnapshot = await getDocs(collection(db, "catalog"));
+    const categories = [];
+    categoriesSnapshot.forEach(doc => categories.push({ id: doc.id, ...doc.data() }));
+
+    if (categories.length === 0) {
       notice.textContent = "No items in catalog yet.";
       return;
     }
 
-    // Group items by type
-    const grouped = {};
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (!grouped[data.type]) grouped[data.type] = [];
-      grouped[data.type].push({ id: doc.id, ...data });
-    });
-
     notice.textContent = "Browse items in the catalog";
 
-    // Render each category
-    for (const type in grouped) {
+    categories.forEach(cat => {
       const catDiv = document.createElement("div");
       catDiv.className = "category";
-      catDiv.innerHTML = `<h2>${type.charAt(0).toUpperCase() + type.slice(1)}s</h2><div class="items-container" id="cat-${type}"></div>`;
+      catDiv.innerHTML = `<h2>${cat.name || "Unnamed Category"}</h2><div class="items-container" id="cat-${cat.id}"></div>`;
       pageContent.appendChild(catDiv);
 
       const container = catDiv.querySelector(".items-container");
-      grouped[type].forEach(item => {
-        const itemCard = document.createElement("div");
-        itemCard.className = "item-card";
-        itemCard.innerHTML = `
-          <img src="${item.image}" alt="${item.name}">
-          <span>${item.name}</span>
-          <span>${item.price} Dosh</span>
-        `;
-        container.appendChild(itemCard);
-      });
-    }
+      if (cat.items && cat.items.length) {
+        cat.items.forEach(item => {
+          if (!item.name) item.name = "Unnamed Item"; // fix undefined
+          const itemCard = document.createElement("div");
+          itemCard.className = "item-card";
+          itemCard.innerHTML = `<img src="${item.image}" alt="${item.name}"><span>${item.name}</span>`;
+          // Redirect to item page
+          itemCard.onclick = () => {
+            window.location.href = `item.html?id=${item.id}`;
+          };
+          container.appendChild(itemCard);
+        });
+      } else {
+        container.innerHTML = "<em>No items in this category yet.</em>";
+      }
+    });
 
   } catch (err) {
     console.error(err);
