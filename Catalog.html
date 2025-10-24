@@ -35,10 +35,10 @@
   <a href="Catalog.html">Catalog</a>
   <a href="Users.html">Users</a>
   <a href="Forums.html">Forum</a>
-  <a href="Clans">Clans</a>
-  <a href="Help">Help</a>
-  <a href="Downloads">Downloads</a>
-  <a href="Create">Create</a>
+  <a href="Clans.html">Clans</a>
+  <a href="Help.html">Help</a>
+  <a href="Downloads.html">Downloads</a>
+  <a href="Create.html">Create</a>
 </div>
 
 <div id="notice">Loading catalog...</div>
@@ -51,7 +51,8 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -64,16 +65,26 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 const pageContent = document.getElementById("page-content");
 const notice = document.getElementById("notice");
+
+let currentUserUid = null;
+
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "Login.html";
+    return;
+  }
+  currentUserUid = user.uid;
+  loadCatalog();
+});
 
 async function loadCatalog() {
   try {
     const categoriesSnapshot = await getDocs(collection(db, "catalog"));
     const categories = [];
-    categoriesSnapshot.forEach(doc => {
-      categories.push({ id: doc.id, ...doc.data() });
-    });
+    categoriesSnapshot.forEach(doc => categories.push({ id: doc.id, ...doc.data() }));
 
     if (categories.length === 0) {
       notice.textContent = "No items in catalog yet.";
@@ -94,6 +105,20 @@ async function loadCatalog() {
           const itemCard = document.createElement("div");
           itemCard.className = "item-card";
           itemCard.innerHTML = `<img src="${item.img}" alt="${item.name}"><span>${item.name}</span>`;
+          itemCard.addEventListener("click", async () => {
+            if (!currentUserUid) return;
+            try {
+              // Add item to inventory in Firestore
+              const userRef = doc(db, "users", currentUserUid);
+              await updateDoc(userRef, {
+                [`inventory.${item.type}`]: arrayUnion(item.id)
+              });
+              alert(`${item.name} added to your inventory!`);
+            } catch (err) {
+              console.error(err);
+              alert("Failed to add item to inventory.");
+            }
+          });
           container.appendChild(itemCard);
         });
       } else {
@@ -106,8 +131,6 @@ async function loadCatalog() {
     notice.textContent = "Failed to load catalog.";
   }
 }
-
-loadCatalog();
 </script>
 
 </body>
