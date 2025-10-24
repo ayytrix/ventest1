@@ -122,7 +122,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -142,13 +142,12 @@
     const pantsDiv = document.getElementById("pants");
     const avatarImage = document.getElementById("avatarImage");
 
-    // test item list (you’ll replace these with real ones later)
     const items = {
-      hats: [
+      hat: [
         { id: "classicCap", name: "Classic Cap", img: "https://static.wikia.nocookie.net/roblox/images/d/d4/ClassicCap.png" },
-        { id: "noHat", name: "No Hat", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Transparent.png/1200px-Transparent.png" }
+        { id: "noHat", name: "No Hat", img: "https://upload.wikimedia.org/wikipedia/commons/2/27/Transparent.png" }
       ],
-      shirts: [
+      shirt: [
         { id: "blueShirt", name: "Blue Shirt", img: "https://static.wikia.nocookie.net/roblox/images/9/9a/ClassicBlueShirt.png" },
         { id: "redShirt", name: "Red Shirt", img: "https://static.wikia.nocookie.net/roblox/images/0/0f/ClassicRedShirt.png" }
       ],
@@ -159,42 +158,37 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "Login.html";
-        return;
-      }
+      if (!user) { window.location.href = "Login.html"; return; }
 
-      const avatarRef = doc(db, "users", user.uid, "avatar", "equipped");
-      let equipped = { hat: null, shirt: null, pants: null };
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+      if (!snap.exists()) { alert("User not found!"); return; }
 
-      const snap = await getDoc(avatarRef);
-      if (snap.exists()) equipped = snap.data();
+      const equipped = snap.data().avatar || { hat: null, shirt: null, pants: null };
 
-      function renderItems(section, type) {
-        section.innerHTML = "";
+      function renderItems(sectionDiv, type) {
+        sectionDiv.innerHTML = "";
         items[type].forEach(item => {
           const div = document.createElement("div");
           div.className = "item" + (equipped[type] === item.id ? " equipped" : "");
           div.innerHTML = `<img src="${item.img}" alt="${item.name}"><span>${item.name}</span>`;
           div.addEventListener("click", async () => {
-            equipped[type] = equipped[type] === item.id ? null : item.id;
-            await setDoc(avatarRef, equipped);
+            equipped[type] = (equipped[type] === item.id) ? null : item.id;
+            await updateDoc(userRef, { avatar: equipped });
             renderAll();
           });
-          section.appendChild(div);
+          sectionDiv.appendChild(div);
         });
       }
 
-      async function renderAll() {
+      function renderAll() {
         renderItems(hatsDiv, "hat");
         renderItems(shirtsDiv, "shirt");
         renderItems(pantsDiv, "pants");
-        // basic fake "render"
-        const parts = [];
-        if (equipped.shirt) parts.push(items.shirts.find(s => s.id === equipped.shirt)?.img);
-        if (equipped.pants) parts.push(items.pants.find(p => p.id === equipped.pants)?.img);
-        if (equipped.hat) parts.push(items.hats.find(h => h.id === equipped.hat)?.img);
-        avatarImage.src = parts[0] || "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux-default-avatar.png";
+        // Simple avatar render (just use last equipped item's img as placeholder)
+        const currentImg = items.hat.concat(items.shirt, items.pants)
+          .find(i => equipped[i.id.split(/(?=[A-Z])/)[0]] === i.id)?.img;
+        avatarImage.src = currentImg || "https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux-default-avatar.png";
       }
 
       renderAll();
