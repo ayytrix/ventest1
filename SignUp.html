@@ -5,156 +5,29 @@
 <title>Venux - Sign Up</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
 <style>
-  body {
-    margin: 0;
-    background-color: #d4d4d4;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    color: #222;
-  }
-
-  #main-header {
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    padding: 10px 20px;
-    border-bottom: 2px solid #071b36;
-    display: flex;
-    align-items: center;
-  }
-  #main-header img {
-    height: 52px;
-    object-fit: contain;
-  }
-
-  #sub-header {
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    padding: 8px 15px;
-    border-bottom: 1px solid #000;
-  }
-  #sub-header a {
-    color: white;
-    text-decoration: none;
-    margin-right: 20px;
-    font-weight: bold;
-  }
-  #sub-header a:hover {
-    text-decoration: underline;
-  }
-
-  #notice {
-    background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
-    color: white;
-    padding: 10px 20px;
-    font-weight: bold;
-    text-align: center;
-    border-bottom: 2px solid #a85f00;
-  }
-
-  #page-content {
-    padding: 40px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .signup-box {
-    background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%);
-    border: 2px solid #999;
-    box-shadow: 2px 2px 0px #aaa;
-    padding: 25px 35px;
-    width: 420px;
-    border-radius: 6px;
-  }
-
-  .signup-box h2 {
-    text-align: center;
-    font-size: 16px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #aaa;
-    padding-bottom: 8px;
-  }
-
-  .signup-box label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-
-  .signup-box input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #999;
-    border-radius: 3px;
-    font-size: 13px;
-  }
-
-  .signup-box button {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-
-  .signup-box button:hover {
-    background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%);
-  }
-
-  .signup-box button:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-  }
-
-  .error-message {
-    color: red;
-    font-size: 12px;
-    margin-top: -5px;
-    margin-bottom: 10px;
-    display: none;
-  }
-
-  .success-message {
-    color: green;
-    font-size: 12px;
-    margin-top: -5px;
-    margin-bottom: 10px;
-    display: none;
-  }
-
-  .signup-links {
-    text-align: center;
-    margin-top: 15px;
-  }
-
-  .signup-links a {
-    color: #0b2c5a;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .signup-links a:hover {
-    text-decoration: underline;
-  }
-
-  #footer {
-    text-align: center;
-    font-size: 12px;
-    color: #444;
-    padding: 10px;
-    border-top: 2px solid #999;
-    background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
-    margin-top: 40px;
-  }
-
-  .turnstile-wrapper {
-    text-align: center;
-    margin: 15px 0;
-  }
+  body { margin: 0; background-color: #d4d4d4; font-family: Arial, sans-serif; font-size: 13px; color: #222; }
+  #main-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 10px 20px; border-bottom: 2px solid #071b36; display: flex; align-items: center; }
+  #main-header img { height: 52px; object-fit: contain; }
+  #sub-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 8px 15px; border-bottom: 1px solid #000; }
+  #sub-header a { color: white; text-decoration: none; margin-right: 20px; font-weight: bold; }
+  #sub-header a:hover { text-decoration: underline; }
+  #notice { background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%); color: white; padding: 10px 20px; font-weight: bold; text-align: center; border-bottom: 2px solid #a85f00; }
+  #page-content { padding: 40px; display: flex; justify-content: center; }
+  .signup-box { background: linear-gradient(to bottom, #ffffff 0%, #e2e2e2 100%); border: 2px solid #999; box-shadow: 2px 2px 0px #aaa; padding: 25px 35px; width: 420px; border-radius: 6px; }
+  .signup-box h2 { text-align: center; font-size: 16px; margin-bottom: 20px; border-bottom: 1px solid #aaa; padding-bottom: 8px; }
+  .signup-box label { display: block; font-weight: bold; margin-bottom: 5px; }
+  .signup-box input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #999; border-radius: 3px; font-size: 13px; }
+  .signup-box button { width: 100%; padding: 10px; background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+  .signup-box button:hover { background: linear-gradient(to bottom, #255da3 0%, #0d3268 100%); }
+  .signup-box button:disabled { background: #cccccc; cursor: not-allowed; }
+  .error-message { color: red; font-size: 12px; margin-top: -5px; margin-bottom: 10px; display: none; }
+  .success-message { color: green; font-size: 12px; margin-top: -5px; margin-bottom: 10px; display: none; }
+  .signup-links { text-align: center; margin-top: 15px; }
+  .signup-links a { color: #0b2c5a; text-decoration: none; font-weight: bold; }
+  .signup-links a:hover { text-decoration: underline; }
+  #footer { text-align: center; font-size: 12px; color: #444; padding: 10px; border-top: 2px solid #999; background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%); margin-top: 40px; }
+  .turnstile-wrapper { text-align: center; margin: 15px 0; }
 </style>
-
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
@@ -247,13 +120,13 @@ const signupBtn = document.getElementById("signupBtn");
 let isUsernameValid = false;
 let isPasswordValid = false;
 
-// Load site notice
+// Load notice
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : "Welcome to Venux!")
   .then(data => document.getElementById("notice").textContent = data)
   .catch(() => document.getElementById("notice").textContent = "Welcome to Venux!");
 
-// Password validation
+// Password check
 function checkPasswords() {
   if (passwordInput.value.length < 6) {
     passwordSuccess.style.display = "none";
@@ -346,27 +219,55 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
 
     const userCredential = await createUserWithEmailAndPassword(auth, uniqueEmail, password);
     const user = userCredential.user;
-
     const userId = await getNextUserId();
 
+    // Full default user structure
     await setDoc(doc(db, "users", user.uid), {
       username,
       authEmail: uniqueEmail,
       email: email || null,
       createdAt: new Date().toISOString(),
       userId,
-      badges: [],
-      friends: [],
-      friendRequests: [],
-      sentRequests: [],
       description: "",
       themeColor: "#dc4105",
-      avatar: "default.png",
       status: "offline",
       online: false,
       lastActive: new Date().toISOString(),
       lastOnline: new Date().toISOString(),
-      warnings: []
+      warnings: [],
+      badges: [],
+      friends: [],
+      friendRequests: [],
+      sentRequests: [],
+      inventory: {
+        hats: [],
+        shirts: [],
+        pants: [],
+        faces: [],
+        gear: []
+      },
+      avatar: {
+        equipped: {
+          hat: null,
+          shirt: null,
+          pants: null,
+          face: null,
+          gear: null
+        },
+        owned: {
+          hats: [],
+          shirts: [],
+          pants: [],
+          faces: [],
+          gear: []
+        }
+      },
+      settings: {
+        isModerator: false,
+        isAdmin: false,
+        acceptFriendRequests: true,
+        showOnlineStatus: true
+      }
     });
 
     window.location.href = "Home.html";
