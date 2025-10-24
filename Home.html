@@ -15,7 +15,6 @@
     overflow-x: hidden;
   }
 
-  /* spiderweb corners */
   body::before, body::after {
     content: '';
     position: fixed;
@@ -118,6 +117,45 @@
     50% { transform: translateY(-8px); }
   }
 
+  .profile-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  .profile-info img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
+
+  .friend-requests-btn {
+    padding: 6px 12px;
+    background: linear-gradient(to bottom, #ff6600, #cc5200);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .friend-requests-btn:hover {
+    background: linear-gradient(to bottom, #ff7b00, #e65c00);
+  }
+
+  #news-section {
+    margin-top: 20px;
+    text-align: left;
+    background: rgba(255, 102, 0, 0.2);
+    border: 2px solid orange;
+    border-radius: 8px;
+    padding: 15px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   footer {
     margin-top: 40px;
     padding: 15px;
@@ -127,27 +165,13 @@
     color: #ccc;
   }
 
-  .auth-buttons button {
-    padding: 6px 12px;
-    background: linear-gradient(to bottom, #ff6600, #cc5200);
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .auth-buttons button:hover {
-    background: linear-gradient(to bottom, #ff7b00, #e65c00);
-  }
-
 </style>
 </head>
 <body>
   <div id="main-header">
     <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux Logo">
-    <div class="auth-buttons">
-      <button onclick="window.location.href='Login.html'">Login</button>
-      <button onclick="window.location.href='Signup.html'">Sign Up</button>
+    <div class="profile-info" id="profileInfo">
+      <!-- Profile info injected via JS -->
     </div>
   </div>
 
@@ -163,17 +187,102 @@
     <a href="Create.html">Create</a>
   </div>
 
-  <div id="notice">Error loading..</div>
+  <div id="notice">Loading...</div>
+
+  <div id="news-section">
+    <h3>News</h3>
+    <ul id="news-list">
+      <!-- News items will be injected here -->
+    </ul>
+  </div>
 
   <div id="page-content">
     <div class="halloween-banner">Happy Halloween Venux users! Limited-time items in the Catalog!</div>
-<img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/pumpkin.png" class="pumpkin" alt="Pumpkin">
-<img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/pumpkin.png" class="pumpkin" alt="Pumpkin">
-<img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/pumpkin.png" class="pumpkin" alt="Pumpkin">
+    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/pumpkin.png" class="pumpkin" alt="Pumpkin">
+    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/pumpkin.png" class="pumpkin" alt="Pumpkin">
+    <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/pumpkin.png" class="pumpkin" alt="Pumpkin">
     <h2>Welcome to Venux!</h2>
     <p>Join the Halloween fun!</p>
   </div>
 
   <footer>© 2025, Venux — All rights reserved</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const noticeBar = document.getElementById("notice");
+const profileDiv = document.getElementById("profileInfo");
+const newsList = document.getElementById("news-list");
+
+async function loadNews() {
+  try {
+    const newsRef = collection(db, "news");
+    const snapshot = await getDocs(newsRef);
+    newsList.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const news = docSnap.data();
+      const li = document.createElement("li");
+      li.textContent = news.title || "Untitled news";
+      newsList.appendChild(li);
+    });
+  } catch {
+    newsList.innerHTML = "<li>Unable to load news</li>";
+  }
+}
+
+async function loadNotice(userId) {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    noticeBar.textContent = userSnap.exists() && userSnap.data().notice ? userSnap.data().notice : "Welcome to Venux!";
+  } catch {
+    noticeBar.textContent = "Welcome to Venux!";
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "Login.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) {
+    window.location.href = "Login.html";
+    return;
+  }
+
+  const userData = userSnap.data();
+
+  profileDiv.innerHTML = `
+    <img src="${userData.avatar || 'https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/default-avatar.png'}" alt="Avatar">
+    <span>Welcome, ${userData.username}</span>
+    <button class="friend-requests-btn" onclick="window.location.href='friendRequests.html'">Friend Requests</button>
+  `;
+
+  // Set dynamic notice
+  loadNotice(user.uid);
+
+  // Load news
+  loadNews();
+});
+</script>
 </body>
 </html>
