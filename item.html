@@ -5,167 +5,98 @@
 <title>Venux - Item</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
 <style>
-  body { margin: 0; font-family: Arial, sans-serif; background-color: #f2f2f2; color: #222; }
-  #main-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 10px 20px; display: flex; align-items: center; border-bottom: 2px solid #071b36; }
-  #main-header img { height: 52px; }
-  #sub-header { background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%); padding: 8px 15px; border-bottom: 1px solid #000; }
-  #sub-header a { color: white; text-decoration: none; margin-right: 20px; font-weight: bold; }
-  #sub-header a:hover { text-decoration: underline; }
-  #notice { background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%); color: white; padding: 10px 20px; font-weight: bold; text-align: center; border-bottom: 2px solid #a85f00; }
-  #page-content { padding: 20px; max-width: 900px; margin: auto; }
-  .item-container { display: flex; gap: 20px; margin-bottom: 20px; }
-  .item-image { width: 300px; height: 300px; object-fit: contain; border: 2px solid #999; }
-  .item-details { flex: 1; }
-  .item-details h2 { margin-top: 0; }
-  .item-details p { margin: 5px 0; }
-  .buy-btn { padding: 10px 20px; background: #1a4a84; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; }
-  .buy-btn:hover { background: #255da3; }
-  .recommended { margin-top: 40px; }
-  .recommended h3 { margin-bottom: 10px; }
-  .recommended-items { display: flex; flex-wrap: wrap; gap: 15px; }
-  .recommended-item { width: 120px; text-align: center; cursor: pointer; border: 2px solid #999; border-radius: 6px; padding: 10px; background: #fff; }
-  .recommended-item img { width: 64px; height: 64px; image-rendering: pixelated; }
+body{margin:0;font-family:Arial,sans-serif;background:#f2f2f2;color:#222;}
+#main-header,#sub-header{padding:10px 20px;background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);}
+#main-header img{height:52px;}
+#sub-header a{color:white;text-decoration:none;margin-right:20px;font-weight:bold;}
+#sub-header a:hover{text-decoration:underline;}
+#notice{background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);color:white;padding:10px 20px;font-weight:bold;text-align:center;}
+#page-content{padding:20px;}
+.item-view{display:flex;gap:20px;margin-top:20px;}
+.item-view img{width:128px;height:128px;image-rendering:pixelated;}
+.item-info h2{margin:0;}
+.item-info p{margin:5px 0;}
+button{padding:10px 15px;background:#1a4a84;color:white;border:none;border-radius:4px;font-weight:bold;cursor:pointer;}
+button:hover{background:#255da3;}
+#footer{text-align:center;font-size:12px;color:#444;padding:10px;border-top:2px solid #999;background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);margin-top:40px;}
 </style>
 </head>
 <body>
 
-<div id="main-header">
-  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
-</div>
-
+<div id="main-header"><img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux"></div>
 <div id="sub-header">
-  <a href="Home.html">Home</a>
-  <a href="Games.html">Games</a>
-  <a href="Catalog.html">Catalog</a>
-  <a href="Users.html">Users</a>
-  <a href="Forums.html">Forum</a>
+<a href="Home.html">Home</a>
+<a href="Games.html">Games</a>
+<a href="Catalog.html">Catalog</a>
+<a href="Users.html">Users</a>
+<a href="Forums.html">Forum</a>
 </div>
-
 <div id="notice">Loading...</div>
-
-<div id="page-content">
-  <div class="item-container">
-    <img id="itemImage" class="item-image" src="" alt="Item Image">
-    <div class="item-details">
-      <h2 id="itemName">Item Name</h2>
-      <p id="itemPrice">Price: 0 dosh</p>
-      <p id="itemDesc">Description</p>
-      <button class="buy-btn" id="buyBtn" disabled>Buy</button>
-    </div>
-  </div>
-
-  <div class="recommended">
-    <h3>Recommended Items</h3>
-    <div class="recommended-items" id="recommendedItems"></div>
-  </div>
-</div>
-
+<div id="page-content"></div>
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
-  authDomain: "venux1.firebaseapp.com",
-  projectId: "venux1",
-  storageBucket: "venux1.appspot.com",
-  messagingSenderId: "231055963335",
-  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2"
+apiKey:"AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+authDomain:"venux1.firebaseapp.com",
+projectId:"venux1",
+storageBucket:"venux1.appspot.com",
+messagingSenderId:"231055963335",
+appId:"1:231055963335:web:34c2f52fca2191b3d0bae2"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+const urlParams = new URLSearchParams(window.location.search);
+const itemId = urlParams.get("id");
 const notice = document.getElementById("notice");
-const itemImage = document.getElementById("itemImage");
-const itemName = document.getElementById("itemName");
-const itemPrice = document.getElementById("itemPrice");
-const itemDesc = document.getElementById("itemDesc");
-const buyBtn = document.getElementById("buyBtn");
-const recommendedContainer = document.getElementById("recommendedItems");
+const pageContent = document.getElementById("page-content");
 
-function getQueryParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
-}
+async function loadItem(){
+  try{
+    const itemSnap = await getDoc(doc(db,"catalog",itemId));
+    if(!itemSnap.exists()){ notice.textContent="Item not found"; return; }
+    const item = itemSnap.data();
+    notice.textContent="";
 
-// Load dynamic notice
-fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r => r.ok ? r.text() : "Welcome to Venux!")
-  .then(data => notice.textContent = data)
-  .catch(() => notice.textContent = "Welcome to Venux!");
+    pageContent.innerHTML=`
+      <div class="item-view">
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-info">
+          <h2>${item.name}</h2>
+          <p><b>Price:</b> ${item.price} dosh</p>
+          <p>${item.description}</p>
+          <button id="buyBtn">Buy</button>
+        </div>
+      </div>
+    `;
 
-async function loadItem(user) {
-  const itemId = getQueryParam("id");
-  if (!itemId) {
-    notice.textContent = "No item specified!";
-    return;
-  }
-
-  try {
-    const itemRef = doc(db, "catalogItems", itemId);
-    const snap = await getDoc(itemRef);
-    if (!snap.exists()) {
-      notice.textContent = "Item not found!";
-      return;
-    }
-
-    const data = snap.data();
-    itemName.textContent = data.name || "Unnamed Item";
-    itemPrice.textContent = `Price: ${data.price || 0} dosh`;
-    itemDesc.textContent = data.description || "No description available";
-    itemImage.src = data.image || "";
-
-    // Enable Buy button if logged in
-    if (user) buyBtn.disabled = false;
-
-    // Buy item
-    buyBtn.onclick = async () => {
-      if (!user) return alert("You must be logged in to buy!");
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) return alert("User not found!");
-
-      const inv = userSnap.data().inventory || { hats: [], shirts: [], pants: [], accessorys: [] };
-      const typeKey = data.type + "s"; // e.g., hat -> hats
-      if (!inv[typeKey]) inv[typeKey] = [];
-
-      if (!inv[typeKey].includes(itemId)) {
-        inv[typeKey].push(itemId);
-        await updateDoc(userRef, { inventory: inv });
-        alert(`${data.name} added to your inventory!`);
-      } else {
-        alert("You already own this item.");
-      }
-    };
-
-    // Recommended items
-    const catSnapshot = await getDocs(collection(db, "catalogItems"));
-    catSnapshot.forEach(docSnap => {
-      const rec = docSnap.data();
-      if (docSnap.id !== itemId) {
-        const div = document.createElement("div");
-        div.className = "recommended-item";
-        div.innerHTML = `<img src="${rec.image}" alt="${rec.name}"><span>${rec.name}</span>`;
-        div.addEventListener("click", () => {
-          window.location.href = `item.html?id=${docSnap.id}`;
-        });
-        recommendedContainer.appendChild(div);
-      }
+    const buyBtn = document.getElementById("buyBtn");
+    onAuthStateChanged(auth, async user=>{
+      if(!user){ buyBtn.disabled=true; buyBtn.textContent="Log in to buy"; return; }
+      buyBtn.addEventListener("click", async ()=>{
+        const userRef = doc(db,"users",user.uid);
+        const userDoc = await getDoc(userRef);
+        if(!userDoc.exists()) return alert("User not found");
+        const inventory = userDoc.data().inventory;
+        const typeMap = { hat:"hats", shirt:"shirts", pants:"pants", accessory:"accessorys" };
+        const typeKey = typeMap[item.type];
+        if(!inventory[typeKey]) inventory[typeKey] = [];
+        if(inventory[typeKey].includes(itemId)) return alert("Already owned!");
+        inventory[typeKey].push(itemId);
+        await updateDoc(userRef,{inventory});
+        alert("Item purchased!");
+      });
     });
 
-  } catch (err) {
-    console.error(err);
-    notice.textContent = "Error loading item.";
-  }
+  }catch(err){console.error(err); notice.textContent="Failed to load item";}
 }
-
-onAuthStateChanged(auth, (user) => {
-  loadItem(user);
-});
+loadItem();
 </script>
 </body>
 </html>
