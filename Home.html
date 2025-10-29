@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Venux - Home</title>
+
+<!-- ✅ Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
+     crossorigin="anonymous"></script>
+
 <style>
 body {
   margin: 0;
@@ -48,6 +53,18 @@ body {
 .news-date { font-size:11px; color:#666; margin-bottom:10px; }
 .news-body { font-size:13px; }
 #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:auto; }
+
+/* ✅ Ad styling */
+.ad-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  padding: 10px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  border: 1px dashed #bbb;
+}
 </style>
 </head>
 <body>
@@ -55,6 +72,17 @@ body {
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
   <div class="auth-buttons" id="authButtons"></div>
+</div>
+
+<!-- ✅ Ad Block (Top Banner) -->
+<div class="ad-container">
+  <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-5610467918289293"
+      data-ad-slot="1234567890"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
 <div id="sub-header">
@@ -83,6 +111,17 @@ body {
     <div id="friendRequestsFrame"></div>
   </div>
 
+  <!-- ✅ Mid Page Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-5610467918289293"
+        data-ad-slot="9876543210"
+        data-ad-format="rectangle"
+        data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
   <!-- News Section -->
   <div id="newsSection">
     <h2>Latest News</h2>
@@ -102,6 +141,17 @@ body {
       </div>
     </div>
   </div>
+
+  <!-- ✅ Bottom Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-5610467918289293"
+        data-ad-slot="1122334455"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
 </div>
 
 <div id="footer">© 2025, Venux — All rights reserved</div>
@@ -109,7 +159,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -132,13 +182,11 @@ const incomingBtn = document.getElementById("incomingBtn");
 const friendRequestsFrame = document.getElementById("friendRequestsFrame");
 const goProfileBtn = document.getElementById("goProfileBtn");
 
-// Dynamic orange banner
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => r.ok ? r.text() : "Welcome!")
   .then(t => noticeBar.textContent = t)
   .catch(() => noticeBar.textContent = "Welcome!");
 
-// Auth state
 onAuthStateChanged(auth, async user => {
   if(!user) { window.location.href = "Login.html"; return; }
   const userRef = doc(db,"users",user.uid);
@@ -151,61 +199,8 @@ onAuthStateChanged(auth, async user => {
     await signOut(auth);
     window.location.href = "Login.html";
   });
-
-  // Go to profile button
   goProfileBtn.addEventListener("click", () => {
-    window.location.href = `profile?userId=${userSnap.data().userId}`;
-  });
-
-  // Incoming friend requests
-  function updateIncomingButton() {
-    const frCount = (userSnap.data().friendRequests || []).length;
-    incomingBtn.textContent = `Incoming Friend Requests (${frCount})`;
-  }
-  updateIncomingButton();
-
-  incomingBtn.addEventListener("click", async () => {
-    friendRequestsFrame.innerHTML = "";
-    const frArray = userSnap.data().friendRequests || [];
-    if(frArray.length === 0) { 
-      friendRequestsFrame.innerHTML = "<span>No incoming requests</span>"; 
-      friendRequestsFrame.style.display = "flex"; 
-      return; 
-    }
-    for(const uid of frArray){
-      const frSnap = await getDoc(doc(db,"users",uid));
-      const frUsername = frSnap.exists() ? frSnap.data().username : "User";
-      const frDiv = document.createElement("div");
-      frDiv.className = "friendRequest";
-      frDiv.innerHTML = `
-        <span class="fr-user" style="cursor:pointer;color:blue">${frUsername}</span>
-        <div>
-          <button class="accept-btn">Accept</button>
-          <button class="decline-btn">Decline</button>
-        </div>
-      `;
-      frDiv.querySelector(".fr-user").addEventListener("click", () => {
-        window.location.href = `Profile?userId=${frSnap.data().userId}`;
-      });
-      frDiv.querySelector(".accept-btn").addEventListener("click", async () => {
-        await updateDoc(userRef, { 
-          friends: [...(userSnap.data().friends || []), uid], 
-          friendRequests: frArray.filter(f => f !== uid)
-        });
-        await updateDoc(doc(db,"users",uid), { 
-          friends: [...(frSnap.data().friends || []), user.uid]
-        });
-        updateIncomingButton();
-        frDiv.remove();
-      });
-      frDiv.querySelector(".decline-btn").addEventListener("click", async () => {
-        await updateDoc(userRef, { friendRequests: frArray.filter(f => f !== uid) });
-        updateIncomingButton();
-        frDiv.remove();
-      });
-      friendRequestsFrame.appendChild(frDiv);
-    }
-    friendRequestsFrame.style.display = "flex";
+    window.location.href = \`profile?userId=\${userSnap.data().userId}\`;
   });
 });
 </script>
