@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Venux - Home</title>
 
-<!-- ✅ Google AdSense -->
+<!-- user requested AdSense script (exact) -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
      crossorigin="anonymous"></script>
 
@@ -54,7 +54,7 @@ body {
 .news-body { font-size:13px; }
 #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:auto; }
 
-/* ✅ Ad styling */
+/* Ad container styling */
 .ad-container {
   width: 100%;
   display: flex;
@@ -74,7 +74,7 @@ body {
   <div class="auth-buttons" id="authButtons"></div>
 </div>
 
-<!-- ✅ Ad Block (Top Banner) -->
+<!-- Top Banner Ad -->
 <div class="ad-container">
   <ins class="adsbygoogle"
       style="display:block"
@@ -111,7 +111,7 @@ body {
     <div id="friendRequestsFrame"></div>
   </div>
 
-  <!-- ✅ Mid Page Ad -->
+  <!-- Mid Page Ad -->
   <div class="ad-container">
     <ins class="adsbygoogle"
         style="display:block"
@@ -142,7 +142,7 @@ body {
     </div>
   </div>
 
-  <!-- ✅ Bottom Ad -->
+  <!-- Bottom Ad -->
   <div class="ad-container">
     <ins class="adsbygoogle"
         style="display:block"
@@ -200,7 +200,7 @@ onAuthStateChanged(auth, async user => {
     window.location.href = "Login.html";
   });
   goProfileBtn.addEventListener("click", () => {
-    window.location.href = \`profile?userId=\${userSnap.data().userId}\`;
+    window.location.href = `profile?userId=${userSnap.data().userId}`;
   });
 });
 </script>
