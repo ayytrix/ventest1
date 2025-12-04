@@ -77,15 +77,21 @@ body {
 </div>
 
 <!-- Top Banner Ad -->
-<div class="ad-container">
+<div class="ad-container" id="topAd">
   <ins class="adsbygoogle"
       style="display:block"
       data-ad-client="ca-pub-5610467918289293"
       data-ad-slot="1234567890"
       data-ad-format="auto"
       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
+
+<script>
+  // Push ads after container is rendered and has width
+  window.addEventListener('load', () => {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
+  });
+</script>
 
 <div id="sub-header">
   <a href="Home">Home</a><span class="nav-separator">|</span>
@@ -113,16 +119,20 @@ body {
     <div id="friendRequestsFrame"></div>
   </div>
 
-  <!-- Mid Page Ad -->
-  <div class="ad-container">
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-5610467918289293"
-        data-ad-slot="9876543210"
-        data-ad-format="rectangle"
-        data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
+<!-- Mid Page Ad -->
+<div class="ad-container" id="midAd">
+  <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-5610467918289293"
+      data-ad-slot="9876543210"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
+  });
+</script>
 
   <!-- News Section -->
   <div id="newsSection">
@@ -143,18 +153,35 @@ body {
       </div>
     </div>
   </div>
-
-  <!-- Bottom Ad -->
-  <div class="ad-container">
-    <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-5610467918289293"
-        data-ad-slot="1122334455"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
+<!-- Mid Page Ad -->
+<div class="ad-container" id="midAd">
+  <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-5610467918289293"
+      data-ad-slot="9876543210"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
 </div>
+<script>
+  window.addEventListener('load', () => {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
+  });
+</script>
+
+<!-- Bottom Ad -->
+<div class="ad-container" id="bottomAd">
+  <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-5610467918289293"
+      data-ad-slot="1122334455"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
+  });
+</script>
 
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
