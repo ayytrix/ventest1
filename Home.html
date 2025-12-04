@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <title>Venux - Home</title>
 
-<!-- user requested AdSense script (exact) -->
+<!-- AdSense script -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
      crossorigin="anonymous"></script>
-
-     <meta name="google-adsense-account" content="ca-pub-5610467918289293">
+<meta name="google-adsense-account" content="ca-pub-5610467918289293">
 
 <style>
 body {
@@ -77,7 +76,7 @@ body {
 </div>
 
 <!-- Top Banner Ad -->
-<div class="ad-container" id="topAd">
+<div class="ad-container">
   <ins class="adsbygoogle"
       style="display:block"
       data-ad-client="ca-pub-5610467918289293"
@@ -85,13 +84,6 @@ body {
       data-ad-format="auto"
       data-full-width-responsive="true"></ins>
 </div>
-
-<script>
-  // Push ads after container is rendered and has width
-  window.addEventListener('load', () => {
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
-  });
-</script>
 
 <div id="sub-header">
   <a href="Home">Home</a><span class="nav-separator">|</span>
@@ -119,20 +111,15 @@ body {
     <div id="friendRequestsFrame"></div>
   </div>
 
-<!-- Mid Page Ad -->
-<div class="ad-container" id="midAd">
-  <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-5610467918289293"
-      data-ad-slot="9876543210"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-</div>
-<script>
-  window.addEventListener('load', () => {
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
-  });
-</script>
+  <!-- Mid Page Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-5610467918289293"
+        data-ad-slot="9876543210"
+        data-ad-format="rectangle"
+        data-full-width-responsive="true"></ins>
+  </div>
 
   <!-- News Section -->
   <div id="newsSection">
@@ -153,35 +140,17 @@ body {
       </div>
     </div>
   </div>
-<!-- Mid Page Ad -->
-<div class="ad-container" id="midAd">
-  <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-5610467918289293"
-      data-ad-slot="9876543210"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-</div>
-<script>
-  window.addEventListener('load', () => {
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
-  });
-</script>
 
-<!-- Bottom Ad -->
-<div class="ad-container" id="bottomAd">
-  <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-5610467918289293"
-      data-ad-slot="1122334455"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
+  <!-- Bottom Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-5610467918289293"
+        data-ad-slot="1122334455"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+  </div>
 </div>
-<script>
-  window.addEventListener('load', () => {
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.error(e); }
-  });
-</script>
 
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
@@ -196,42 +165,4 @@ const firebaseConfig = {
   projectId: "venux1",
   storageBucket: "venux1.appspot.com",
   messagingSenderId: "231055963335",
-  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
-  measurementId: "G-N36RRV95SW"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const noticeBar = document.getElementById("notice");
-const authButtons = document.getElementById("authButtons");
-const profileUsername = document.getElementById("profileUsername");
-const incomingBtn = document.getElementById("incomingBtn");
-const friendRequestsFrame = document.getElementById("friendRequestsFrame");
-const goProfileBtn = document.getElementById("goProfileBtn");
-
-fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r => r.ok ? r.text() : "Welcome!")
-  .then(t => noticeBar.textContent = t)
-  .catch(() => noticeBar.textContent = "Welcome!");
-
-onAuthStateChanged(auth, async user => {
-  if(!user) { window.location.href = "Login.html"; return; }
-  const userRef = doc(db,"users",user.uid);
-  const userSnap = await getDoc(userRef);
-  const username = userSnap.exists() ? userSnap.data().username : "User";
-  profileUsername.textContent = username;
-  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await updateDoc(userRef, { online: false, lastOnline: serverTimestamp() });
-    await signOut(auth);
-    window.location.href = "Login.html";
-  });
-  goProfileBtn.addEventListener("click", () => {
-    window.location.href = `profile?userId=${userSnap.data().userId}`;
-  });
-});
-</script>
-</body>
-</html>
+  app
