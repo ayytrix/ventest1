@@ -152,6 +152,37 @@ body {
   </div>
 </div>
 
+     <!-- Inside body, after all your <ins class="adsbygoogle"> elements -->
+<script>
+function renderAdsWhenVisible() {
+    const ads = document.querySelectorAll('.adsbygoogle');
+    ads.forEach(ad => {
+        const adWidth = ad.offsetWidth;
+        if(adWidth > 0 && !ad.dataset.rendered) {
+            try {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                ad.dataset.rendered = "true"; // mark as rendered
+            } catch(e) {
+                console.warn("AdSense error", e);
+            }
+        }
+    });
+}
+
+// Try rendering immediately, then on resize and interval
+window.addEventListener('load', () => {
+    renderAdsWhenVisible();
+    window.addEventListener('resize', renderAdsWhenVisible);
+    const interval = setInterval(() => {
+        renderAdsWhenVisible();
+        // stop checking after all ads rendered
+        if(document.querySelectorAll('.adsbygoogle:not([data-rendered])').length === 0) {
+            clearInterval(interval);
+        }
+    }, 500);
+});
+</script>
+
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script type="module">
