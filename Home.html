@@ -158,13 +158,19 @@ body {
 <div id="footer">© 2025, Venux — All rights reserved</div>
 
 <script>
-  // Initialize all AdSense ads after DOM loads
-  window.addEventListener('load', () => {
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    document.querySelectorAll('.adsbygoogle').forEach(ad => {
-      try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.warn(e); }
-    });
-  });
+     
+  <!-- Each Ad -->
+<div class="ad-container">
+  <ins class="adsbygoogle"
+      style="display:block; width:100%; min-height:100px;"
+      data-ad-client="ca-pub-5610467918289293"
+      data-ad-slot="1234567890"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+</div>
+
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 
 <script type="module">
