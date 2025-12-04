@@ -30,8 +30,32 @@ body {
 .logout-btn { background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); }
 .logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
 .edit-btn, .theme-btn, .friend-btn { margin-top:10px; padding:5px 10px; font-size:12px; cursor:pointer; }
-#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+
+#notice {
+  background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%);
+  color:white;
+  padding:10px 20px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:2px solid #a85f00;
+}
+
+#sub-header {
+  background:#0b2c5a;
+  padding:6px 20px;
+  color:white;
+  font-weight:bold;
+  font-size:13px;
+}
+#sub-header a {
+  color:white;
+  text-decoration:none;
+  margin-right:5px;
+}
+.nav-separator { margin-right:5px; color:#ccc; }
+
 #page-content { padding:20px; flex:1; }
+
 .profile-header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
 .avatar-placeholder {
   width:80px;
@@ -43,23 +67,49 @@ body {
   background-position:center;
 }
 .profile-username { font-weight:bold; font-size:20px; }
+
 #description { margin-bottom:20px; }
 #profileButtons { margin-bottom:20px; }
+
 #badges { margin-top:20px; }
 .badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:4px; margin-right:6px; font-size:12px; color:white; font-weight:bold; }
 .badge img { width:16px; height:16px; margin-right:4px; vertical-align:middle; }
-#footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); }
+
+#footer {
+  text-align:center;
+  font-size:12px;
+  color:#444;
+  padding:10px;
+  border-top:2px solid #999;
+  background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%);
+}
 </style>
 </head>
 <body>
 
+<!-- MAIN HEADER -->
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
   <div class="nav-links" id="authNavLinks"></div>
 </div>
 
+<!-- ✅ FIXED: MOVED HERE FROM SCRIPT -->
+<div id="sub-header">
+  <a href="Home">Home</a> <span class="nav-separator">|</span>
+  <a href="Games">Games</a> <span class="nav-separator">|</span>
+  <a href="Catalog">Catalog</a> <span class="nav-separator">|</span>
+  <a href="Users">Users</a> <span class="nav-separator">|</span>
+  <a href="Forums">Forum</a> <span class="nav-separator">|</span>
+  <a href="Clans">Clans</a> <span class="nav-separator">|</span>
+  <a href="Help">Help</a> <span class="nav-separator">|</span>
+  <a href="Downloads">Downloads</a> <span class="nav-separator">|</span>
+  <a href="Create">Create</a>
+</div>
+
+<!-- NOTICE BAR -->
 <div id="notice">Loading...</div>
 
+<!-- PAGE CONTENT -->
 <div id="page-content">
   <div class="profile-header">
     <div class="avatar-placeholder" id="avatarFrame"></div>
@@ -133,132 +183,130 @@ onAuthStateChanged(auth, async (user) => {
 
   const currentUserRef = doc(db, "users", user.uid);
 
-  // Navbar
-<div id="sub-header" style="
-    background:#0b2c5a;
-    padding:6px 20px;
-    color:white;
-    font-weight:bold;
-    font-size:13px;
-">
-  <a href="Home">Home</a> <span class="nav-separator">|</span>
-  <a href="Games">Games</a> <span class="nav-separator">|</span>
-  <a href="Catalog">Catalog</a> <span class="nav-separator">|</span>
-  <a href="Users">Users</a> <span class="nav-separator">|</span>
-  <a href="Forums">Forum</a> <span class="nav-separator">|</span>
-  <a href="Clans">Clans</a> <span class="nav-separator">|</span>
-  <a href="Help">Help</a> <span class="nav-separator">|</span>
-  <a href="Downloads">Downloads</a> <span class="nav-separator">|</span>
-  <a href="Create">Create</a>
-</div>
+  // Add logout button
+  authNavLinks.innerHTML = `
+    <a href="Profile?userId=${user.uid}">Profile</a>
+    <button id="logoutBtn" class="button logout-btn">Logout</button>
+  `;
 
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
+  document.getElementById("logoutBtn").onclick = async () => {
     await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
     await signOut(auth);
     window.location.href = "Login.html";
-  });
+  };
 
   await updateDoc(currentUserRef, { online: true, lastOnline: serverTimestamp() });
-  window.addEventListener("beforeunload", async () => {
-    await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
-  });
 
-  let userDoc = viewingUserId ? await getUserByNumericId(viewingUserId) : await getUserByNumericId(user.uid);
-  if (!userDoc) { noticeBar.textContent = dynamicNotice; return; }
+  let userDoc =
+    viewingUserId
+      ? await getUserByNumericId(viewingUserId)
+      : await getUserByNumericId(user.uid);
+
+  if (!userDoc) {
+    noticeBar.textContent = dynamicNotice;
+    return;
+  }
+
   const data = userDoc.data();
   const isOwner = user.uid === userDoc.id;
 
-  // Gradient navbar for userId 2
   if (data.userId === 2) {
     document.getElementById("main-header").style.background =
       "linear-gradient(to right, #ff8c00 0%, #ff0000 100%)";
   }
 
-  // Custom profile picture for userId 4
   if (data.userId === 4) {
-    avatarFrame.style.backgroundImage = "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/4pfp.jpg')";
+    avatarFrame.style.backgroundImage =
+      "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/4pfp.jpg')";
   } else {
-    avatarFrame.style.backgroundImage = "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/defaultpfp.png')";
+    avatarFrame.style.backgroundImage =
+      "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/defaultpfp.png')";
   }
 
-  // Theme color
   if (data.themeColor) document.body.style.background = data.themeColor;
 
-  profileUsername.textContent = data.username || "User";
+  profileUsername.textContent = data.username ?? "User";
+
   descriptionDiv.innerHTML = `<p>${data.description || "This user hasn't added a description yet."}</p>`;
 
   if (isOwner) {
     editDescriptionBtn.style.display = "inline-block";
     editThemeBtn.style.display = "inline-block";
 
-    editDescriptionBtn.addEventListener("click", () => {
-      descriptionDiv.innerHTML = `<textarea id="descTextarea">${data.description||""}</textarea>
-      <button class="edit-btn" id="saveDescription">Save</button>`;
-      document.getElementById("saveDescription").addEventListener("click", async () => {
+    editDescriptionBtn.onclick = () => {
+      descriptionDiv.innerHTML = `
+        <textarea id="descTextarea">${data.description || ""}</textarea>
+        <button class="edit-btn" id="saveDescription">Save</button>
+      `;
+      document.getElementById("saveDescription").onclick = async () => {
         const newDesc = document.getElementById("descTextarea").value;
         await updateDoc(userDoc.ref, { description: newDesc });
         descriptionDiv.innerHTML = `<p>${newDesc}</p>`;
-      });
-    });
+      };
+    };
 
-    editThemeBtn.addEventListener("click", () => {
+    editThemeBtn.onclick = () => {
       const colorInput = document.createElement("input");
       colorInput.type = "color";
-      colorInput.value = data.themeColor||"#d4d4d4";
+      colorInput.value = data.themeColor || "#d4d4d4";
       const doneBtn = document.createElement("button");
       doneBtn.textContent = "Save Theme";
       doneBtn.className = "edit-btn";
-      descriptionDiv.appendChild(document.createElement("br"));
-      descriptionDiv.appendChild(colorInput);
-      descriptionDiv.appendChild(doneBtn);
+      descriptionDiv.append(colorInput, doneBtn);
 
-      doneBtn.addEventListener("click", async () => {
-        const newColor = colorInput.value;
-        document.body.style.background = newColor;
-        await updateDoc(userDoc.ref, { themeColor: newColor });
+      doneBtn.onclick = async () => {
+        await updateDoc(userDoc.ref, { themeColor: colorInput.value });
+        document.body.style.background = colorInput.value;
         colorInput.remove();
         doneBtn.remove();
-      });
-    });
-  }
-
-  // --- Add Friend Button ---
-  if (!isOwner) {
+      };
+    };
+  } else {
     friendBtn.style.display = "inline-block";
     friendBtn.textContent = "Add Friend";
-    friendBtn.disabled = false;
 
     friendBtn.onclick = async () => {
-      const frRef = collection(userDoc.ref,"friendRequests");
-      await setDoc(doc(frRef,user.uid), { from:user.uid, timestamp:serverTimestamp() });
+      const frRef = collection(userDoc.ref, "friendRequests");
+      await setDoc(doc(frRef, user.uid), {
+        from: user.uid,
+        timestamp: serverTimestamp(),
+      });
       friendBtn.textContent = "Friend Request Sent";
       friendBtn.disabled = true;
     };
-  } else friendBtn.style.display="none";
+  }
 
-  // --- Badges ---
   const badges = [];
   const badgeDefs = [
-    { userId: 1, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
-    { userId: 2, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
-    { userId: 2, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
-    { userId: 5, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000"},
-    { userId: 50, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b"},
+    { userId: 1, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000" },
+    { userId: 2, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b" },
+    { userId: 2, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000" },
+    { userId: 5, name:"Administrator", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/developer-removebg-preview.png", color:"#8b0000" },
+    { userId: 50, name:"V.I.P", icon:"https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/IMG_1805-removebg-preview%20(1).png", color:"#f59e0b" },
   ];
-  badgeDefs.forEach(b=>{if(b.userId===data.userId) badges.push(b);});
 
-  badgeContainer.innerHTML="";
-  if(badges.length===0) badgeContainer.innerHTML="<span>No badges earned yet.</span>";
-  else badges.forEach(b=>{
-    const el=document.createElement("span");
-    el.className="badge";
-    el.style.background=b.color||"#1a4a84";
-    if(b.icon){ const img=document.createElement("img"); img.src=b.icon; img.alt=b.name; el.appendChild(img);}
-    el.appendChild(document.createTextNode(b.name));
-    badgeContainer.appendChild(el);
+  badgeDefs.forEach(b => {
+    if (b.userId === data.userId) badges.push(b);
   });
 
+  badgeContainer.innerHTML = "";
+  if (badges.length === 0) {
+    badgeContainer.innerHTML = "<span>No badges earned yet.</span>";
+  } else {
+    badges.forEach(b => {
+      const el = document.createElement("span");
+      el.className = "badge";
+      el.style.background = b.color;
+      const img = document.createElement("img");
+      img.src = b.icon;
+      img.alt = b.name;
+      el.appendChild(img);
+      el.append(b.name);
+      badgeContainer.appendChild(el);
+    });
+  }
 });
 </script>
+
 </body>
 </html>
