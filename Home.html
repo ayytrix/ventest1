@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <title>Venux - Home</title>
 
-<!-- AdSense script -->
+<!-- Google AdSense script -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
      crossorigin="anonymous"></script>
+
 <meta name="google-adsense-account" content="ca-pub-5610467918289293">
 
 <style>
@@ -65,6 +66,8 @@ body {
   background: #f7f7f7;
   border-radius: 8px;
   border: 1px dashed #bbb;
+  min-width: 320px;
+  min-height: 100px; /* ensures AdSense has a slot size */
 }
 </style>
 </head>
@@ -78,7 +81,7 @@ body {
 <!-- Top Banner Ad -->
 <div class="ad-container">
   <ins class="adsbygoogle"
-      style="display:block"
+      style="display:block; width:100%; min-height:100px;"
       data-ad-client="ca-pub-5610467918289293"
       data-ad-slot="1234567890"
       data-ad-format="auto"
@@ -114,10 +117,10 @@ body {
   <!-- Mid Page Ad -->
   <div class="ad-container">
     <ins class="adsbygoogle"
-        style="display:block"
+        style="display:block; width:100%; min-height:100px;"
         data-ad-client="ca-pub-5610467918289293"
         data-ad-slot="9876543210"
-        data-ad-format="rectangle"
+        data-ad-format="auto"
         data-full-width-responsive="true"></ins>
   </div>
 
@@ -144,7 +147,7 @@ body {
   <!-- Bottom Ad -->
   <div class="ad-container">
     <ins class="adsbygoogle"
-        style="display:block"
+        style="display:block; width:100%; min-height:100px;"
         data-ad-client="ca-pub-5610467918289293"
         data-ad-slot="1122334455"
         data-ad-format="auto"
@@ -152,38 +155,17 @@ body {
   </div>
 </div>
 
-     <!-- Inside body, after all your <ins class="adsbygoogle"> elements -->
-<script>
-function renderAdsWhenVisible() {
-    const ads = document.querySelectorAll('.adsbygoogle');
-    ads.forEach(ad => {
-        const adWidth = ad.offsetWidth;
-        if(adWidth > 0 && !ad.dataset.rendered) {
-            try {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                ad.dataset.rendered = "true"; // mark as rendered
-            } catch(e) {
-                console.warn("AdSense error", e);
-            }
-        }
-    });
-}
-
-// Try rendering immediately, then on resize and interval
-window.addEventListener('load', () => {
-    renderAdsWhenVisible();
-    window.addEventListener('resize', renderAdsWhenVisible);
-    const interval = setInterval(() => {
-        renderAdsWhenVisible();
-        // stop checking after all ads rendered
-        if(document.querySelectorAll('.adsbygoogle:not([data-rendered])').length === 0) {
-            clearInterval(interval);
-        }
-    }, 500);
-});
-</script>
-
 <div id="footer">© 2025, Venux — All rights reserved</div>
+
+<script>
+  // Initialize all AdSense ads after DOM loads
+  window.addEventListener('load', () => {
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    document.querySelectorAll('.adsbygoogle').forEach(ad => {
+      try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.warn(e); }
+    });
+  });
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -230,15 +212,6 @@ onAuthStateChanged(auth, async user => {
   });
   goProfileBtn.addEventListener("click", () => {
     window.location.href = `profile?userId=${userSnap.data().userId}`;
-  });
-});
-
-// ==== AdSense fix: render ads after page fully loads ====
-window.addEventListener('load', () => {
-  const ads = document.querySelectorAll('.adsbygoogle');
-  ads.forEach(ad => {
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); }
-    catch(e) { console.warn('AdSense error', e); }
   });
 });
 </script>
