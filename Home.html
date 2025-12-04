@@ -165,4 +165,51 @@ const firebaseConfig = {
   projectId: "venux1",
   storageBucket: "venux1.appspot.com",
   messagingSenderId: "231055963335",
-  app
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const noticeBar = document.getElementById("notice");
+const authButtons = document.getElementById("authButtons");
+const profileUsername = document.getElementById("profileUsername");
+const incomingBtn = document.getElementById("incomingBtn");
+const friendRequestsFrame = document.getElementById("friendRequestsFrame");
+const goProfileBtn = document.getElementById("goProfileBtn");
+
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : "Welcome!")
+  .then(t => noticeBar.textContent = t)
+  .catch(() => noticeBar.textContent = "Welcome!");
+
+onAuthStateChanged(auth, async user => {
+  if(!user) { window.location.href = "Login.html"; return; }
+  const userRef = doc(db,"users",user.uid);
+  const userSnap = await getDoc(userRef);
+  const username = userSnap.exists() ? userSnap.data().username : "User";
+  profileUsername.textContent = username;
+  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await updateDoc(userRef, { online: false, lastOnline: serverTimestamp() });
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+  goProfileBtn.addEventListener("click", () => {
+    window.location.href = `profile?userId=${userSnap.data().userId}`;
+  });
+});
+
+// ==== AdSense fix: render ads after page fully loads ====
+window.addEventListener('load', () => {
+  const ads = document.querySelectorAll('.adsbygoogle');
+  ads.forEach(ad => {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); }
+    catch(e) { console.warn('AdSense error', e); }
+  });
+});
+</script>
+</body>
+</html>
