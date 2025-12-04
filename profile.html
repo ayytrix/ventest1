@@ -134,17 +134,24 @@ onAuthStateChanged(auth, async (user) => {
   const currentUserRef = doc(db, "users", user.uid);
 
   // Navbar
-  <div id="sub-header">
-  <a href="Home">Home</a><span class="nav-separator">|</span>
-  <a href="Games">Games</a><span class="nav-separator">|</span>
-  <a href="Catalog">Catalog</a><span class="nav-separator">|</span>
-  <a href="Users">Users</a><span class="nav-separator">|</span>
-  <a href="Forums">Forum</a><span class="nav-separator">|</span>
-  <a href="Clans">Clans</a><span class="nav-separator">|</span>
-  <a href="Help">Help</a><span class="nav-separator">|</span>
-  <a href="Downloads">Downloads</a><span class="nav-separator">|</span>
-  <a href="Create">Create</a><span class="nav-separator">|</span>
+<div id="sub-header" style="
+    background:#0b2c5a;
+    padding:6px 20px;
+    color:white;
+    font-weight:bold;
+    font-size:13px;
+">
+  <a href="Home">Home</a> <span class="nav-separator">|</span>
+  <a href="Games">Games</a> <span class="nav-separator">|</span>
+  <a href="Catalog">Catalog</a> <span class="nav-separator">|</span>
+  <a href="Users">Users</a> <span class="nav-separator">|</span>
+  <a href="Forums">Forum</a> <span class="nav-separator">|</span>
+  <a href="Clans">Clans</a> <span class="nav-separator">|</span>
+  <a href="Help">Help</a> <span class="nav-separator">|</span>
+  <a href="Downloads">Downloads</a> <span class="nav-separator">|</span>
+  <a href="Create">Create</a>
 </div>
+
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await updateDoc(currentUserRef, { online: false, lastOnline: serverTimestamp() });
     await signOut(auth);
