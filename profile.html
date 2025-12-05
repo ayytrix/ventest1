@@ -223,6 +223,14 @@ onAuthStateChanged(auth, async (user) => {
       "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/defaultpfp.png')";
   }
 
+  if (data.userId === 10) {
+    avatarFrame.style.backgroundImage =
+      "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/onepfp.png')";
+  } else {
+    avatarFrame.style.backgroundImage =
+      "url('https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/defaultpfp.png')";
+  }
+
   if (data.themeColor) document.body.style.background = data.themeColor;
 
   profileUsername.textContent = data.username ?? "User";
