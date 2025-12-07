@@ -73,28 +73,6 @@
     background: rgba(255, 255, 255, 0.1);
   }
 
-  #sub-header {
-    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
-    padding: 8px 15px;
-    border-bottom: 1px solid #000;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  #sub-header a {
-    margin-right: 10px;
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
-
-  #sub-header a:hover {
-    background: linear-gradient(to bottom, #1f5da0 0%, #0e3670 100%);
-  }
-
   #notice {
     background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
     color: white;
@@ -247,6 +225,23 @@
     display: flex;
     justify-content: center;
   }
+
+  /* Logout button style (inside authButtons container) */
+  .logout-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
+    color: white;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+  }
+  .logout-btn:hover {
+    background: linear-gradient(to bottom, #da190b 0%, #f44336 100%);
+  }
 </style>
 </head>
 <body>
@@ -282,18 +277,6 @@
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-
-<div id="sub-header">
-  <a href="Home">Home</a>|
-  <a href="Games">Games</a>|
-  <a href="Catalog">Catalog</a>|
-  <a href="Users">Users</a>|
-  <a href="Forums">Forum</a>|
-  <a href="Clans">Clans</a>|
-  <a href="Help">Help</a>|
-  <a href="Downloads">Downloads</a>|
-  <a href="Create">Create</a>
-</div>
 
 <div id="notice">Loading...</div>
 
@@ -334,7 +317,7 @@
       <div class="news-title">Update Log</div>
       <div class="news-date">Posted: 19th October, 2025</div>
       <div class="news-body">
-        - Check out our new status site: <a href="https://status.venux.fun/" target="_blank">status.venux.fun</a><br />
+        - Check out our new status site: <a href="https://status.venux.fun/" target="_blank" rel="noopener noreferrer">status.venux.fun</a><br />
         - Added more pages and functionality.
       </div>
     </div>
@@ -397,11 +380,15 @@
     const username = userSnap.exists() ? userSnap.data().username : "User";
     profileUsername.textContent = username;
     authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
+
+    // Add event listener AFTER logoutBtn exists
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", async () => {
       await updateDoc(userRef, { online: false, lastOnline: serverTimestamp() });
       await signOut(auth);
       window.location.href = "Login.html";
     });
+
     goProfileBtn.addEventListener("click", () => {
       window.location.href = `profile?userId=${userSnap.data().userId}`;
     });
