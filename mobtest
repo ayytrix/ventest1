@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-adsense-account" content="ca-pub-5610467918289293">
+<title>Venux - Home</title>
+
+<!-- MOBILE REDIRECT (2013 style like m.roblox.com) -->
+<script>
+if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    window.location.href = "https://m.venux.fun";
+}
+</script>
+
+<!-- AdSense Script -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
+crossorigin="anonymous"></script>
+
+<style>
+/* ------------------------------------------
+   2013 ROBLOX STYLE THEME (ONLY STYLE EDITS)
+------------------------------------------- */
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e1e1e1;
+  color: #111;
+  font-size: 13px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2013 Roblox Header Style */
+#main-header {
+  background: linear-gradient(to bottom, #1b4f8a 0%, #0e315a 100%);
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #0a2442;
+}
+
+#main-header img {
+  height: 50px;
+}
+
+/* Navigation Bar (2013 Roblox style) */
+#sub-header {
+  background: #1b4f8a;
+  padding: 6px 10px;
+  border-bottom: 2px solid #0a2442;
+  font-size: 13px;
+}
+
+#sub-header a {
+  color: white;
+  padding: 6px 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#sub-header a:hover {
+  background: #0e3970;
+}
+
+/* Notice Bar (2013 Roblox yellow bar) */
+#notice {
+  background: linear-gradient(to bottom, #ffb100 0%, #d68b00 100%);
+  color: #fff;
+  padding: 8px;
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid #a56a00;
+}
+
+/* User Profile Frame */
+#profileFrame {
+  margin-top: 15px;
+  background: white;
+  border: 2px solid #b3b3b3;
+  border-radius: 4px;
+  padding: 10px;
+  width: 600px;
+  max-width: 90%;
+}
+
+.avatar-square {
+  width: 150px;
+  height: 150px;
+  background: #cfcfcf;
+  border: 2px solid #9c9c9c;
+  margin-bottom: 10px;
+}
+
+.profile-username {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Buttons (2013 Roblox green/yellow theme) */
+.button {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  font-size: 12px;
+}
+
+.profile-btn {
+  background: linear-gradient(to bottom, #4cb34c 0%, #2d8d2d 100%);
+}
+
+.incoming-btn {
+  background: linear-gradient(to bottom, #ffc107 0%, #d89f00 100%);
+}
+
+/* Friend request frame */
+#friendRequestsFrame {
+  background: white;
+  padding: 10px;
+  border: 2px solid #999;
+  margin-top: 10px;
+  border-radius: 4px;
+  display: none;
+  width: 300px;
+}
+
+/* ------------------------------------------
+   SMALLER 2013-STYLE AD CONTAINERS
+------------------------------------------- */
+.ad-container {
+  width: 100%;
+  max-width: 380px;
+  margin: 10px auto;
+  padding: 4px;
+  background: #f3f3f3;
+  border: 1px solid #b5b5b5;
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px #ccc;
+}
+
+/* News Box (unchanged content, slightly improved 2013 style) */
+.news-box {
+  background: white;
+  border: 2px solid #b3b3b3;
+  padding: 12px;
+  width: 600px;
+  max-width: 90%;
+  box-shadow: 2px 2px 0 #999;
+  border-radius: 4px;
+}
+
+/* Footer */
+#footer {
+  background: #d0d0d0;
+  padding: 10px;
+  text-align: center;
+  border-top: 2px solid #9c9c9c;
+  margin-top: auto;
+}
+</style>
+</head>
+<body>
+
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
+  <div class="auth-buttons" id="authButtons"></div>
+</div>
+
+<!-- Top Ad -->
+<div class="ad-container">
+  <ins class="adsbygoogle"
+       style="display:block; width:100%; min-height:50px;"
+       data-ad-client="ca-pub-5610467918289293"
+       data-ad-slot="1234567890"
+       data-ad-format="auto"></ins>
+</div>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+<div id="sub-header">
+  <a href="Home">Home</a>|
+  <a href="Games">Games</a>|
+  <a href="Catalog">Catalog</a>|
+  <a href="Users">Users</a>|
+  <a href="Forums">Forum</a>|
+  <a href="Clans">Clans</a>|
+  <a href="Help">Help</a>|
+  <a href="Downloads">Downloads</a>|
+  <a href="Create">Create</a>
+</div>
+
+<div id="notice">Loading...</div>
+
+<div id="page-content">
+
+  <div id="profileFrame">
+    <div class="avatar-square"></div>
+    <div class="profile-username" id="profileUsername">Username</div>
+
+    <div class="profile-buttons">
+      <button class="button profile-btn" id="goProfileBtn">Go to Profile</button>
+      <button class="button incoming-btn" id="incomingBtn">Incoming Friend Requests (0)</button>
+    </div>
+
+    <div id="friendRequestsFrame"></div>
+  </div>
+
+  <!-- Mid Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+         style="display:block; width:100%; min-height:50px;"
+         data-ad-client="ca-pub-5610467918289293"
+         data-ad-slot="9876543210"
+         data-ad-format="auto"></ins>
+  </div>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+  <!-- NEWS — **UNTOUCHED** -->
+  <div id="newsSection">
+    <h2>Latest News</h2>
+
+    <div class="news-box">
+      <div class="news-title">Welcome to Venux!</div>
+      <div class="news-date">Posted: October 8th, 2025</div>
+      <div class="news-body">
+        Our site has officially launched at this date, October 8th, 2025. Our sites development began July 31st, 2025.
+      </div>
+    </div>
+
+    <div class="news-box">
+      <div class="news-title">Update Log</div>
+      <div class="news-date">Posted: 19th October, 2025</div>
+      <div class="news-body">
+        - Check out our new status site: <a href="https://status.venux.fun/" target="_blank">status.venux.fun</a><br>
+        - Added more pages and functionality.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+         style="display:block; width:100%; min-height:50px;"
+         data-ad-client="ca-pub-5610467918289293"
+         data-ad-slot="1122334455"
+         data-ad-format="auto"></ins>
+  </div>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+</div>
+
+<div id="footer">© 2025, Venux — All rights reserved</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+  authDomain: "venux1.firebaseapp.com",
+  projectId: "venux1",
+  storageBucket: "venux1.appspot.com",
+  messagingSenderId: "231055963335",
+  appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+  measurementId: "G-N36RRV95SW"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const noticeBar = document.getElementById("notice");
+const authButtons = document.getElementById("authButtons");
+const profileUsername = document.getElementById("profileUsername");
+const incomingBtn = document.getElementById("incomingBtn");
+const friendRequestsFrame = document.getElementById("friendRequestsFrame");
+const goProfileBtn = document.getElementById("goProfileBtn");
+
+fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+  .then(r => r.ok ? r.text() : "Welcome!")
+  .then(t => noticeBar.textContent = t)
+  .catch(() => noticeBar.textContent = "Welcome!");
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = "Login.html"; return; }
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+  const username = userSnap.exists() ? userSnap.data().username : "User";
+  profileUsername.textContent = username;
+  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class=\"logout-btn\" id=\"logoutBtn\">Logout</button>`;
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await updateDoc(userRef, { online: false, lastOnline: serverTimestamp() });
+    await signOut(auth);
+    window.location.href = "Login.html";
+  });
+  goProfileBtn.addEventListener("click", () => {
+    window.location.href = `profile?userId=${userSnap.data().userId}`;
+  });
+});
+</script>
+
+</body>
+</html>
