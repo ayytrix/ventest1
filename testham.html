@@ -1,135 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-adsense-account" content="ca-pub-5610467918289293">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="google-adsense-account" content="ca-pub-5610467918289293" />
 <title>Venux - Home</title>
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293" crossorigin="anonymous"></script>
+<!-- AdSense Script -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
+    crossorigin="anonymous"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #d4d4d4;
-  color: #222;
-  font-size: 13px;
-}
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #d4d4d4;
+    color: #222;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* Smaller ad containers */
-.ad-container {
-  width: 100%;
-  max-width: 450px;
-  margin: 8px auto;
-  padding: 4px;
-  background: #f7f7f7;
-  border-radius: 6px;
-  border: 1px dashed #bbb;
-  display: flex;
-  justify-content: center;
-}
+  #main-header {
+    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1001; /* Keep header above menu */
+  }
 
-/* Header */
-header {
-  background: #0f6cbf;
-  color: white;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+  #main-header img {
+    height: 52px;
+    object-fit: contain;
+  }
 
-/* Hamburger button */
-#hamburger {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-}
+  /* Hamburger button for mobile */
+  #hamburgerBtn {
+    display: none;
+    font-size: 28px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
 
-/* Mobile menu */
-#mobileMenu {
-  display: none;
-  background: white;
-  border-bottom: 1px solid #ccc;
-  padding: 10px;
-}
+  /* Navigation links container - desktop */
+  .nav-links {
+    display: flex;
+    gap: 10px;
+  }
 
-#mobileMenu a {
-  display: block;
-  padding: 8px 0;
-  color: #222;
-  text-decoration: none;
-}
+  .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
 
-/* Main content wrapper */
-.main {
-  padding: 10px;
-}
+  .nav-links a:hover {
+    background: linear-gradient(to bottom, #1f5da0 0%, #0e3670 100%);
+  }
+
+  .auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+  }
+
+  .logout-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .logout-btn:hover {
+    background: linear-gradient(to bottom, #da190b 0%, #f44336 100%);
+  }
+
+  #sub-header {
+    background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
+    padding: 8px 15px;
+    border-bottom: 1px solid #000;
+  }
+
+  #sub-header a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 4px;
+  }
+
+  #sub-header a:hover {
+    background: linear-gradient(to bottom, #1f5da0 0%, #0e3670 100%);
+  }
+
+  #notice {
+    background: linear-gradient(to bottom, #ffa200 0%, #cc7a00 100%);
+    color: white;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #a85f00;
+  }
+
+  #page-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #profileFrame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .avatar-square {
+    width: 150px;
+    height: 150px;
+    background: #ccc;
+    border: 2px solid #999;
+    margin-bottom: 10px;
+  }
+
+  .profile-username {
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .profile-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .button {
+    padding: 5px 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+  }
+
+  .profile-btn {
+    background: #28a745;
+  }
+
+  .incoming-btn {
+    background: #ffc107;
+  }
+
+  #friendRequestsFrame {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+    border: 2px solid #999;
+    padding: 10px;
+    background: #fff;
+    border-radius: 6px;
+  }
+
+  .friendRequest {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .accept-btn {
+    background: #28a745;
+    color: white;
+    padding: 2px 6px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .decline-btn {
+    background: #dc3545;
+    color: white;
+    padding: 2px 6px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .news-box {
+    background: linear-gradient(to bottom, #fff 0%, #e2e2e2 100%);
+    border: 2px solid #999;
+    padding: 12px;
+    margin-bottom: 15px;
+    width: 600px;
+    box-shadow: 2px 2px 0 #aaa;
+  }
+
+  .news-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .news-date {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+
+  .news-body {
+    font-size: 13px;
+  }
+
+  #footer {
+    text-align: center;
+    font-size: 12px;
+    color: #444;
+    padding: 10px;
+    border-top: 2px solid #999;
+    background: linear-gradient(to bottom, #f3f3f3 0%, #d8d8d8 100%);
+    margin-top: auto;
+  }
+
+  .ad-container {
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    justify-content: center;
+    margin: 10px auto;
+    padding: 5px;
+    background: #f7f7f7;
+    border-radius: 8px;
+    border: 1px dashed #bbb;
+  }
+
+  /* MOBILE STYLES */
+  @media (max-width: 768px) {
+    /* Hide desktop nav, show hamburger */
+    .nav-links {
+      display: none;
+    }
+    #hamburgerBtn {
+      display: block;
+    }
+
+    /* Sub-header smaller and scrollable on mobile */
+    #sub-header {
+      padding: 8px 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    #sub-header a {
+      display: inline-block;
+      margin-right: 10px;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    /* News and profile boxes width 100% */
+    .news-box {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    #profileFrame {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 0 15px;
+    }
+
+    #page-content {
+      padding: 15px 10px;
+    }
+  }
+
+  /* MOBILE HAMBURGER MENU OVERLAY */
+  #mobileMenuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    color: white;
+    display: none;
+    flex-direction: column;
+    padding-top: 62px; /* Leave header visible */
+    z-index: 1000;
+  }
+
+  #mobileMenuOverlay a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 15px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  #mobileMenuOverlay a:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 </style>
 </head>
 <body>
 
-<!-- Header with Hamburger Menu -->
-<header>
-  <div style="font-size:20px; font-weight:bold;">Venux</div>
-  <button id="hamburger">☰</button>
-</header>
+<!-- Main Header with Logo and Hamburger -->
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux" />
+  
+  <!-- Hamburger button only visible on mobile -->
+  <button id="hamburgerBtn" aria-label="Toggle navigation menu">☰</button>
 
-<!-- Slide-down mobile menu -->
-<nav id="mobileMenu">
-  <a href="#">Home</a>
-  <a href="#">Games</a>
-  <a href="#">Catalog</a>
-  <a href="#">Profile</a>
-</nav>
+  <!-- Desktop navigation links -->
+  <nav class="nav-links">
+    <a href="Home">Home</a>
+    <a href="Games">Games</a>
+    <a href="Catalog">Catalog</a>
+    <a href="Users">Users</a>
+    <a href="Forums">Forum</a>
+    <a href="Clans">Clans</a>
+    <a href="Help">Help</a>
+    <a href="Downloads">Downloads</a>
+    <a href="Create">Create</a>
+  </nav>
 
-<!-- MAIN CONTENT -->
-<div class="main">
-
-  <!-- Ad Example -->
-  <div class="ad-container">
-    <!-- Adsense block -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-5610467918289293"
-         data-ad-slot="1234567890"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
-
-  <!-- NEWS SECTION (UNTOUCHED LIKE YOU ASKED) -->
-  <!-- Put your news items here exactly as they were -->
-  <!-- Example placeholder so page isn't empty -->
-  <h2>News</h2>
-  <p>This is the news section you told me not to change.</p>
-
+  <div class="auth-buttons" id="authButtons"></div>
 </div>
 
-<!-- Hamburger menu script -->
+<!-- Mobile Menu Overlay -->
+<div id="mobileMenuOverlay" role="menu" aria-hidden="true">
+  <a href="Home" role="menuitem">Home</a>
+  <a href="Games" role="menuitem">Games</a>
+  <a href="Catalog" role="menuitem">Catalog</a>
+  <a href="Users" role="menuitem">Users</a>
+  <a href="Forums" role="menuitem">Forum</a>
+  <a href="Clans" role="menuitem">Clans</a>
+  <a href="Help" role="menuitem">Help</a>
+  <a href="Downloads" role="menuitem">Downloads</a>
+  <a href="Create" role="menuitem">Create</a>
+</div>
+
+<!-- Top Banner Ad -->
+<div class="ad-container">
+  <ins class="adsbygoogle"
+       style="display:block; width:100%; min-height:50px;"
+       data-ad-client="ca-pub-5610467918289293"
+       data-ad-slot="1234567890"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+</div>
 <script>
-// ===============================
-// Venux Mobile Navigation Script
-// ===============================
+  (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
 
-// Grab the menu + the button
-const menu = document.getElementById('mobileMenu');
-const btn = document.getElementById('hamburger');
+<!-- Sub-header with links -->
+<div id="sub-header">
+  <a href="Home">Home</a>|
+  <a href="Games">Games</a>|
+  <a href="Catalog">Catalog</a>|
+  <a href="Users">Users</a>|
+  <a href="Forums">Forum</a>|
+  <a href="Clans">Clans</a>|
+  <a href="Help">Help</a>|
+  <a href="Downloads">Downloads</a>|
+  <a href="Create">Create</a>
+</div>
 
-// Toggle menu
-btn.addEventListener('click', () => {
-  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-});
+<div id="notice">Loading...</div>
 
-// Close menu when clicking outside
-document.addEventListener('click', (e) => {
-  if (!menu.contains(e.target) && e.target !== btn) {
-    menu.style.display = 'none';
-  }
-});
+<div id="page-content">
+  <div id="profileFrame">
+    <div class="avatar-square"></div>
+    <div class="profile-username" id="profileUsername">Username</div>
+    <div class="profile-buttons">
+      <button class="button profile-btn" id="goProfileBtn">Go to Profile</button>
+      <button class="button incoming-btn" id="incomingBtn">Incoming Friend Requests (0)</button>
+    </div>
+    <div id="friendRequestsFrame"></div>
+  </div>
+
+  <!-- Mid Page Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+         style="display:block; width:100%; min-height:50px;"
+         data-ad-client="ca-pub-5610467918289293"
+         data-ad-slot="9876543210"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+  <div id="newsSection">
+    <h2>Latest News</h2>
+    <div class="news-box">
+      <div class="news-title">Welcome to Venux!</div>
+      <div class="news-date">Posted: October 8th, 2025</div>
+      <div class="news-body">
+        Our site has officially launched at this date, October 8th, 2025. Our sites development began July 31st, 2025.
+      </div>
+    </div>
+    <div class="news-box">
+      <div class="news-title">Update Log</div>
+      <div class="news-date">Posted: 19th October, 2025</div>
+      <div class="news-body">
+        - Check out our new status site: <a href="https://status.venux.fun/" target="_blank">status.venux.fun</a><br />
+        - Added more pages and functionality.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Ad -->
+  <div class="ad-container">
+    <ins class="adsbygoogle"
+         style="display:block; width:100%; min-height:50px;"
+         data-ad-client="ca-pub-5610467918289293"
+         data-ad-slot="1122334455"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<div id="footer">© 2025, Venux — All rights reserved</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
+    authDomain: "venux1.firebaseapp.com",
+    projectId: "venux1",
+    storageBucket: "venux1.appspot.com",
+    messagingSenderId: "231055963335",
+    appId: "1:231055963335:web:34c2f52fca2191b3d0bae2",
+    measurementId: "G-N36RRV95SW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const noticeBar = document.getElementById("notice");
+  const authButtons = document.getElementById("authButtons");
+  const profileUsername = document.getElementById("profileUsername");
+  const incomingBtn = document.getElementById("incomingBtn");
+  const friendRequestsFrame = document.getElementById("friendRequestsFrame");
+  const goProfileBtn = document.getElementById("goProfileBtn");
+
+  fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
+    .then((r) => (r.ok ? r.text() : "Welcome!"))
+    .then((t) => (noticeBar.textContent = t))
+    .catch(() => (noticeBar.textContent = "Welcome!"));
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "Login.html";
+      return;
+    }
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    const username = userSnap.exists() ? userSnap.data().username : "User";
+    profileUsername.textContent = username;
+    authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await updateDoc(userRef, { online: false, lastOnline: serverTimestamp() });
+      await signOut(auth);
+      window.location.href = "Login.html";
+    });
+    goProfileBtn.addEventListener("click", () => {
+      window.location.href = `profile?userId=${userSnap.data().userId}`;
+    });
+  });
+</script>
+
+<script>
+  // Hamburger menu toggle logic
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+
+  hamburgerBtn.addEventListener("click", () => {
+    if (mobileMenuOverlay.style.display === "flex") {
+      mobileMenuOverlay.style.display = "none";
+      mobileMenuOverlay.setAttribute("aria-hidden", "true");
+    } else {
+      mobileMenuOverlay.style.display = "flex";
+      mobileMenuOverlay.setAttribute("aria-hidden", "false");
+    }
+  });
+
+  // Close menu if clicking outside menu links
+  mobileMenuOverlay.addEventListener("click", (e) => {
+    if (e.target === mobileMenuOverlay) {
+      mobileMenuOverlay.style.display = "none";
+      mobileMenuOverlay.setAttribute("aria-hidden", "true");
+    }
+  });
 </script>
 
 </body>
