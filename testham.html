@@ -37,9 +37,8 @@
     object-fit: contain;
   }
 
-  /* Hamburger button for mobile */
+  /* Hamburger button */
   #hamburgerBtn {
-    display: none;
     font-size: 28px;
     color: white;
     background: none;
@@ -47,53 +46,39 @@
     cursor: pointer;
   }
 
-  /* Navigation links container - desktop */
-  .nav-links {
-    display: flex;
-    gap: 10px;
+  #mobileMenuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    color: white;
+    display: none;
+    flex-direction: column;
+    padding-top: 62px; /* Leave header visible */
+    z-index: 1000;
+    overflow-y: auto;
   }
 
-  .nav-links a {
+  #mobileMenuOverlay a {
     color: white;
     text-decoration: none;
-    font-weight: bold;
-    font-size: 13px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    font-size: 18px;
+    padding: 15px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  .nav-links a:hover {
-    background: linear-gradient(to bottom, #1f5da0 0%, #0e3670 100%);
-  }
-
-  .auth-buttons {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-  }
-
-  .logout-btn {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 12px;
-    background: linear-gradient(to bottom, #f44336 0%, #da190b 100%);
-    color: white;
-    transition: all 0.3s ease;
-  }
-
-  .logout-btn:hover {
-    background: linear-gradient(to bottom, #da190b 0%, #f44336 100%);
+  #mobileMenuOverlay a:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 
   #sub-header {
     background: linear-gradient(to bottom, #1a4a84 0%, #0b2c5a 100%);
     padding: 8px 15px;
     border-bottom: 1px solid #000;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
   #sub-header a {
@@ -103,6 +88,7 @@
     font-weight: bold;
     padding: 6px 10px;
     border-radius: 4px;
+    font-size: 13px;
   }
 
   #sub-header a:hover {
@@ -119,7 +105,7 @@
   }
 
   #page-content {
-    padding: 20px;
+    padding: 20px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -130,6 +116,8 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
   }
 
   .avatar-square {
@@ -150,6 +138,8 @@
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .button {
@@ -175,7 +165,8 @@
     flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
-    width: 300px;
+    width: 100%;
+    max-width: 400px;
     border: 2px solid #999;
     padding: 10px;
     background: #fff;
@@ -214,7 +205,8 @@
     border: 2px solid #999;
     padding: 12px;
     margin-bottom: 15px;
-    width: 600px;
+    width: 100%;
+    max-width: 400px;
     box-shadow: 2px 2px 0 #aaa;
   }
 
@@ -245,110 +237,23 @@
   }
 
   .ad-container {
-    width: 100%;
-    max-width: 450px;
-    display: flex;
-    justify-content: center;
+    width: 320px;
+    max-width: 90vw;
     margin: 10px auto;
     padding: 5px;
     background: #f7f7f7;
     border-radius: 8px;
     border: 1px dashed #bbb;
-  }
-
-  /* MOBILE STYLES */
-  @media (max-width: 768px) {
-    /* Hide desktop nav, show hamburger */
-    .nav-links {
-      display: none;
-    }
-    #hamburgerBtn {
-      display: block;
-    }
-
-    /* Sub-header smaller and scrollable on mobile */
-    #sub-header {
-      padding: 8px 10px;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    #sub-header a {
-      display: inline-block;
-      margin-right: 10px;
-      padding: 6px 8px;
-      font-size: 12px;
-    }
-
-    /* News and profile boxes width 100% */
-    .news-box {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    #profileFrame {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-      padding: 0 15px;
-    }
-
-    #page-content {
-      padding: 15px 10px;
-    }
-  }
-
-  /* MOBILE HAMBURGER MENU OVERLAY */
-  #mobileMenuOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(10, 10, 10, 0.95);
-    color: white;
-    display: none;
-    flex-direction: column;
-    padding-top: 62px; /* Leave header visible */
-    z-index: 1000;
-  }
-
-  #mobileMenuOverlay a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 15px 30px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  #mobileMenuOverlay a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
   }
 </style>
 </head>
 <body>
 
-<!-- Main Header with Logo and Hamburger -->
 <div id="main-header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux" />
-  
-  <!-- Hamburger button only visible on mobile -->
   <button id="hamburgerBtn" aria-label="Toggle navigation menu">☰</button>
-
-  <!-- Desktop navigation links -->
-  <nav class="nav-links">
-    <a href="Home">Home</a>
-    <a href="Games">Games</a>
-    <a href="Catalog">Catalog</a>
-    <a href="Users">Users</a>
-    <a href="Forums">Forum</a>
-    <a href="Clans">Clans</a>
-    <a href="Help">Help</a>
-    <a href="Downloads">Downloads</a>
-    <a href="Create">Create</a>
-  </nav>
-
   <div class="auth-buttons" id="authButtons"></div>
 </div>
 
@@ -368,17 +273,16 @@
 <!-- Top Banner Ad -->
 <div class="ad-container">
   <ins class="adsbygoogle"
-       style="display:block; width:100%; min-height:50px;"
+       style="display:block; width:320px; height:50px;"
        data-ad-client="ca-pub-5610467918289293"
        data-ad-slot="1234567890"
        data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
+       data-full-width-responsive="false"></ins>
 </div>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 
-<!-- Sub-header with links -->
 <div id="sub-header">
   <a href="Home">Home</a>|
   <a href="Games">Games</a>|
@@ -407,11 +311,11 @@
   <!-- Mid Page Ad -->
   <div class="ad-container">
     <ins class="adsbygoogle"
-         style="display:block; width:100%; min-height:50px;"
+         style="display:block; width:320px; height:50px;"
          data-ad-client="ca-pub-5610467918289293"
          data-ad-slot="9876543210"
          data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+         data-full-width-responsive="false"></ins>
   </div>
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
@@ -439,11 +343,11 @@
   <!-- Bottom Ad -->
   <div class="ad-container">
     <ins class="adsbygoogle"
-         style="display:block; width:100%; min-height:50px;"
+         style="display:block; width:320px; height:50px;"
          data-ad-client="ca-pub-5610467918289293"
          data-ad-slot="1122334455"
          data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+         data-full-width-responsive="false"></ins>
   </div>
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
@@ -505,7 +409,6 @@
 </script>
 
 <script>
-  // Hamburger menu toggle logic
   const hamburgerBtn = document.getElementById("hamburgerBtn");
   const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
 
@@ -519,7 +422,7 @@
     }
   });
 
-  // Close menu if clicking outside menu links
+  // Close menu if clicking outside links
   mobileMenuOverlay.addEventListener("click", (e) => {
     if (e.target === mobileMenuOverlay) {
       mobileMenuOverlay.style.display = "none";
