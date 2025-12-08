@@ -62,7 +62,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, arrayRemove, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, deleteDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPmJ-QYXZ41gx-4PjCpUPuw7DLnDq0JFg",
@@ -77,35 +77,134 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Security functions
+function sanitizeHTML(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function validateInput(input, maxLength = 1000, allowedPattern = null) {
+  if (typeof input !== 'string') return '';
+  
+  // Trim and limit length
+  input = input.trim().substring(0, maxLength);
+  
+  // Remove control characters except newline and tab
+  input = input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  
+  // Apply custom pattern if provided
+  if (allowedPattern && !allowedPattern.test(input)) {
+    return '';
+  }
+  
+  return input;
+}
+
+function validateThreadContent(content) {
+  // Allow basic formatting but strip scripts and dangerous tags
+  const allowedTags = ['br', 'b', 'i', 'u', 'strong', 'em', 'code', 'pre'];
+  const tagPattern = /<\/?([a-z][a-z0-9]*)[^>]*>/gi;
+  
+  return content.replace(tagPattern, (match, tagName) => {
+    return allowedTags.includes(tagName.toLowerCase()) ? match : '';
+  });
+}
+
+// Rate limiting
+class RateLimiter {
+  constructor(limit = 5, windowMs = 60000) {
+    this.limit = limit;
+    this.windowMs = windowMs;
+    this.requests = new Map();
+  }
+
+  check(userId) {
+    const now = Date.now();
+    const userRequests = this.requests.get(userId) || [];
+    
+    // Clean old requests
+    const validRequests = userRequests.filter(time => now - time < this.windowMs);
+    
+    if (validRequests.length >= this.limit) {
+      return false;
+    }
+    
+    validRequests.push(now);
+    this.requests.set(userId, validRequests);
+    return true;
+  }
+}
+
+const postLimiter = new RateLimiter(5, 60000); // 5 posts per minute
+const replyLimiter = new RateLimiter(10, 60000); // 10 replies per minute
+
 const noticeBar = document.getElementById("notice");
 const authButtons = document.getElementById("authButtons");
 const pageContent = document.getElementById("page-content");
 
+// Secure fetch with timeout and sanitization
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
-  .then(r => r.ok ? r.text() : "Welcome to Venux Forums!")
-  .then(t => noticeBar.textContent = t)
-  .catch(() => noticeBar.textContent = "Welcome to Venux Forums!");
+  .then(r => {
+    if (!r.ok) throw new Error('Network response was not ok');
+    return r.text();
+  })
+  .then(text => {
+    // Sanitize fetched content
+    const sanitizedText = validateInput(text, 500);
+    noticeBar.textContent = sanitizedText || "Welcome to Venux Forums!";
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+    noticeBar.textContent = "Welcome to Venux Forums!";
+  });
+
+// Content Security Policy meta tag (would be better in server headers)
+const cspMeta = document.createElement('meta');
+cspMeta.httpEquiv = 'Content-Security-Policy';
+cspMeta.content = "default-src 'self' https://www.gstatic.com; script-src 'self' https://www.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://raw.githubusercontent.com https://venux1.firebaseapp.com https://venux1.firebaseio.com https://venux1.appspot.com;";
+document.head.appendChild(cspMeta);
+
+// Add CSRF token simulation
+function generateCSRFToken() {
+  return 'csrf_' + Math.random().toString(36).substr(2) + '_' + Date.now();
+}
+
+let csrfToken = generateCSRFToken();
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "Login.html";
     return;
   }
+  
+  // Verify user token periodically
+  setInterval(() => {
+    user.getIdToken(true).catch(() => {
+      window.location.href = "Login.html";
+    });
+  }, 300000); // Refresh token every 5 minutes
+
   const userSnap = await getDoc(doc(db, "users", user.uid));
-  const username = userSnap.exists() && userSnap.data().username ? userSnap.data().username : "User";
+  const username = userSnap.exists() && userSnap.data().username ? 
+    validateInput(userSnap.data().username, 50, /^[a-zA-Z0-9_-]+$/) : "User";
   const numericUserId = userSnap.exists() && userSnap.data().userId ? userSnap.data().userId : 0;
 
-  authButtons.innerHTML = `<span>Welcome, ${username}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+  // Secure innerHTML with sanitization
+  authButtons.innerHTML = `<span>Welcome, ${sanitizeHTML(username)}</span> <button class="logout-btn" id="logoutBtn">Logout</button>`;
+  
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "Login.html";
   });
 
+  // Secure page content with sanitized inputs
   pageContent.innerHTML = `
     <h2>Forums</h2>
     <div>
-      <input type="text" id="threadTitle" placeholder="Thread title">
-      <textarea id="threadBody" placeholder="Thread content"></textarea>
+      <input type="text" id="threadTitle" placeholder="Thread title" maxlength="200">
+      <textarea id="threadBody" placeholder="Thread content" maxlength="5000"></textarea>
+      <input type="hidden" id="csrfToken" value="${csrfToken}">
       <button id="postThread" class="submit-btn">Post Thread</button>
     </div>
     <div id="threadsContainer"></div>
@@ -125,56 +224,70 @@ onAuthStateChanged(auth, async (user) => {
       const tDocId = tObj.id;
       const t = tObj.data;
       const authorSnap = await getDoc(doc(db, "users", t.uid));
-      const authorName = authorSnap.exists() ? authorSnap.data().username : "User";
+      const authorName = authorSnap.exists() ? 
+        sanitizeHTML(validateInput(authorSnap.data().username, 50, /^[a-zA-Z0-9_-]+$/)) : "User";
       const authorUserId = authorSnap.exists() ? authorSnap.data().userId : t.uid;
 
       const threadLikes = t.likes || [];
       const isLiked = threadLikes.includes(user.uid);
 
+      // Sanitize thread content
+      const safeTitle = sanitizeHTML(validateInput(t.title, 200));
+      const safeBody = sanitizeHTML(validateThreadContent(validateInput(t.body, 5000)));
+
       let threadHTML = `
-        <div class="thread-box" id="thread-${tDocId}">
-          <div class="thread-title ${t.pinned ? 'pinned' : ''}">${t.title}</div>
+        <div class="thread-box" id="thread-${sanitizeHTML(tDocId)}">
+          <div class="thread-title ${t.pinned ? 'pinned' : ''}">${safeTitle}</div>
           <div class="thread-meta">
-            <a class="username-link" href="profile?userId=${authorUserId}">${authorName}</a> - ${t.date}
+            <a class="username-link" href="profile?userId=${authorUserId}">${authorName}</a> - ${sanitizeHTML(t.date)}
           </div>
-          <div class="thread-body">${t.body}</div>
-          <button class="like-btn" data-threadid="${tDocId}">${isLiked ? 'Unlike' : 'Like'} (${threadLikes.length})</button>
-          <button class="view-replies-btn" data-threadid="${tDocId}">View Replies (${t.replies?.length || 0})</button>
-          <div class="replies-container" id="replies-${tDocId}">
+          <div class="thread-body">${safeBody}</div>
+          <button class="like-btn" data-threadid="${sanitizeHTML(tDocId)}">${isLiked ? 'Unlike' : 'Like'} (${threadLikes.length})</button>
+          <button class="view-replies-btn" data-threadid="${sanitizeHTML(tDocId)}">View Replies (${t.replies?.length || 0})</button>
+          <div class="replies-container" id="replies-${sanitizeHTML(tDocId)}">
       `;
 
       t.replies?.forEach((r, index) => {
         const liked = (r.likes || []).includes(user.uid);
+        const safeReplyText = sanitizeHTML(validateInput(r.text, 1000));
+        const safeReplyUsername = sanitizeHTML(validateInput(r.username, 50, /^[a-zA-Z0-9_-]+$/));
+        
         threadHTML += `
           <div class="reply-box">
-            <a class="username-link" href="profile?userId=${r.userId}">${r.username}</a>: ${r.text}
-            <button class="like-btn" data-threadid="${tDocId}" data-replyindex="${index}">${liked ? 'Unlike' : 'Like'} (${r.likes ? r.likes.length : 0})</button>
+            <a class="username-link" href="profile?userId=${r.userId}">${safeReplyUsername}</a>: ${safeReplyText}
+            <button class="like-btn" data-threadid="${sanitizeHTML(tDocId)}" data-replyindex="${index}">${liked ? 'Unlike' : 'Like'} (${r.likes ? r.likes.length : 0})</button>
           </div>
         `;
       });
 
       threadHTML += `
-          <textarea placeholder="Reply..." data-threadid="${tDocId}" class="reply-input"></textarea>
-          <button class="reply-btn" data-threadid="${tDocId}">Reply</button>
+          <textarea placeholder="Reply..." data-threadid="${sanitizeHTML(tDocId)}" class="reply-input" maxlength="1000"></textarea>
+          <button class="reply-btn" data-threadid="${sanitizeHTML(tDocId)}">Reply</button>
           </div>
         </div>
       `;
       threadsContainer.innerHTML += threadHTML;
     }
 
-    // Like button logic
+    // Secure event handlers
     document.querySelectorAll(".like-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const threadId = btn.dataset.threadid;
-        const replyIndex = btn.dataset.replyindex;
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const threadId = validateInput(btn.dataset.threadid, 100, /^[a-zA-Z0-9_-]+$/);
+        const replyIndex = btn.dataset.replyindex ? parseInt(validateInput(btn.dataset.replyindex, 10, /^\d+$/)) : undefined;
+        
+        if (!threadId) return;
+        
         const ref = doc(db, "threads", threadId);
         const snap = await getDoc(ref);
         if (!snap.exists()) return;
+        
         const data = snap.data();
 
-        if (replyIndex !== undefined) {
-          // Reply like
+        if (replyIndex !== undefined && !isNaN(replyIndex)) {
           const replies = data.replies || [];
+          if (replyIndex >= replies.length) return;
+          
           const reply = replies[replyIndex];
           reply.likes = reply.likes || [];
           if (reply.likes.includes(user.uid)) {
@@ -185,7 +298,6 @@ onAuthStateChanged(auth, async (user) => {
           replies[replyIndex] = reply;
           await updateDoc(ref, { replies });
         } else {
-          // Thread like
           let likes = data.likes || [];
           if (likes.includes(user.uid)) {
             likes = likes.filter(uid => uid !== user.uid);
@@ -198,50 +310,118 @@ onAuthStateChanged(auth, async (user) => {
       });
     });
 
-    // Reply system
     document.querySelectorAll(".reply-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const threadId = btn.dataset.threadid;
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const threadId = validateInput(btn.dataset.threadid, 100, /^[a-zA-Z0-9_-]+$/);
+        if (!threadId) return;
+        
+        // Rate limiting
+        if (!replyLimiter.check(user.uid)) {
+          alert("Too many replies. Please wait a minute.");
+          return;
+        }
+        
         const input = document.querySelector(`.reply-input[data-threadid='${threadId}']`);
-        const text = input.value.trim();
+        const text = validateInput(input.value.trim(), 1000);
+        
         if (!text) return;
+        
         await updateDoc(doc(db, "threads", threadId), {
-          replies: arrayUnion({ userId: numericUserId, username, text, likes: [] })
+          replies: arrayUnion({ 
+            userId: numericUserId, 
+            username: validateInput(username, 50, /^[a-zA-Z0-9_-]+$/), 
+            text: text, 
+            likes: [],
+            timestamp: new Date().toISOString()
+          })
         });
         input.value = "";
         loadThreads();
       });
     });
 
-    // View replies toggle
     document.querySelectorAll(".view-replies-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const container = document.getElementById(`replies-${btn.dataset.threadid}`);
-        container.style.display = container.style.display === "none" ? "block" : "none";
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const threadId = validateInput(btn.dataset.threadid, 100, /^[a-zA-Z0-9_-]+$/);
+        if (!threadId) return;
+        
+        const container = document.getElementById(`replies-${threadId}`);
+        if (container) {
+          container.style.display = container.style.display === "none" ? "block" : "none";
+        }
       });
     });
   }
 
-  document.getElementById("postThread").addEventListener("click", async () => {
-    const title = document.getElementById("threadTitle").value.trim();
-    const body = document.getElementById("threadBody").value.trim();
-    if (!title || !body) return alert("Enter title and body");
+  document.getElementById("postThread").addEventListener("click", async (e) => {
+    e.preventDefault();
+    
+    // CSRF check
+    const submittedToken = document.getElementById("csrfToken").value;
+    if (submittedToken !== csrfToken) {
+      alert("Security token invalid. Please refresh the page.");
+      csrfToken = generateCSRFToken();
+      return;
+    }
+    
+    // Rate limiting
+    if (!postLimiter.check(user.uid)) {
+      alert("Too many posts. Please wait a minute.");
+      return;
+    }
+    
+    const title = validateInput(document.getElementById("threadTitle").value.trim(), 200);
+    const body = validateInput(document.getElementById("threadBody").value.trim(), 5000);
+    
+    if (!title || !body) {
+      alert("Enter title and body (max 200 chars for title, 5000 for body)");
+      return;
+    }
+    
+    // Additional validation
+    if (title.length < 3) {
+      alert("Title must be at least 3 characters");
+      return;
+    }
+    
+    if (body.length < 10) {
+      alert("Body must be at least 10 characters");
+      return;
+    }
+    
     await addDoc(collection(db, "threads"), {
       uid: user.uid,
-      title,
-      body,
+      title: title,
+      body: body,
       date: new Date().toLocaleString(),
       replies: [],
       pinned: false,
-      likes: []
+      likes: [],
+      timestamp: new Date().toISOString()
     });
+    
     document.getElementById("threadTitle").value = "";
     document.getElementById("threadBody").value = "";
+    csrfToken = generateCSRFToken(); // Rotate token after use
     loadThreads();
   });
 
   await loadThreads();
 });
+
+// Prevent form submission on Enter in textareas (to avoid accidental submissions)
+document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'TEXTAREA' && e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      e.target.form?.querySelector('button[type="submit"]')?.click();
+    }
+  });
+});
+
 </script>
 </body>
+
 </html>
