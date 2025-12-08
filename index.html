@@ -1,56 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Verify You Are Human</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif; /* Set Arial for the whole page */
-            text-align: center;
-            margin-top: 100px;
-        }
-        .container {
-            display: inline-block;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-        }
-        button {
-            font-family: Arial, sans-serif; /* Ensure button uses Arial too */
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify You Are Human</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      padding: 0 15px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      display: inline-block;
+      max-width: 400px;
+      width: 100%;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      font-family: Arial, sans-serif;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 250px;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        margin-top: 40px;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Verify you are human</h2>
+  <div class="container">
+    <h2>Verify you are human</h2>
 
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ" data-callback="captchaSuccess"></div>
-        <br>
-        <button id="continueBtn" disabled>Continue</button>
-    </div>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAB5iBn-21zzorRzJ" data-callback="captchaSuccess"></div>
 
-    <script>
-        let verified = false;
+    <button id="continueBtn" disabled>Continue</button>
+  </div>
 
-        // Called when CAPTCHA is successfully solved
-        function captchaSuccess(token) {
-            verified = true;
-            document.getElementById('continueBtn').disabled = false;
-        }
+  <script>
+    let verified = false;
 
-        // Only redirect if CAPTCHA is solved
-        document.getElementById('continueBtn').addEventListener('click', function() {
-            if (verified) {
-                window.location.href = 'Home.html'; // your actual site
-            } else {
-                alert("Please complete the CAPTCHA first!");
-            }
-        });
-    </script>
+    // Called when CAPTCHA is successfully solved
+    function captchaSuccess(token) {
+      verified = true;
+      document.getElementById('continueBtn').disabled = false;
+    }
+
+    // Only redirect if CAPTCHA is solved
+    document.getElementById('continueBtn').addEventListener('click', function () {
+      if (verified) {
+        window.location.href = 'Home.html'; // your actual site
+      } else {
+        alert("Please complete the CAPTCHA first!");
+      }
+    });
+  </script>
 </body>
-</html>
 
+</html>
