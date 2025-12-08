@@ -143,6 +143,18 @@ const noticeBar = document.getElementById("notice");
 const authButtons = document.getElementById("authButtons");
 const pageContent = document.getElementById("page-content");
 
+// Add CSP meta tag with Firebase domains allowed
+const cspMeta = document.createElement('meta');
+cspMeta.httpEquiv = 'Content-Security-Policy';
+cspMeta.content = "default-src 'self' https://www.gstatic.com https://firebase.googleapis.com; " +
+                 "script-src 'self' https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'; " +
+                 "style-src 'self' 'unsafe-inline'; " +
+                 "img-src 'self' https: data: blob:; " +
+                 "connect-src 'self' https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://firebasestorage.googleapis.com; " +
+                 "frame-src 'self' https://*.firebaseapp.com; " +
+                 "font-src 'self' https: data:;";
+document.head.appendChild(cspMeta);
+
 // Secure fetch with timeout and sanitization
 fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
   .then(r => {
@@ -158,12 +170,6 @@ fetch("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/anc")
     console.error('Fetch error:', error);
     noticeBar.textContent = "Welcome to Venux Forums!";
   });
-
-// Content Security Policy meta tag (would be better in server headers)
-const cspMeta = document.createElement('meta');
-cspMeta.httpEquiv = 'Content-Security-Policy';
-cspMeta.content = "default-src 'self' https://www.gstatic.com; script-src 'self' https://www.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://raw.githubusercontent.com https://venux1.firebaseapp.com https://venux1.firebaseio.com https://venux1.appspot.com;";
-document.head.appendChild(cspMeta);
 
 // Add CSRF token simulation
 function generateCSRFToken() {
@@ -421,6 +427,11 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Log security events
+function logSecurityEvent(event, details) {
+  console.log(`Security Event: ${event}`, details);
+  // In production, send this to your logging service
+}
 </script>
 </body>
 
