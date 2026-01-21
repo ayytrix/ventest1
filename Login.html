@@ -5,6 +5,18 @@
 <title>Venux - Login</title>
 <style>
   body { margin:0; background:#d4d4d4; font-family:Arial,sans-serif; font-size:13px; color:#222; }
+
+  /* TOP BANNER */
+  #top-banner {
+    width: 100%;
+    height: 140px;
+    background-image: url("https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/banner");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-bottom: 2px solid #071b36;
+  }
+
   #header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; border-bottom:2px solid #071b36; display:flex; align-items:center; }
   #header img { height:52px; }
   #nav { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000; }
@@ -30,6 +42,8 @@
 </style>
 </head>
 <body>
+
+<div id="top-banner"></div>
 
 <div id="header">
   <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux Logo">
@@ -141,10 +155,9 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await signInWithEmailAndPassword(auth, authEmail, password);
     const user = userCredential.user;
 
-    // Check bans / warnings / termination
     if (userData.banned) {
-      const banMessage = `Account Banned! Duration: ${userData.banDuration || "N/A"}\nNote: ${userData.banNote||"None"}`;
-      showModal("Banned", banMessage, "Logout", async ()=> {
+      const banMessage = `Account Banned! Duration: ${userData.banDuration || "N/A"}\nNote: ${userData.banNote || "None"}`;
+      showModal("Banned", banMessage, "Logout", async () => {
         await signOut(auth);
         window.location.reload();
       });
@@ -152,7 +165,7 @@ loginBtn.addEventListener("click", async () => {
     }
 
     if (userData.terminated) {
-      showModal("Account Terminated", "This account has been terminated.", "Logout", async ()=> {
+      showModal("Account Terminated", "This account has been terminated.", "Logout", async () => {
         await signOut(auth);
         window.location.reload();
       });
@@ -160,19 +173,18 @@ loginBtn.addEventListener("click", async () => {
     }
 
     if (userData.warned) {
-      const warnMessage = `Warning: ${userData.warnNote||"No details"}\nClick below to continue`;
-      showModal("Warning", warnMessage, "Reactivate Account", ()=> {
-        // Remove warned status
-        updateDoc(doc(db,"users",user.uid), { warned: false, warnNote: "" });
+      const warnMessage = `Warning: ${userData.warnNote || "No details"}\nClick below to continue`;
+      showModal("Warning", warnMessage, "Reactivate Account", () => {
+        updateDoc(doc(db, "users", user.uid), { warned: false, warnNote: "" });
         window.location.href = "Home";
       });
       return;
     }
 
-    await updateDoc(doc(db,"users",user.uid), { lastLogin: new Date().toISOString() });
+    await updateDoc(doc(db, "users", user.uid), { lastLogin: new Date().toISOString() });
     window.location.href = "Home";
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     errorMessage.textContent = err.message || "Login failed.";
     loginBtn.disabled = false;
@@ -180,8 +192,8 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 
-usernameInput.addEventListener("keypress", (e) => { if(e.key==="Enter") loginBtn.click(); });
-passwordInput.addEventListener("keypress", (e) => { if(e.key==="Enter") loginBtn.click(); });
+usernameInput.addEventListener("keypress", (e) => { if (e.key === "Enter") loginBtn.click(); });
+passwordInput.addEventListener("keypress", (e) => { if (e.key === "Enter") loginBtn.click(); });
 </script>
 </body>
 </html>
