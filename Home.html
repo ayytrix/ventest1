@@ -4,56 +4,50 @@
 <meta charset="UTF-8">
      <meta name="google-adsense-account" content="ca-pub-5610467918289293">
 <title>Venux - Home</title>
+     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png">
 
 <!-- AdSense Script -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5610467918289293"
      crossorigin="anonymous"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial,sans-serif;
-  background: #d4d4d4;
-  color: #222;
-  font-size: 13px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-#main-header {
-  background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%);
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+body { margin:0; font-family:Arial,sans-serif; background:#d4d4d4; color:#222; font-size:13px; }
+#main-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
 #main-header img { height:52px; object-fit:contain; }
-.nav-links a { color:white; text-decoration:none; font-weight:bold; font-size:13px; padding:6px 10px; border-radius:4px; transition: all 0.3s ease; }
-.nav-links a:hover { background: linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
 .auth-buttons { display:flex; align-items:center; gap:10px; color:white; }
 .logout-btn { padding:8px 15px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,#f44336 0%,#da190b 100%); color:white; transition: all 0.3s ease; }
 .logout-btn:hover { background:linear-gradient(to bottom,#da190b 0%,#f44336 100%); }
-#sub-header { background: linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding: 8px 15px; border-bottom: 1px solid #000; }
-#sub-header a { margin-right:10px; text-decoration:none; color:white; font-weight:bold; padding:6px 10px; border-radius:4px; }
-#sub-header a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); }
-#notice { background: linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
-#page-content { padding:20px; display:flex; flex-direction: column; align-items:center; }
-#profileFrame { display:flex; flex-direction: column; align-items:center; margin-bottom:20px; }
-.avatar-square { width:150px; height:150px; background:#ccc; border:2px solid #999; margin-bottom:10px; }
-.profile-username { font-weight:bold; font-size:20px; margin-bottom:10px; }
-.profile-buttons { display:flex; gap:10px; margin-bottom:10px; }
-.button { padding:5px 10px; font-size:12px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; color:white; }
-.profile-btn { background: #28a745; }
-.incoming-btn { background: #ffc107; }
-#friendRequestsFrame { display:none; flex-direction:column; gap:10px; margin-bottom:20px; width:300px; border:2px solid #999; padding:10px; background:#fff; border-radius:6px; }
-.friendRequest { display:flex; justify-content: space-between; align-items:center; gap:5px; }
-.accept-btn { background: #28a745; color:white; padding:2px 6px; border:none; border-radius:4px; cursor:pointer; font-size:12px; }
-.decline-btn { background:#dc3545; color:white; padding:2px 6px; border:none; border-radius:4px; cursor:pointer; font-size:12px; }
-.news-box { background: linear-gradient(to bottom,#fff 0%,#e2e2e2 100%); border:2px solid #999; padding:12px; margin-bottom:15px; width:600px; box-shadow:2px 2px 0 #aaa; }
-.news-title { font-weight:bold; font-size:14px; margin-bottom:6px; }
-.news-date { font-size:11px; color:#666; margin-bottom:10px; }
-.news-body { font-size:13px; }
+#sub-header { background:linear-gradient(to bottom,#1a4a84 0%,#0b2c5a 100%); padding:8px 15px; border-bottom:1px solid #000000; }
+#sub-header a { color:white; text-decoration:none; margin:0 10px 0 0; font-weight:bold; padding:6px 10px; border-radius:4px; transition: all 0.3s ease; }
+#sub-header a:hover { background:linear-gradient(to bottom,#1f5da0 0%,#0e3670 100%); text-decoration:none; }
+.nav-separator { color:white; margin:0 10px 0 0; }
+#notice { background:linear-gradient(to bottom,#ffa200 0%,#cc7a00 100%); color:white; padding:10px 20px; font-weight:bold; text-align:center; border-bottom:2px solid #a85f00; }
+#page-content { padding:20px; max-width:800px; margin:auto; }
+h2 { color:#1a4a84; margin-top:20px; }
+p { margin-bottom:12px; line-height:1.5; }
+ul { margin-left:20px; margin-bottom:12px; }
 #footer { text-align:center; font-size:12px; color:#444; padding:10px; border-top:2px solid #999; background:linear-gradient(to bottom,#f3f3f3 0%,#d8d8d8 100%); margin-top:40px; }
+</style>
+</head>
+<body>
+
+<div id="main-header">
+  <img src="https://raw.githubusercontent.com/ayytrix/ventest1/refs/heads/main/venux.png" alt="Venux">
+  <div class="auth-buttons" id="authButtons"></div>
+</div>
+
+<div id="sub-header">
+  <span class="nav-separator">|</span>
+  <a href="Home">Home</a><span class="nav-separator">|</span>
+  <a href="Games">Games</a><span class="nav-separator">|</span>
+  <a href="Catalog">Catalog</a><span class="nav-separator">|</span>
+  <a href="Users">Users</a><span class="nav-separator">|</span>
+  <a href="Forums">Forum</a><span class="nav-separator">|</span>
+  <a href="Clans">Clans</a><span class="nav-separator">|</span>
+  <a href="Help">Help</a><span class="nav-separator">|</span>
+  <a href="Downloads">Downloads</a><span class="nav-separator">|</span>
+  <a href="Create">Create</a><span class="nav-separator">|</span>
+</div>
 
 .ad-container {
   width: 100%;
